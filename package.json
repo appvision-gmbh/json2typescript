@@ -1,0 +1,39 @@
+{
+  "name": "json2typescript",
+  "version": "0.9.1",
+  "description": "Provides TypeScript methods to map a JSON string to a JavaScript object on runtime",
+  "keywords": [
+    "convert",
+    "json",
+    "to",
+    "typescript",
+    "javascript",
+    "map",
+    "mapper",
+    "mapping",
+    "json2typescript",
+    "jsonconvert",
+    "class",
+    "object",
+    "instance"
+  ],
+  "author": "dhlab@unibas.ch",
+  "license": "MIT",
+  "homepage": "http://dhlab.unibas.ch",
+  "typings": "src/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "typescript": {
+    "definition": "index.d.ts"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
