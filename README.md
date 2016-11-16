@@ -23,6 +23,7 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 # Changelog
 
+* v0.9.3: It is now possible to map an JSON object to an TypeScript array, then the object keys become the array keys. Also, class properties can be set to optional. See below in the chapter "decorators" for more information.
 * v0.9.2: Added method `serializeString()`, changed `property` names and behaviour
 * v0.9.1: First version released to the public
 
@@ -224,23 +225,24 @@ Property decorators are a vital part for type checking. It is important that the
 ```typescript
 @JsonObject
 export class User {
-    @JsonProperty("jsonKeyOfName", String)
+    @JsonProperty("jsonKeyOfName", String, false)
     public name: string = undefined;
 }
 ```
 
 Note: You must assign any value or `undefined` to your property at initialization, otherwise our mapper does **not** work.
 
-#### First parameter: json key
+#### First parameter: jsonKey
 
 The first parameter of `@JsonProperty` is the JSON object key. 
 It happens that the keys given by the server are very ugly.
 Here you can map any key to the `User` property `name`.
 In our case, `json[jsonKeyOfName]` gets mapped to `user[name]`.
 
-#### Second parameter: expected type
+#### Second parameter (optional): expectedType
 
-The second parameter of `@JsonProperty` is the expected type. 
+The second parameter of `@JsonProperty` is the expected type.
+This parameter is optional; the default value is undefined (which allows any type).
 Make sure you pass the class name and not an instance of the class.
 In case of primitive types, you have to use the upper case names. 
 See the following cheat sheet for reference:
@@ -262,6 +264,14 @@ See the following cheat sheet for reference:
 At first, our array notation on the left looks odd. 
 But this notation allows you to define even nested arrays. 
 See the examples at the end of this document for more info about nesting arrays.
+
+#### Third parameter (optional): isOptional
+
+The third parameter of `@JsonProperty` determines whether the `jsonKey` has to be present in the json.
+This parameter is optional; the default value is false.
+By default, `JsonConvert` throws an exception if a decorated class property cannot be found in the given JSON.
+If you set the third parameter to true, there is no exception when it is missing. 
+The type is still checked as soon the property is present again.
 
 #### Important notes
 
@@ -298,7 +308,6 @@ The default value is `false`.
 Determines whether primitive types should be checked. 
 If true, it will be allowed to assign primitive to other primitive types.
 The default is `false`.
-
 
 `(bool) JsonConvert.valueCheckingMode`
 

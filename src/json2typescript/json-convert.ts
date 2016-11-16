@@ -1,7 +1,7 @@
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @version 0.9.2
+ * @version 0.9.3
  * @licence MIT
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
@@ -163,12 +163,16 @@ export abstract class JsonConvert {
         // Get expected and real values
         let jsonKey: string = mapping[propertyKey]["jsonKey"];
         let expectedType: any = mapping[propertyKey]["type"];
+        let isOptional: boolean = mapping[propertyKey]["optional"];
 
         let jsonValue: any = json[jsonKey];
 
 
         // Check if the json value exists
         if (typeof(jsonValue) === "undefined") {
+
+            if (isOptional) return;
+
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + classInstance.constructor.name + "\" because the defined JSON property \"" + jsonKey + "\" does not exist:\n\n" +
@@ -304,6 +308,37 @@ export abstract class JsonConvert {
         }
 
         // Check if attempt was 1-d and expected was n-d
+        if (expectedType instanceof Array && jsonValue instanceof Object) {
+
+            let array = [];
+
+            // No data given, so return empty value
+            if (jsonValue.length === 0) {
+                return array;
+            }
+
+            // We obviously don't care about the type, so return the json value as is
+            if (expectedType.length === 0) {
+                return jsonValue;
+            }
+
+            // Loop through the data. Both expectedType and jsonValue are at least of length 1
+            let autofillType: boolean = expectedType.length < Object.keys(jsonValue).length;
+            let i = 0;
+            for (let key in jsonValue) {
+
+                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i-1];
+
+                array[key] = JsonConvert.deserializeObject_mapProperty(expectedType[i], jsonValue[key]);
+
+                i++;
+            }
+
+            return array;
+
+        }
+
+        // Check if attempt was 1-d and expected was n-d
         if (expectedType instanceof Array) {
             if (jsonValue === null) {
                 if (JsonConvert.valueCheckingMode !== JsonConvert.ValueCheckingMode.DISALLOW_NULL) return null;
@@ -396,13 +431,14 @@ export function JsonObject(target: any) {
  * Use the following notation for the type:
  * Primitive type: String|Number|Boolean
  * Custom type: YourClassName
- * Array type: [String|Numer|Boolean|YourClassName]
+ * Array type: [String|Number|Boolean|YourClassName]
  * @param jsonKey the key in the expected JSON object
- * @param type the expected type String|Boolean|Number|any
+ * @param expectedType optional param (default: undefined), the expected type String|Boolean|Number|any
+ * @param isOptional optional param (default: false), if true, the property does not have to be present in the json object
  * @see https://www.npmjs.com/package/json2typescript full documentation
  * @returns {(target:any, key:string)=>void}
  */
-export function JsonProperty(jsonKey: string, type?: any): any {
+export function JsonProperty(jsonKey: string, expectedType?: any, isOptional?: boolean): any {
 
     return function (target: any, key: string): void {
 
@@ -410,10 +446,16 @@ export function JsonProperty(jsonKey: string, type?: any): any {
             target["__jsonconvert__mapping__"] = [];
         }
 
+        if (typeof(isOptional) === "undefined") {
+            isOptional = false;
+        }
+
         target["__jsonconvert__mapping__"][key] = {
             "jsonKey": jsonKey,
-            "type": type
+            "type": expectedType,
+            "optional": isOptional
         };
 
     }
+
 }
