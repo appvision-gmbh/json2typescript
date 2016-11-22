@@ -1,7 +1,7 @@
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @version 0.9.3
+ * @version 0.9.4
  * @licence MIT
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
@@ -155,8 +155,13 @@ export abstract class JsonConvert {
 
         // Check if a object-JSON mapping is possible for a property
         if (JsonConvert.deserializeObject_propertyHasDecorator(mapping, propertyKey) === false) {
-            classInstance[propertyKey] = json[propertyKey];
+
+            // Make sure values are not overridden by undefined json values
+            if (typeof(json[propertyKey]) !== "undefined")
+                classInstance[propertyKey] = json[propertyKey];
+
             return;
+
         }
 
 

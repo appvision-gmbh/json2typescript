@@ -23,6 +23,7 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 # Changelog
 
+* v0.9.4: Class properties are now not overridden to `undefined` if there is no decorator and no matching json value.
 * v0.9.3: It is now possible to map an JSON object to an TypeScript array, then the object keys become the array keys. Also, class properties can be set to optional. See below in the chapter "decorators" for more information.
 * v0.9.2: Added method `serializeString()`, changed `property` names and behaviour
 * v0.9.1: First version released to the public
