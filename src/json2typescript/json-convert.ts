@@ -1,7 +1,7 @@
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @version 0.9.4
+ * @version 0.9.5
  * @licence MIT
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
@@ -99,6 +99,7 @@ export abstract class JsonConvert {
         // Create an object from json string
         let  jsonObject = JSON.parse(jsonString);
 
+		
         return JsonConvert.deserializeObject(jsonObject, classObject);
 
     }
@@ -113,7 +114,7 @@ export abstract class JsonConvert {
      */
     public static deserializeObject(jsonObject: any, classObject: { new(): any }): any {
 
-        if (typeof(jsonObject) !== "object") {
+        if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Passed parameter jsonObject in JsonConvert.deserializeObject() is not of type object."
@@ -127,7 +128,7 @@ export abstract class JsonConvert {
 
         let classInstance = new classObject();
 
-        // Loop through all (not undefined) class properties
+        // Loop through all initialized class properties
         for (const propertyKey of Object.keys(classInstance)) {
             JsonConvert.deserializeObject_loopProperty(classInstance, propertyKey, jsonObject);
         }
@@ -138,6 +139,45 @@ export abstract class JsonConvert {
         }
 
         return classInstance;
+
+    }
+
+    /**
+     * Tries to deserialize a JSON array to a TypeScript class.
+     * @param jsonArray the JSON array
+     * @param classObject the object class
+     * @returns {any[]} the deserialized array of object instances
+     * @throws an exception in case of failure
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    public static deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
+
+        if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter jsonArray in JsonConvert.deserializeArray() is not of type array object."
+            );
+        }
+
+        if (JsonConvert.debugMode) {
+            console.log("Receiving JSON array:");
+            console.log(jsonArray);
+        }
+
+        let array: any[] = [];
+
+        // Loop through all array elements
+        for (const jsonObject of jsonArray) {
+            array.push(JsonConvert.deserializeObject(jsonObject, classObject));
+        }
+
+        if (JsonConvert.debugMode) {
+            console.log("Returning array of CLASS instances:");
+            console.log(array);
+        }
+
+        return array;
+
     }
 
     /**
