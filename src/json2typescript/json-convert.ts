@@ -1,7 +1,7 @@
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @version 0.9.5
+ * @version 0.9.6
  * @licence MIT
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
