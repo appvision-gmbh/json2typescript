@@ -1,6 +1,6 @@
 {
   "name": "json2typescript",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Provides TypeScript methods to map a JSON string to a JavaScript object on runtime",
   "keywords": [
     "convert",
