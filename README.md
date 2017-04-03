@@ -23,7 +23,7 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 # Changelog
 
-* v0.9.6: Fixed errors in ReadMe.
+* v0.9.7, v0.9.6: Fixed errors in ReadMe and small bug on JsonConvert.
 * v0.9.5: New method for deserializing array of objects.
 * v0.9.4: Class properties are now not overridden to `undefined` if there is no decorator and no matching json value.
 * v0.9.3: It is now possible to map an JSON object to an TypeScript array, then the object keys become the array keys. Also, class properties can be set to optional. See below in the chapter "decorators" for more information.
@@ -206,6 +206,8 @@ export class AppComponent implements OnInit {
 ```
 Play around with the JSON to provocate exceptions when deserializing the string.
 
+---
+
 # Detailed reference
 
 ## Class and property decorators
@@ -331,14 +333,15 @@ The default is `JsonConvert.ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 Tries to serialize a JavaScript object to a JSON string.
 
-
 `(any) public static deserializeString(jsonString: string, classObject: { new(): any })`
 
 Tries to deserialize a JSON string to a TypeScript class.
 
 `(any) public static deserializeObject(jsonObject: Object, classObject: { new(): any })`
 
-Tries to deserialize a JSON object to a TypeScript class.
+Tries to deserialize a JSON array to a TypeScript class.
+
+`(any) public static deserializeArray(jsonArray: any[], classObject: { new(): any })`
 
 
 ---

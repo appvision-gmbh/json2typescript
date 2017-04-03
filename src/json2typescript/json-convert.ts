@@ -1,8 +1,7 @@
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
+ *
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @version 0.9.6
- * @licence MIT
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export abstract class JsonConvert {
@@ -97,11 +96,20 @@ export abstract class JsonConvert {
         }
 
         // Create an object from json string
-        let  jsonObject = JSON.parse(jsonString);
+        let jsonData = JSON.parse(jsonString);
 
-		
-        return JsonConvert.deserializeObject(jsonObject, classObject);
-
+		if (typeof(jsonData) === 'object') {
+		    if (jsonData instanceof Array) {
+                return JsonConvert.deserializeArray(jsonData, classObject);
+            } else {
+                return JsonConvert.deserializeObject(jsonData, classObject);
+            }
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter jsonString in JsonConvert.deserializeString() is not a valid json string."
+            );
+        }
     }
 
     /**
@@ -155,7 +163,7 @@ export abstract class JsonConvert {
         if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Passed parameter jsonArray in JsonConvert.deserializeArray() is not of type array object."
+                "Passed parameter jsonArray in JsonConvert.deserializeArray() is not of type array."
             );
         }
 
@@ -465,6 +473,8 @@ export abstract class JsonConvert {
 /**
  * Decorator of a class that comes from a JSON object.
  * @param target the class
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export function JsonObject(target: any) {
@@ -480,8 +490,10 @@ export function JsonObject(target: any) {
  * @param jsonKey the key in the expected JSON object
  * @param expectedType optional param (default: undefined), the expected type String|Boolean|Number|any
  * @param isOptional optional param (default: false), if true, the property does not have to be present in the json object
- * @see https://www.npmjs.com/package/json2typescript full documentation
  * @returns {(target:any, key:string)=>void}
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+ * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export function JsonProperty(jsonKey: string, expectedType?: any, isOptional?: boolean): any {
 
