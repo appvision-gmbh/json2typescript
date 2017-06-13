@@ -247,7 +247,7 @@ export abstract class JsonConvert {
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
                 "\tJSON type: \n\t\t" + JsonConvert.deserializeObject_getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
-                e.message
+                e.message + "\n"
             );
         }
     }
