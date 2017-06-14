@@ -1,6 +1,8 @@
 {
   "name": "json2typescript",
   "version": "0.9.6",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "description": "Provides TypeScript methods to map a JSON string to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -20,13 +22,9 @@
   "author": "dhlab@unibas.ch",
   "license": "MIT",
   "homepage": "http://dhlab.unibas.ch",
-  "typings": "src/index",
   "scripts": {
     "test": "karma start karma.conf.js",
     "build": "npm run test && tsc"
-  },
-  "typescript": {
-    "definition": "dist/index.d.ts"
   },
   "dependencies": {
   },
@@ -41,9 +39,12 @@
     "phantomjs-prebuilt": "2.1.14",
     "typescript": "2.3.4"
   },
-  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/dhlab-basel/json2typescript"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
 }
