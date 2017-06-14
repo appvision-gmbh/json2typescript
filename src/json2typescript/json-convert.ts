@@ -1,4 +1,25 @@
 /**
+ * Helper class for value checking mode.
+ */
+enum ValueCheckingMode {
+    /**
+     * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
+     * All given values can be null.
+     */
+    ALLOW_NULL,
+        /**
+         * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
+         * Objects can be null, but primitive types cannot be null.
+         */
+    ALLOW_OBJECT_NULL,
+        /**
+         * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
+         * No null values are tolerated.
+         */
+    DISALLOW_NULL
+}
+
+/**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @version 0.9.6
@@ -6,27 +27,6 @@
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export abstract class JsonConvert {
-
-    /**
-     * Helper class for value checking mode.
-     */
-    public static ValueCheckingMode = class {
-        /**
-         * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
-         * All given values can be null.
-         */
-        public static readonly ALLOW_NULL: number = 1;
-        /**
-         * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
-         * Objects can be null, but primitive types cannot be null.
-         */
-        public static readonly ALLOW_OBJECT_NULL: number = 2;
-        /**
-         * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
-         * No null values are tolerated.
-         */
-        public static readonly DISALLOW_NULL: number = 3;
-    }
 
     /**
      * Determines whether debugging info is shown in console.
@@ -42,11 +42,11 @@ export abstract class JsonConvert {
     /**
      * Determines which types are allowed to be null.
      * You may assign three different values:
-     * JsonConvert.ValueCheckingMode.ALLOW_NULL: All given values can be null.
-     * JsonConvert.ValueCheckingMode.ALLOW_OBJECT_NULL: Objects can be null, but primitive types cannot be null.
-     * JsonConvert.ValueCheckingMode.DISALLOW_NULL: No null values are tolerated.
+     * ValueCheckingMode.ALLOW_NULL: All given values can be null.
+     * ValueCheckingMode.ALLOW_OBJECT_NULL: Objects can be null, but primitive types cannot be null.
+     * ValueCheckingMode.DISALLOW_NULL: No null values are tolerated.
      */
-    public static valueCheckingMode: number = JsonConvert.ValueCheckingMode.ALLOW_OBJECT_NULL;
+    public static valueCheckingMode: number = ValueCheckingMode.ALLOW_OBJECT_NULL;
 
     /**
      * Tries to serialize a JavaScript object to a JSON string.
@@ -82,7 +82,7 @@ export abstract class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeString(jsonString: string, classObject: { new(): any }): any {
+    public static deserializeString(jsonString: string, classObject: {new(): any}): any {
 
         if (typeof(jsonString) !== "string") {
             throw new Error(
@@ -97,9 +97,8 @@ export abstract class JsonConvert {
         }
 
         // Create an object from json string
-        let  jsonObject = JSON.parse(jsonString);
+        let jsonObject = JSON.parse(jsonString);
 
-		
         return JsonConvert.deserializeObject(jsonObject, classObject);
 
     }
@@ -112,7 +111,7 @@ export abstract class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeObject(jsonObject: any, classObject: { new(): any }): any {
+    public static deserializeObject(jsonObject: any, classObject: {new(): any}): any {
 
         if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
@@ -143,14 +142,14 @@ export abstract class JsonConvert {
     }
 
     /**
-     * Tries to deserialize a JSON array to a TypeScript class.
+     * Tries to deserialize a JSON array to a TypeScript class array.
      * @param jsonArray the JSON array
      * @param classObject the object class
      * @returns {any[]} the deserialized array of object instances
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
+    public static deserializeArray(jsonArray: any[], classObject: {new(): any}): any[] {
 
         if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
@@ -230,7 +229,7 @@ export abstract class JsonConvert {
         // Map the property
         try {
             classInstance[propertyKey] = JsonConvert.deserializeObject_mapProperty(expectedType, jsonValue);
-        } catch(e) {
+        } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + classInstance.constructor.name + "\" because of a type error.\n\n" +
@@ -277,7 +276,7 @@ export abstract class JsonConvert {
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode !== JsonConvert.ValueCheckingMode.DISALLOW_NULL)
+                    if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
                         return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
@@ -288,7 +287,7 @@ export abstract class JsonConvert {
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode !== JsonConvert.ValueCheckingMode.DISALLOW_NULL)
+                    if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
                         return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
@@ -299,7 +298,7 @@ export abstract class JsonConvert {
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode === JsonConvert.ValueCheckingMode.ALLOW_NULL) return null;
+                    if (JsonConvert.valueCheckingMode === ValueCheckingMode.ALLOW_NULL) return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
 
@@ -342,7 +341,7 @@ export abstract class JsonConvert {
             let autofillType: boolean = expectedType.length < jsonValue.length;
             for (let i = 0; i < jsonValue.length; i++) {
 
-                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i-1];
+                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
 
                 array[i] = JsonConvert.deserializeObject_mapProperty(expectedType[i], jsonValue[i]);
 
@@ -372,7 +371,7 @@ export abstract class JsonConvert {
             let i = 0;
             for (let key in jsonValue) {
 
-                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i-1];
+                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
 
                 array[key] = JsonConvert.deserializeObject_mapProperty(expectedType[i], jsonValue[key]);
 
@@ -386,7 +385,7 @@ export abstract class JsonConvert {
         // Check if attempt was 1-d and expected was n-d
         if (expectedType instanceof Array) {
             if (jsonValue === null) {
-                if (JsonConvert.valueCheckingMode !== JsonConvert.ValueCheckingMode.DISALLOW_NULL) return null;
+                if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
                 else throw new Error("\tReason: JSON value is null.");
             }
             throw new Error("\tReason: Expected type is array, but JSON value is non-array.");

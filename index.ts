@@ -1,1 +1,0 @@
-export * from "./src/json2typescript/json-convert";
