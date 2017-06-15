@@ -1,7 +1,7 @@
 /**
  * Helper class for value checking mode.
  */
-enum ValueCheckingMode {
+export enum ValueCheckingMode {
     /**
      * Readonly flag for JsonConvert.ValueCheckingMode.valueChecking property.
      * All given values can be null.
