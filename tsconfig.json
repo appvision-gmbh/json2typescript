@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "mapRoot": "./",
     "module": "commonjs",
     "removeComments": true,
     "target": "es5",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "dist"
   },
-  "exclude": [
-    "node_modules"
+  "include": [
+    "src/**/*"
   ],
-  "files": [
-    "./index.ts",
-    "./src/json2typescript/json-convert"
+  "exclude": [
+    "node_modules",
+    "test",
+    "**/*.spec.ts"
   ]
 }
