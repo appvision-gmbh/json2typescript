@@ -11,9 +11,26 @@
  */
 export enum ValueCheckingMode {
     ALLOW_NULL = 1,
-    ALLOW_OBECT_NULL = 2,
+    ALLOW_OBJECT_NULL = 2,
     DISALLOW_NULL = 3
-}
+};
+
+/**
+ * Enum for the debug mode of a JsonConvert class instance.
+ *
+ * The values should be used as follows:
+ * - DISABLE: json2typescript will be disabled, could be used in production
+ * - ENABLE: json2typescript is enabled, but only errors are logged
+ * - LOGGING: json2typescript is enabled and detailed information is logged
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+ * @see https://www.npmjs.com/package/json2typescript full documentation
+ */
+export enum DebugMode {
+    DISABLE = 0,
+    ENABLE = 1,
+    LOGGING = 2
+};
 
 /**
  * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
@@ -21,27 +38,47 @@ export enum ValueCheckingMode {
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
-export abstract class JsonConvert {
+export class JsonConvert {
 
     /**
      * Determines whether debugging info is shown in console.
+     *
+     * You may assign three different values:
+     * - DebugMode.DISABLE: json2typescript will be disabled, could be used in production
+     * - DebugMode.ENABLE: json2typescript is enabled, but only errors are logged
+     * - DebugMode.LOGGING: json2typescript is enabled and detailed information is logged
      */
-    public static debugMode: boolean = false;
+    public debugMode: number = DebugMode.ENABLE;
+
+    /**
+     * Determines which types are allowed to be null.
+     *
+     * You may assign three different values:
+     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     */
+    public valueCheckingMode: number = ValueCheckingMode.ALLOW_OBJECT_NULL;
 
     /**
      * Determines whether primitive types should be checked.
      * If true, it will be allowed to assign primitive to other primitive types.
      */
-    public static ignorePrimitiveChecks: boolean = false;
+    public ignorePrimitiveChecks: boolean = false;
 
     /**
-     * Determines which types are allowed to be null.
-     * You may assign three different values:
-     * ValueCheckingMode.ALLOW_NULL: All given values can be null.
-     * ValueCheckingMode.ALLOW_OBJECT_NULL: Objects can be null, but primitive types cannot be null.
-     * ValueCheckingMode.DISALLOW_NULL: No null values are tolerated.
+     * Constructor.
+     *
+     * Check the equally named class properties to learn more about the meaning of the params.
+     * @param debugMode optional param (default: DebugMode.ENABLE_SILENTLY)
+     * @param valueCheckingMode optional param (default: ValueCheckingMode.ALLOW_OBJECT_NULL)
+     * @param ignorePrimitiveChecks optional param (default: false)
      */
-    public static valueCheckingMode: number = ValueCheckingMode.ALLOW_OBECT_NULL;
+    public construct(debugMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
+        if (debugMode in DebugMode) this.debugMode = debugMode;
+        if (valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
+        if (ignorePrimitiveChecks) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
+    }
 
     /**
      * Tries to serialize a JavaScript object to a JSON string.
@@ -49,9 +86,9 @@ export abstract class JsonConvert {
      * @returns {string} the JSON string
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static serializeObject(instance: Object): string {
+    public serializeObject(instance: Object): string {
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JavaScript object:");
             console.log(instance);
@@ -59,7 +96,7 @@ export abstract class JsonConvert {
 
         let jsonString: string = JSON.stringify(instance);
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Returning JSON string:");
             console.log(jsonString);
             console.log("----------");
@@ -70,6 +107,27 @@ export abstract class JsonConvert {
     }
 
     /**
+     * Tries to deserialize given data to a TypeScript class.
+     * @param json the JSON as string, object or array
+     * @param classObject the object class
+     * @returns {any} the deserialized data (object instance or array of object instances)
+     * @throws an exception in case of failure
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    public deserialize(json: any, classObject: { new(): any }): any {
+
+        if (typeof json === "string") return this.deserializeString(json, classObject);
+        if (json.constructor === Array) return this.deserializeArray(json, classObject);
+        if (typeof json === "object") return this.deserializeObject(json, classObject); // must be last due to the fact that an array is an object in TypeScript!
+
+        throw new Error(
+            "Fatal error in JsonConvert. " +
+            "Passed parameter json in JsonConvert.deserialize() is not a valid json format (string, object or array)."
+        );
+
+    };
+
+    /**
      * Tries to deserialize a JSON string to a TypeScript class.
      * @param jsonString the JSON string
      * @param classObject the object class
@@ -77,7 +135,7 @@ export abstract class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeString(jsonString: string, classObject: { new(): any }): any {
+    public deserializeString(jsonString: string, classObject: { new(): any }): any {
 
         if (typeof(jsonString) !== "string") {
             throw new Error(
@@ -86,7 +144,7 @@ export abstract class JsonConvert {
             );
         }
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Receiving JSON string:");
             console.log(jsonString);
         }
@@ -96,9 +154,9 @@ export abstract class JsonConvert {
 
         if (typeof(jsonData) === 'object') {
             if (jsonData instanceof Array) {
-                return JsonConvert.deserializeArray(jsonData, classObject);
+                return this.deserializeArray(jsonData, classObject);
             } else {
-                return JsonConvert.deserializeObject(jsonData, classObject);
+                return this.deserializeObject(jsonData, classObject);
             }
         } else {
             throw new Error(
@@ -116,7 +174,7 @@ export abstract class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeObject(jsonObject: any, classObject: { new(): any }): any {
+    public deserializeObject(jsonObject: any, classObject: { new(): any }): any {
 
         if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
@@ -125,7 +183,10 @@ export abstract class JsonConvert {
             );
         }
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.DISABLE) {
+            return jsonObject;
+        }
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Receiving JSON object:");
             console.log(jsonObject);
         }
@@ -134,10 +195,10 @@ export abstract class JsonConvert {
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(classInstance)) {
-            JsonConvert.deserializeObject_loopProperty(classInstance, propertyKey, jsonObject);
+            this.deserializeObject_loopProperty(classInstance, propertyKey, jsonObject);
         }
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Returning CLASS instance:");
             console.log(classInstance);
         }
@@ -154,7 +215,7 @@ export abstract class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public static deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
+    public deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
 
         if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
@@ -163,7 +224,10 @@ export abstract class JsonConvert {
             );
         }
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.DISABLE) {
+            return jsonArray;
+        }
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Receiving JSON array:");
             console.log(jsonArray);
         }
@@ -172,10 +236,10 @@ export abstract class JsonConvert {
 
         // Loop through all array elements
         for (const jsonObject of jsonArray) {
-            array.push(JsonConvert.deserializeObject(jsonObject, classObject));
+            array.push(this.deserializeObject(jsonObject, classObject));
         }
 
-        if (JsonConvert.debugMode) {
+        if (this.debugMode === DebugMode.LOGGING) {
             console.log("Returning array of CLASS instances:");
             console.log(array);
         }
@@ -191,14 +255,14 @@ export abstract class JsonConvert {
      * @param json the JSON object
      * @throws throws an expection in case of failure
      */
-    private static deserializeObject_loopProperty(classInstance: any, propertyKey: string, json: Object): void {
+    private deserializeObject_loopProperty(classInstance: any, propertyKey: string, json: Object): void {
 
         // Get the mapping array
         let mapping = classInstance["__jsonconvert__mapping__"];
 
 
         // Check if a object-JSON mapping is possible for a property
-        if (JsonConvert.deserializeObject_propertyHasDecorator(mapping, propertyKey) === false) {
+        if (this.deserializeObject_propertyHasDecorator(mapping, propertyKey) === false) {
 
             // Make sure values are not overridden by undefined json values
             if (typeof(json[propertyKey]) !== "undefined")
@@ -233,15 +297,15 @@ export abstract class JsonConvert {
 
         // Map the property
         try {
-            classInstance[propertyKey] = JsonConvert.deserializeObject_mapProperty(expectedType, jsonValue);
+            classInstance[propertyKey] = this.deserializeObject_mapProperty(expectedType, jsonValue);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + classInstance.constructor.name + "\" because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + propertyKey + "\n\n" +
-                "\tExpected type: \n\t\t" + JsonConvert.deserializeObject_getExpectedType(expectedType) + "\n\n" +
+                "\tExpected type: \n\t\t" + this.deserializeObject_getExpectedType(expectedType) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
-                "\tJSON type: \n\t\t" + JsonConvert.deserializeObject_getJsonType(jsonValue) + "\n\n" +
+                "\tJSON type: \n\t\t" + this.deserializeObject_getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
                 e.message + "\n"
             );
@@ -254,7 +318,7 @@ export abstract class JsonConvert {
      * @param propertyKey the property key
      * @returns {boolean} true if the mapping exists, otherwise false
      */
-    private static deserializeObject_propertyHasDecorator(mapping: any, propertyKey: string): boolean {
+    private deserializeObject_propertyHasDecorator(mapping: any, propertyKey: string): boolean {
         return typeof(mapping) !== "undefined" && typeof(mapping[propertyKey]) !== "undefined";
     }
 
@@ -266,7 +330,7 @@ export abstract class JsonConvert {
      * @returns returns the resulted mapped property
      * @throws throws an expection in case of failure
      */
-    private static deserializeObject_mapProperty(expectedType: any, jsonValue: any): any {
+    private deserializeObject_mapProperty(expectedType: any, jsonValue: any): any {
 
         // Map immediately if we don't care about the type
         if (typeof(expectedType) === "undefined" || expectedType === null || expectedType === Object) {
@@ -281,18 +345,18 @@ export abstract class JsonConvert {
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
+                    if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
                         return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
 
-                return JsonConvert.deserializeObject(jsonValue, expectedType);
+                return this.deserializeObject(jsonValue, expectedType);
 
             } else if (expectedType === null || expectedType === Object || expectedType === undefined) { // general object
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
+                    if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
                         return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
@@ -303,7 +367,7 @@ export abstract class JsonConvert {
 
                 // Check if we have null value
                 if (jsonValue === null) {
-                    if (JsonConvert.valueCheckingMode === ValueCheckingMode.ALLOW_NULL) return null;
+                    if (this.valueCheckingMode === ValueCheckingMode.ALLOW_NULL) return null;
                     else throw new Error("\tReason: JSON value is null.");
                 }
 
@@ -315,7 +379,7 @@ export abstract class JsonConvert {
                 ) {
                     return jsonValue;
                 } else { // primitive types mismatch
-                    if (JsonConvert.ignorePrimitiveChecks) return jsonValue;
+                    if (this.ignorePrimitiveChecks) return jsonValue;
                     throw new Error("\tReason: JSON object does not match the expected primitive type.");
                 }
 
@@ -348,7 +412,7 @@ export abstract class JsonConvert {
 
                 if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
 
-                array[i] = JsonConvert.deserializeObject_mapProperty(expectedType[i], jsonValue[i]);
+                array[i] = this.deserializeObject_mapProperty(expectedType[i], jsonValue[i]);
 
             }
 
@@ -378,7 +442,7 @@ export abstract class JsonConvert {
 
                 if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
 
-                array[key] = JsonConvert.deserializeObject_mapProperty(expectedType[i], jsonValue[key]);
+                array[key] = this.deserializeObject_mapProperty(expectedType[i], jsonValue[key]);
 
                 i++;
             }
@@ -390,7 +454,7 @@ export abstract class JsonConvert {
         // Check if attempt was 1-d and expected was n-d
         if (expectedType instanceof Array) {
             if (jsonValue === null) {
-                if (JsonConvert.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
+                if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
                 else throw new Error("\tReason: JSON value is null.");
             }
             throw new Error("\tReason: Expected type is array, but JSON value is non-array.");
@@ -413,7 +477,7 @@ export abstract class JsonConvert {
      * @param expectedType the expected type given from the decorator
      * @returns {string} the string representation
      */
-    private static deserializeObject_getExpectedType(expectedType: any): string {
+    private deserializeObject_getExpectedType(expectedType: any): string {
 
         let type: string = "";
 
@@ -421,7 +485,7 @@ export abstract class JsonConvert {
             type = "[";
             for (let i = 0; i < expectedType.length; i++) {
                 if (i > 0) type += ",";
-                type += JsonConvert.deserializeObject_getExpectedType(expectedType[i]);
+                type += this.deserializeObject_getExpectedType(expectedType[i]);
             }
             type += "]";
             return type;
@@ -444,7 +508,7 @@ export abstract class JsonConvert {
      * @param jsonValue the JSON value
      * @returns {string} the string representation
      */
-    private static deserializeObject_getJsonType(jsonValue: any): string {
+    private deserializeObject_getJsonType(jsonValue: any): string {
 
         if (jsonValue === null) return "null";
 
@@ -454,7 +518,7 @@ export abstract class JsonConvert {
             type = "[";
             for (let i = 0; i < jsonValue.length; i++) {
                 if (i > 0) type += ",";
-                type += JsonConvert.deserializeObject_getJsonType(jsonValue[i]);
+                type += this.deserializeObject_getJsonType(jsonValue[i]);
             }
             type += "]";
             return type;

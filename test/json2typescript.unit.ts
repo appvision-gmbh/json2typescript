@@ -1,8 +1,10 @@
-import {JsonConvert, JsonObject, JsonProperty} from "../src/json2typescript/json-convert";
+import { DebugMode, JsonConvert, JsonObject, JsonProperty } from "../src/json2typescript/json-convert";
 
 describe('Unit tests', () => {
 
     describe('JsonConvert', () => {
+
+        let jsonConvert = new JsonConvert();
 
         @JsonObject
         class Car {
@@ -24,19 +26,19 @@ describe('Unit tests', () => {
             });
 
             it('should serialize an object to a string', () => {
-                let strObject: string = JsonConvert.serializeObject(car);
+                let strObject: string = jsonConvert.serializeObject(car);
                 expect(strObject).toBe('{"brand":"Brand"}');
             });
 
             it('should log something when debug mode is enabled', () => {
-                JsonConvert.debugMode = true;
-                JsonConvert.serializeObject(car);
+                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.serializeObject(car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                JsonConvert.debugMode = false;
-                JsonConvert.serializeObject(car);
+                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.serializeObject(car);
                 expect(console.log).not.toHaveBeenCalled();
             });
 
@@ -50,31 +52,31 @@ describe('Unit tests', () => {
             beforeEach(function () {
                 car = new Car();
                 car.brand = 'Brand';
-                spyOn(JsonConvert, 'deserializeObject').and.returnValue(car);
+                spyOn(jsonConvert, 'deserializeObject').and.returnValue(car);
             });
 
             it('should serialize a string to a class', () => {
-                let carInstance = JsonConvert.deserializeString(strCar, Car);
-                expect(JsonConvert.deserializeObject).toHaveBeenCalled();
+                let carInstance = jsonConvert.deserializeString(strCar, Car);
+                expect(jsonConvert.deserializeObject).toHaveBeenCalled();
                 expect(carInstance.constructor.name).toBe((<any>Car).name);
                 expect(carInstance.brand).toBe(car.brand);
             });
 
             it('should throw an error when trying to deserialize an object', () => {
                 expect(() => {
-                    JsonConvert.deserializeString({brand: "Brand"} as any, Car)
+                    jsonConvert.deserializeString({brand: "Brand"} as any, Car)
                 }).toThrowError();
             });
 
             it('should log something when debug mode is enabled', () => {
-                JsonConvert.debugMode = true;
-                JsonConvert.deserializeString(strCar, Car);
+                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                JsonConvert.debugMode = false;
-                JsonConvert.deserializeString(strCar, Car);
+                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });
 
@@ -95,44 +97,44 @@ describe('Unit tests', () => {
             beforeEach(function () {
                 car = new Car();
                 car.brand = 'Brand';
-                spyOn(<any>JsonConvert, 'deserializeObject_loopProperty').and.callFake((classInstance: any, propertyKey: string, json: Object) => {
+                spyOn(<any>jsonConvert, 'deserializeObject_loopProperty').and.callFake((classInstance: any, propertyKey: string, json: Object) => {
                     classInstance[propertyKey] = json[propertyKey];
                 });
             });
 
             it('should deserialize a json object to a class', () => {
-                let carInstance = JsonConvert.deserializeObject(carObj, Car);
-                expect((<any>JsonConvert).deserializeObject_loopProperty).toHaveBeenCalled();
+                let carInstance = jsonConvert.deserializeObject(carObj, Car);
+                expect((<any>jsonConvert).deserializeObject_loopProperty).toHaveBeenCalled();
                 expect(carInstance).toEqual(car);
             });
 
             it('should throw an error when not given an object and not given an array', () => {
                 expect(() => {
-                    JsonConvert.deserializeObject('{}', Car);
+                    jsonConvert.deserializeObject('{}', Car);
                 }).toThrowError();
             });
 
             it('should throw an error when [not given an object and] given an array', () => {
                 expect(() => {
-                    JsonConvert.deserializeObject([], Car);
+                    jsonConvert.deserializeObject([], Car);
                 }).toThrowError();
             });
 
             it('should log something when debug mode is enabled', () => {
-                JsonConvert.debugMode = true;
-                JsonConvert.deserializeObject(carObj, Car);
+                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                JsonConvert.debugMode = false;
-                JsonConvert.deserializeObject(carObj, Car);
+                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });
 
             it('should loop through all properties of given object', () => {
-                JsonConvert.deserializeObject(new Truck(), Truck);
-                expect((<any>JsonConvert).deserializeObject_loopProperty).toHaveBeenCalledTimes(2);
+                jsonConvert.deserializeObject(new Truck(), Truck);
+                expect((<any>jsonConvert).deserializeObject_loopProperty).toHaveBeenCalledTimes(2);
             });
 
         });

@@ -34,8 +34,30 @@ describe('Integration tests', function () {
                 car.brand = 'Brand';
             });
             it('should serialize a class to a string', function () {
-                var strObject = json_convert_1.JsonConvert.serializeObject(car);
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var strObject = jsonConvert.serializeObject(car);
                 expect(strObject).toBe('{"brand":"Brand"}');
+            });
+        });
+        describe('deserialize', function () {
+            var strCar = '{"brand":"Brand"}';
+            var carObj = { brand: "Brand" };
+            var car;
+            beforeEach(function () {
+                car = new Car();
+                car.brand = 'Brand';
+            });
+            it('should serialize a string to a class', function () {
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var car = jsonConvert.deserialize(strCar, Car);
+                expect(car.constructor.name).toBe(Car.name);
+                expect(car.brand).toBe('Brand');
+            });
+            it('should serialize an object to a class', function () {
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var car = jsonConvert.deserialize(carObj, Car);
+                expect(car.constructor.name).toBe(Car.name);
+                expect(car.brand).toBe('Brand');
             });
         });
         describe('deserializeString', function () {
@@ -46,7 +68,8 @@ describe('Integration tests', function () {
                 car.brand = 'Brand';
             });
             it('should serialize a string to a class', function () {
-                var car = json_convert_1.JsonConvert.deserializeString(strCar, Car);
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var car = jsonConvert.deserializeString(strCar, Car);
                 expect(car.constructor.name).toBe(Car.name);
                 expect(car.brand).toBe('Brand');
             });
@@ -59,8 +82,22 @@ describe('Integration tests', function () {
                 car.brand = 'Brand';
             });
             it('should deserialize a json object to a class', function () {
-                var carInstance = json_convert_1.JsonConvert.deserializeObject(carObj, Car);
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var carInstance = jsonConvert.deserializeObject(carObj, Car);
                 expect(carInstance).toEqual(car);
+            });
+        });
+        describe('deserializeArray', function () {
+            var carArr = [{ brand: "Brand" }];
+            var cars = [];
+            beforeEach(function () {
+                cars[0] = new Car();
+                cars[0].brand = 'Brand';
+            });
+            it('should deserialize a json array to a array of classes', function () {
+                var jsonConvert = new json_convert_1.JsonConvert();
+                var carsArray = jsonConvert.deserializeArray(carArr, Car);
+                expect(carsArray).toEqual(cars);
             });
         });
     });
