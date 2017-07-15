@@ -1,1 +1,0 @@
-export { JsonConvert, JsonObject, JsonProperty } from "./src/json2typescript/json-convert";

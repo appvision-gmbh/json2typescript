@@ -3,15 +3,23 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "mapRoot": "./",
     "module": "commonjs",
     "removeComments": true,
     "target": "es5",
     "sourceMap": true
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "test",
+    "**/*.spec.ts"
   ],
   "files": [
     "./index.ts",

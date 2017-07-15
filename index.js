@@ -1,0 +1,1 @@
+//# sourceMappingURL=C:/Users/andreas/GIT/appvision@git.appvision.ch/unibasel/json2typescript/index.js.map

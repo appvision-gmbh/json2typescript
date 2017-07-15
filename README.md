@@ -23,12 +23,7 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 # Changelog
 
-* v0.9.7, v0.9.6: Fixed errors in ReadMe and small bug on JsonConvert.
-* v0.9.5: New method for deserializing array of objects.
-* v0.9.4: Class properties are now not overridden to `undefined` if there is no decorator and no matching json value.
-* v0.9.3: It is now possible to map an JSON object to an TypeScript array, then the object keys become the array keys. Also, class properties can be set to optional. See below in the chapter "decorators" for more information.
-* v0.9.2: Added method `serializeString()`, changed `property` names and behaviour
-* v0.9.1: First version released to the public
+See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
 ---
 
@@ -407,11 +402,9 @@ export class User {
 
 ---
 
-# Imprint
+# Authors
 
-This package was created by the **Digital Humanities Lab** of **University of Basel** in 2016.
-We make use of it in our new website of 
-http://www.salsah.org.
+This NPM package was originally created by the **Digital Humanities Lab** of **University of Basel** in 2016.
+We make use of it in our new website of http://www.salsah.org.
 
-More information on 
-http://dhlab.unibas.ch
+More information on http://dhlab.unibas.ch
