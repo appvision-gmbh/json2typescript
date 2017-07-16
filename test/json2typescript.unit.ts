@@ -1,4 +1,4 @@
-import { DebugMode, JsonConvert, JsonObject, JsonProperty } from "../src/json2typescript/json-convert";
+import { OperationMode, JsonConvert, JsonObject, JsonProperty, OperationMode } from "../src/json2typescript/json-convert";
 
 describe('Unit tests', () => {
 
@@ -31,13 +31,13 @@ describe('Unit tests', () => {
             });
 
             it('should log something when debug mode is enabled', () => {
-                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.operationMode = OperationMode.LOGGING;
                 jsonConvert.serializeObject(car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.operationMode = OperationMode.ENABLE;
                 jsonConvert.serializeObject(car);
                 expect(console.log).not.toHaveBeenCalled();
             });
@@ -69,13 +69,13 @@ describe('Unit tests', () => {
             });
 
             it('should log something when debug mode is enabled', () => {
-                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.operationMode = OperationMode.LOGGING;
                 jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.operationMode = OperationMode.ENABLE;
                 jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });
@@ -121,13 +121,13 @@ describe('Unit tests', () => {
             });
 
             it('should log something when debug mode is enabled', () => {
-                jsonConvert.debugMode = DebugMode.LOGGING;
+                jsonConvert.operationMode = OperationMode.LOGGING;
                 jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).toHaveBeenCalled();
             });
 
             it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.debugMode = DebugMode.ENABLE;
+                jsonConvert.operationMode = OperationMode.ENABLE;
                 jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });

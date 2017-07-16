@@ -1,54 +1,51 @@
 /**
- * Enum for the value checking mode of a JsonConvert class instance.
- *
- * The values should be used as follows:
- * - ALLOW_NULL: all given values in the JSON are allowed to be null
- * - ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
- * - DISALLOW_NULL: no null values are tolerated in the JSON
- *
- * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @see https://www.npmjs.com/package/json2typescript full documentation
- */
-export enum ValueCheckingMode {
-    ALLOW_NULL = 1,
-    ALLOW_OBJECT_NULL = 2,
-    DISALLOW_NULL = 3
-};
-
-/**
- * Enum for the debug mode of a JsonConvert class instance.
- *
- * The values should be used as follows:
- * - DISABLE: json2typescript will be disabled, could be used in production
- * - ENABLE: json2typescript is enabled, but only errors are logged
- * - LOGGING: json2typescript is enabled and detailed information is logged
- *
- * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
- * @see https://www.npmjs.com/package/json2typescript full documentation
- */
-export enum DebugMode {
-    DISABLE = 0,
-    ENABLE = 1,
-    LOGGING = 2
-};
-
-/**
- * Offers a simple API for mapping json objects to TypeScript/JavaScript classes and vice versa.
+ * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
  *
  * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export class JsonConvert {
 
+    ////////////////
+    // PROPERTIES //
+    ////////////////
+
+
     /**
-     * Determines whether debugging info is shown in console.
+     * Determines how the JsonConvert class instance should operate.
      *
      * You may assign three different values:
-     * - DebugMode.DISABLE: json2typescript will be disabled, could be used in production
-     * - DebugMode.ENABLE: json2typescript is enabled, but only errors are logged
-     * - DebugMode.LOGGING: json2typescript is enabled and detailed information is logged
+     * - OperationMode.DISABLE: json2typescript will be disabled, no type checking is done
+     * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
+     * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
      */
-    public debugMode: number = DebugMode.ENABLE;
+    private _operationMode: number = OperationMode.ENABLE;
+
+    /**
+     * Determines how the JsonConvert class instance should operate.
+     *
+     * You may assign three different values:
+     * - OperationMode.DISABLE: json2typescript will be disabled, no type checking is done
+     * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
+     * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
+     * @returns {number}
+     */
+    get operationMode(): number {
+        return this._operationMode;
+    }
+
+    /**
+     * Determines how the JsonConvert class instance should operate.
+     *
+     * You may assign three different values:
+     * - OperationMode.DISABLE: json2typescript will be disabled, no type checking is done
+     * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
+     * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
+     * @param value
+     */
+    set operationMode(value: number) {
+        if (value in OperationMode) this._operationMode = value;
+    }
 
     /**
      * Determines which types are allowed to be null.
@@ -58,27 +55,83 @@ export class JsonConvert {
      * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
      * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
      */
-    public valueCheckingMode: number = ValueCheckingMode.ALLOW_OBJECT_NULL;
+    private _valueCheckingMode: number = ValueCheckingMode.ALLOW_OBJECT_NULL;
+
+    /**
+     * Determines which types are allowed to be null.
+     *
+     * You may assign three different values:
+     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     * @returns {number}
+     */
+    get valueCheckingMode(): number {
+        return this._valueCheckingMode;
+    }
+
+    /**
+     * Determines which types are allowed to be null.
+     *
+     * You may assign three different values:
+     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     * @param value
+     */
+    set valueCheckingMode(value: number) {
+        if (value in ValueCheckingMode) this._valueCheckingMode = value;
+    }
 
     /**
      * Determines whether primitive types should be checked.
      * If true, it will be allowed to assign primitive to other primitive types.
      */
-    public ignorePrimitiveChecks: boolean = false;
+    private _ignorePrimitiveChecks: boolean = false;
+
+    /**
+     * Determines whether primitive types should be checked.
+     * If true, it will be allowed to assign primitive to other primitive types.
+     * @returns {boolean}
+     */
+    get ignorePrimitiveChecks(): boolean {
+        return this._ignorePrimitiveChecks;
+    }
+
+    /**
+     * Determines whether primitive types should be checked.
+     * If true, it will be allowed to assign primitive to other primitive types.
+     * @param value
+     */
+    set ignorePrimitiveChecks(value: boolean) {
+        this._ignorePrimitiveChecks = value;
+    }
+
+
+    /////////////////
+    // CONSTRUCTOR //
+    /////////////////
+
 
     /**
      * Constructor.
      *
      * Check the equally named class properties to learn more about the meaning of the params.
-     * @param debugMode optional param (default: DebugMode.ENABLE_SILENTLY)
+     * @param operationMode optional param (default: OperationMode.ENABLE)
      * @param valueCheckingMode optional param (default: ValueCheckingMode.ALLOW_OBJECT_NULL)
      * @param ignorePrimitiveChecks optional param (default: false)
      */
-    public construct(debugMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
-        if (debugMode in DebugMode) this.debugMode = debugMode;
+    construct(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
+        if (operationMode in OperationMode) this.operationMode = operationMode;
         if (valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
     }
+
+
+    ////////////////////
+    // PUBLIC METHODS //
+    ////////////////////
+
 
     /**
      * Tries to serialize a JavaScript object to a JSON string.
@@ -86,9 +139,9 @@ export class JsonConvert {
      * @returns {string} the JSON string
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public serializeObject(instance: Object): string {
+    serializeObject(instance: Object): string {
 
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JavaScript object:");
             console.log(instance);
@@ -96,7 +149,7 @@ export class JsonConvert {
 
         let jsonString: string = JSON.stringify(instance);
 
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Returning JSON string:");
             console.log(jsonString);
             console.log("----------");
@@ -114,7 +167,7 @@ export class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public deserialize(json: any, classObject: { new(): any }): any {
+    deserialize(json: any, classObject: { new(): any }): any {
 
         if (typeof json === "string") return this.deserializeString(json, classObject);
         if (json.constructor === Array) return this.deserializeArray(json, classObject);
@@ -135,7 +188,7 @@ export class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public deserializeString(jsonString: string, classObject: { new(): any }): any {
+    deserializeString(jsonString: string, classObject: { new(): any }): any {
 
         if (typeof(jsonString) !== "string") {
             throw new Error(
@@ -144,7 +197,7 @@ export class JsonConvert {
             );
         }
 
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Receiving JSON string:");
             console.log(jsonString);
         }
@@ -174,7 +227,7 @@ export class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public deserializeObject(jsonObject: any, classObject: { new(): any }): any {
+    deserializeObject(jsonObject: any, classObject: { new(): any }): any {
 
         if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
@@ -183,10 +236,10 @@ export class JsonConvert {
             );
         }
 
-        if (this.debugMode === DebugMode.DISABLE) {
+        if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject;
         }
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Receiving JSON object:");
             console.log(jsonObject);
         }
@@ -198,7 +251,7 @@ export class JsonConvert {
             this.deserializeObject_loopProperty(classInstance, propertyKey, jsonObject);
         }
 
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Returning CLASS instance:");
             console.log(classInstance);
         }
@@ -215,7 +268,7 @@ export class JsonConvert {
      * @throws an exception in case of failure
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    public deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
+    deserializeArray(jsonArray: any[], classObject: { new(): any }): any[] {
 
         if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
@@ -224,10 +277,10 @@ export class JsonConvert {
             );
         }
 
-        if (this.debugMode === DebugMode.DISABLE) {
+        if (this.operationMode === OperationMode.DISABLE) {
             return jsonArray;
         }
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Receiving JSON array:");
             console.log(jsonArray);
         }
@@ -239,7 +292,7 @@ export class JsonConvert {
             array.push(this.deserializeObject(jsonObject, classObject));
         }
 
-        if (this.debugMode === DebugMode.LOGGING) {
+        if (this.operationMode === OperationMode.LOGGING) {
             console.log("Returning array of CLASS instances:");
             console.log(array);
         }
@@ -247,6 +300,12 @@ export class JsonConvert {
         return array;
 
     }
+
+
+    /////////////////////
+    // PRIVATE METHODS //
+    /////////////////////
+
 
     /**
      * Tries to find the JSON mapping for a given class property and finally assign the value.
@@ -529,6 +588,40 @@ export class JsonConvert {
     }
 
 }
+
+/**
+ * Enum for the operation mode of a JsonConvert class instance.
+ *
+ * The values should be used as follows:
+ * - DISABLE: json2typescript will be disabled, no type checking is done
+ * - ENABLE: json2typescript is enabled, but only errors are logged
+ * - LOGGING: json2typescript is enabled and detailed information is logged
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+ * @see https://www.npmjs.com/package/json2typescript full documentation
+ */
+export enum OperationMode {
+    DISABLE = 0,
+    ENABLE = 1,
+    LOGGING = 2
+};
+
+/**
+ * Enum for the value checking mode of a JsonConvert class instance.
+ *
+ * The values should be used as follows:
+ * - ALLOW_NULL: all given values in the JSON are allowed to be null
+ * - ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
+ * - DISALLOW_NULL: no null values are tolerated in the JSON
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+ * @see https://www.npmjs.com/package/json2typescript full documentation
+ */
+export enum ValueCheckingMode {
+    ALLOW_NULL = 1,
+    ALLOW_OBJECT_NULL = 2,
+    DISALLOW_NULL = 3
+};
 
 /**
  * Decorator of a class that comes from a JSON object.

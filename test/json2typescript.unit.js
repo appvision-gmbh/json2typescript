@@ -46,12 +46,12 @@ describe('Unit tests', function () {
                 expect(strObject).toBe('{"brand":"Brand"}');
             });
             it('should log something when debug mode is enabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.LOGGING;
+                jsonConvert.operationMode = json_convert_1.OperationMode.LOGGING;
                 jsonConvert.serializeObject(car);
                 expect(console.log).toHaveBeenCalled();
             });
             it('should not log anything when debug mode is disabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.ENABLE;
+                jsonConvert.operationMode = json_convert_1.OperationMode.ENABLE;
                 jsonConvert.serializeObject(car);
                 expect(console.log).not.toHaveBeenCalled();
             });
@@ -76,12 +76,12 @@ describe('Unit tests', function () {
                 }).toThrowError();
             });
             it('should log something when debug mode is enabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.LOGGING;
+                jsonConvert.operationMode = json_convert_1.OperationMode.LOGGING;
                 jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).toHaveBeenCalled();
             });
             it('should not log anything when debug mode is disabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.ENABLE;
+                jsonConvert.operationMode = json_convert_1.OperationMode.ENABLE;
                 jsonConvert.deserializeString(strCar, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });
@@ -128,12 +128,12 @@ describe('Unit tests', function () {
                 }).toThrowError();
             });
             it('should log something when debug mode is enabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.LOGGING;
+                jsonConvert.operationMode = json_convert_1.OperationMode.LOGGING;
                 jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).toHaveBeenCalled();
             });
             it('should not log anything when debug mode is disabled', function () {
-                jsonConvert.debugMode = json_convert_1.DebugMode.ENABLE;
+                jsonConvert.operationMode = json_convert_1.OperationMode.ENABLE;
                 jsonConvert.deserializeObject(carObj, Car);
                 expect(console.log).not.toHaveBeenCalled();
             });
