@@ -1,7 +1,6 @@
 import { JsonConvert } from  "../src/json2typescript/json-convert";
 import { JsonObject, JsonProperty, JsonConverter } from  "../src/json2typescript/json-convert-decorators";
 import { OperationMode, ValueCheckingMode } from  "../src/json2typescript/json-convert-enums";
-import { MappingOptions } from  "../src/json2typescript/json-convert-options";
 import { JsonCustomConvert } from  "../src/json2typescript/json-custom-convert";
 
 describe('Integration tests', () => {

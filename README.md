@@ -15,16 +15,21 @@ With **json2typescript**, only a simple function call is necessary, as demonstra
 let jsonStr: string = ...;
 let jsonObj: object = JSON.parse(jsonStr);
 
-// Now you can map the string to the object automatically
-let user: User = JsonConvert.deserialize(jsonObj, User);
+// Now you can map the json object to the TypeScript object automatically
+let jsonConvert: JsonConvert = new JsonConvert();
+let user: User = jsonConvert.deserializeObject(jsonObj, User);
 console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... }
 ```
+
+> Tip: All `serialize()` and `deserialize()` methods may throw an exception in case of failure. Make sure you catch the errors in production!
 
 ---
 
 # Changelog
 
 See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
+
+> Tip: Version 1.0.0 has several breaking changes. When upgrading from `json2typescript` < 1.0.0, please make sure you fix these issues.
 
 ---
 
@@ -64,7 +69,7 @@ Now you are ready to use the package.
 In order to use the **json2typescript** package, all you need to do is write decorators and import the package. The following things need to be done if you would like to map JSON to existing classes:
 
 * Classes need to be preceeded by `@JsonObject`
-* Properties need to be preceeded by `@JsonProperty(key, Type)`
+* Properties need to be preceeded by `@JsonProperty(key, options)`
 * Properties need to have a default value (or undefined), otherwise the mapper will not work
 
 See below an example so you can learn from it how **json2typescript** works best.
@@ -81,39 +86,39 @@ export class City {
     // It will only be mapped if our JSON object contains a key named "id".
     // If there is no such element, no exception is thrown.
     // There will be no type checking at all.
-    public id: number = undefined; // <- assign a value or undefined to enable the mapper!
+    id: number = undefined; // <- assign a value or undefined to enable the mapper!
 
     // This maps the value of the JSON key "name" to the class property "name".
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("name", String)
-    public name: string = undefined;
+    name: string = undefined;
     
     // This maps the JSON key "founded" to the private class property "_founded".
     // Note the use of public getter and setter.
     // If the JSON value is not of type number (or missing), there will be an exception.
     @JsonProperty("founded", Number)
     private _founded: number = undefined;
-    public get founded() { return this._founded; }
-    public set founded(value: number) { this._founded = value; }
+    get founded() { return this._founded; }
+    set founded(value: number) { this._founded = value; }
     
     // This maps the JSON key "beautiful" to the class property "beautiful".
     // If the JSON value is not of type boolean (or missing), there will be an exception.
     @JsonProperty("beautiful", Boolean)
-    public beautiful: boolean = undefined;
+    beautiful: boolean = undefined;
     
     // This maps the JSON key "data" to the class property "data".
     // We are not sure about the type, so we omit the second parameter.
     // There will be an exception if the JSON value is missing.
     @JsonProperty("data") // is the same as @JsonProperty("data", undefined)
-    public data: any = undefined;
+    data: any = undefined;
     
     // This maps the JSON key "keywords" to the class property "keywords".
     // This is an example of a string array. Note our syntax "[String]".
     // In the further examples at the end of this document, you can see how to nest complex arrays.
     @JsonProperty("keywords", [String])
-    public keywords: string[] = undefined; // or Array<string>
+    keywords: string[] = undefined; // or Array<string>
     
-    public printInfo() {
+    printInfo() {
         if (this.beautiful)
             console.log(this.name + " was founded in " + this.founded + " and is really beautiful!");
         else
@@ -135,13 +140,13 @@ export class Country {
     // This maps the value of the JSON key "countryName" to the class property "name".
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("countryName", String)
-    public name: string = undefined;
+    name: string = undefined;
     
     // This maps the value of the JSON key "cities" to the class property "cities".
     // If the JSON value is not of type array object (or missing), there will be an exception.
     // There will be an exception too if the objects in the array do not match the class "City".
     @JsonProperty("cities", [City])
-    public cities: City[] = undefined;
+    cities: City[] = undefined;
     
 }
 ```
@@ -193,7 +198,7 @@ export class AppComponent implements OnInit {
         // Map to the country class
         let country: Country;
         try {
-            country = JsonConvert.deserialize(jsonObject, Country);
+            country = jsonConvert.deserialize(jsonObject, Country);
             country.cities[0].printInfo(); // prints: Basel was founded in -200 and is really beautiful!
         } catch (e) {
             console.log((<Error>e));
@@ -207,7 +212,8 @@ Play around with the JSON to provocate exceptions when deserializing the object.
 # Detailed reference
 
 ## Class and property decorators
-Decorators should be used whenever you would like to assign a JSON value to a TypeScript class instance property.
+
+Decorators should be used whenever you would like to map JSON with TypeScript data.
 
 ### Class decorators
 
@@ -227,33 +233,37 @@ Property decorators are a vital part for type checking. It is important that the
 ```typescript
 @JsonObject
 export class User {
-    @JsonProperty("jsonKeyOfName", String, false)
-    public name: string = undefined;
+    @JsonProperty("jsonPropertyName", String, false)
+    name: string = undefined;
 }
 ```
 
-Note: You must assign any value or `undefined` to your property at initialization, otherwise our mapper does **not** work.
+Important note: You must assign any (valid) value or `undefined` to your property at 
+initialization, otherwise our mapper does **not** work.
+
+> Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
 #### First parameter: jsonProperty
 
-The first parameter of `@JsonProperty` is the JSON object property. 
-It happens that the keys given by the server are very ugly.
-Here you can map any key to the `User` property `name`.
-In our case, `json["jsonKeyOfName"]` gets mapped to `user["name"]`.
+The first parameter of `@JsonProperty` is the JSON object property name. 
+It happens that the property names given by the server are very ugly.
+Here you can map any json property name to the `User` property `name`.
+In our case, `json["jsonPropertyName"]` gets mapped to `user.name`.
 
 #### Second parameter (optional): conversionOption
 
 The second parameter of `@JsonProperty` describes what happens when doing the mapping between JSON and TypeScript objects.
-This parameter is optional; the default value is undefined (which means no type check is done when the mapping happens).
+This parameter is optional; the default value is `undefined` (which means no type check is done when the mapping happens).
 
 ##### Use of expected type
 
 If you would like that `json2typescript` performs an automatic type 
 check according to given TypeScript types, you can pass a type you
-expect.
+expect. Follow the following guide when doing that:
 
-Make sure you pass the class name and not an instance of the class.
-In case of primitive types, you have to use the upper case names. 
+- Make sure you pass the class name and not an instance of the class.
+- In case of primitive types, you have to use the upper case names. 
+
 See the following cheat sheet for reference:
 
 | Expected type             | TypeScript type       |
@@ -276,15 +286,37 @@ See the examples at the end of this document for more info about nesting arrays.
 
 ##### Adding a custom converter
 
-More advanced users may need to use custom converters.
+More advanced users may need to use custom converters. If you don't want
+`json2typescript` to use your custom converter, you need to follow these
+steps:
+
+- Write a converter class that implements `JsonCustomConvert<T>` where
+`<T>` is the type resulting in the TypeScript class.
+- Make sure you add the `@JsonConverter` decorator to this class (see next chapter how).
+- Pass your converter class as second param in the `@JsonProperty` decorator
+
+Assume you would like to transform `1893-11-15` (string from JSON) to a TypeScript
+`Date` instance, then you would write a class `DateConverter` (see next chapter how)
+and pass it as second param in `@JsonProperty` as below:
+
+```typescript
+@JsonObject
+export class User {
+    @JsonProperty("birthdate", DateConverter)
+    birthdate: Date = undefined;
+}
+```
 
 #### Third parameter (optional): isOptional
 
-The third parameter of `@JsonProperty` determines whether the `jsonKey` has to be present in the json.
+The third parameter of `@JsonProperty` determines whether the `jsonProperty` has to be present in the json.
 This parameter is optional; the default value is false.
-By default, `JsonConvert` throws an exception if a decorated class property cannot be found in the given JSON.
+
+By default, `JsonConvert` throws an exception if a decorated class property cannot be found in the given JSON when deserializing.
 If you set the third parameter to true, there is no exception when it is missing. 
 The type is still checked as soon the property is present again.
+
+The same applies for the case when you try to serialize a TypeScript object to a JSON object. If the property is not defined in the class and optional, it will not be added to the JSON object.
 
 #### Important notes
 
@@ -324,63 +356,91 @@ class DateConverter implements JsonCustomConvert<Date> {
 }
 ```
 
-Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the custom converter class above to make sure it is stored as a real TypeScript date in your class. For your property, you simply have use the `@JsonProperty` decorator as follows:
+> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same time between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
+
+Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you simply have use the `@JsonProperty` decorator as follows:
 
 
 ```typescript
 @JsonObject
 export class User {
     @JsonProperty("date", DateConverter)
-    public date: Date = undefined;
+    date: Date = undefined;
 }
 ```
 
 With this approach, you will achieve that your property `date` is going to be a real instance of `Date`.
 
 
+
 ## JsonConvert class properties and methods
 
 ### Public properties
 
-`(bool) JsonConvert.debugMode`
+#### `(number) JsonConvert.operationMode`
 
-Determines whether debugging info is shown in console when parsing a JSON object. 
-The default value is `false`.
+Determines how the JsonConvert class instance should operate. 
+You may assign three different values:
+- `OperationMode.DISABLE`: json2typescript will be disabled, no type checking or mapping is done
+- `OperationMode.ENABLE`: json2typescript is enabled, but only errors are logged
+- `OperationMode.LOGGING`: json2typescript is enabled and detailed information is logged
 
-`(bool) JsonConvert.ignorePrimitiveChecks`
+The default value is `OperationMode.ENABLE`.
 
-Determines whether primitive types should be checked. 
-If true, it will be allowed to assign primitive to other primitive types.
-The default is `false`.
+> Tip: Make sure you import the `ENUM` `OperationMode` when assigning a value to this property.
 
-`(bool) JsonConvert.valueCheckingMode`
+#### `(number) JsonConvert.valueCheckingMode`
 
 Determines which types are allowed to be null.
 You may assign three different values:
-* `JsonConvert.ValueCheckingMode.ALLOW_NULL`: All given values can be null.
-* `JsonConvert.ValueCheckingMode.ALLOW_OBJECT_NULL`: Objects can be null, but primitive types cannot be null.
-* `JsonConvert.ValueCheckingMode.DISALLOW_NULL`: No null values are tolerated.
+* `ValueCheckingMode.ALLOW_NULL`: All given values can be null
+* `ValueCheckingMode.ALLOW_OBJECT_NULL`: Objects can be null, but primitive types cannot be null
+* `ValueCheckingMode.DISALLOW_NULL`: No null values are tolerated
 
-The default is `JsonConvert.ValueCheckingMode.ALLOW_OBJECT_NULL`. 
+The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`. 
+
+> Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
+
+#### `(bool) JsonConvert.ignorePrimitiveChecks`
+
+Determines whether primitive types should be checked. 
+If true, it will be allowed to assign primitive to other primitive types.
+
+The default is `false`.
+
 
 > Tip: The TypeScript developer team suggests you to avoid null values. If your JSON api doesn't return null values, you should try the last flag disallowing null values.
 
 ### Public methods
 
-`(string) public static serializeObject(instance: Object)`
+`json2typescript` allows you to map JSON objects (or arrays) to TypeScript objects (or arrays) and vice versa.
 
-Tries to serialize a JavaScript object to a JSON string.
+#### Serializing (TypeScript to JSON)
+ 
+`(any) serialize(data: any)`
 
-`(any) public static deserializeString(jsonString: string, classObject: { new(): any })`
+Tries to serialize a TypeScript object or array of objects to JSON.
 
-Tries to deserialize a JSON string to a TypeScript class.
+> Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the serialize method.
 
-`(any) public static deserializeObject(jsonObject: Object, classObject: { new(): any })`
+#### Deserializing (JSON to TypeScript)
+ 
+`(any) deserialize(json: any, classReference: { new(): any })`
 
-Tries to deserialize a JSON array to a TypeScript class.
+Tries to deserialize given JSON to a TypeScript object or array of objects.
 
-`(any) public static deserializeArray(jsonArray: any[], classObject: { new(): any })`
+> Tip: The param `json` must not be a string, but an `object` or an `array`.  Use `JSON.parse()` before applying the deserialize method in case you have a json string.
 
+#### Other methods
+
+The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
+In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
+- `(object) serializeObject(instance: object)`
+- `(object[]) serializeArray(instanceArray: object[])`
+- `(object) deserializeObject(jsonObject: object, classReference: { new(): any })`
+- `(object[]) deserializeArray(jsonArray: object[], classReference: { new(): any })`
+
+>
 
 ---
 
@@ -412,7 +472,7 @@ As we have an array of array of strings, you can define the expected type like t
 @JsonObject
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], [String, String]])
-    public keywords: any = undefined;
+    keywords: any = undefined;
 }
 ```
 
@@ -437,7 +497,7 @@ You can define the expected type in your class like this:
 @JsonObject
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], Number])
-    public keywords: any = undefined;
+    keywords: any = undefined;
 }
 ```
 

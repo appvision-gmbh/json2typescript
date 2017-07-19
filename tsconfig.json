@@ -11,7 +11,8 @@
     "module": "commonjs",
     "removeComments": true,
     "target": "es5",
-    "sourceMap": true
+    "sourceMap": true,
+    "strictNullChecks": false
   },
   "exclude": [
     "node_modules",
