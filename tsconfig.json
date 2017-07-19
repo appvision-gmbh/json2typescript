@@ -20,6 +20,10 @@
   ],
   "files": [
     "index.ts",
-    "src/json2typescript/json-convert"
+    "src/json2typescript/json-convert",
+    "src/json2typescript/json-convert-decorators.ts",
+    "src/json2typescript/json-convert-enums.ts"
+    "src/json2typescript/json-convert-options.ts",
+    "src/json2typescript/json-custom-convert.ts",
   ]
 }

@@ -1,0 +1,18 @@
+/**
+ * Internal constants.
+ */
+export class Settings {
+    static readonly MAPPING_PROPERTY = "__jsonconvert__mapping__";
+    static readonly MAPPER_PROPERTY = "__jsonconvert__mapper__";
+};
+
+/**
+ * Internal mapping options for a property.
+ */
+export class MappingOptions {
+    classProperty: string = "";
+    jsonProperty: string = "";
+    expectedType: string = undefined;
+    isOptional: boolean = false;
+    customConverter: any = null;
+}

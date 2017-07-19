@@ -1,103 +1,168 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * Created by andreas on 15.07.2017.
- */
+exports.__esModule = true;
 var json_convert_1 = require("../src/json2typescript/json-convert");
+var json_convert_decorators_1 = require("../src/json2typescript/json-convert-decorators");
+var json_convert_enums_1 = require("../src/json2typescript/json-convert-enums");
 describe('Integration tests', function () {
     describe('JsonConvert', function () {
-        var Car = (function () {
-            function Car() {
-                this.brand = null;
+        // JSONCONVERT INSTANCE
+        var jsonConvert = new json_convert_1.JsonConvert();
+        jsonConvert.operationMode = json_convert_enums_1.OperationMode.ENABLE;
+        jsonConvert.valueCheckingMode = json_convert_enums_1.ValueCheckingMode.ALLOW_NULL;
+        jsonConvert.ignorePrimitiveChecks = false;
+        // JSON DATA
+        var human1JsonObject = {
+            firstname: "Andreas",
+            lastname: "Aeschlimann"
+        };
+        var cat1JsonObject = {
+            name: "Meowy",
+            district: 100,
+            owner: human1JsonObject
+        };
+        var cat2JsonObject = {
+            name: "Links",
+            district: 50,
+            owner: human1JsonObject
+        };
+        var dog1JsonObject = {
+            name: "Barky",
+            barking: true,
+            owner: null
+        };
+        var animalJsonArray = [cat1JsonObject, dog1JsonObject];
+        var catsJsonArray = [cat1JsonObject, cat2JsonObject];
+        // TYPESCRIPT CLASSES
+        var DateConverter = (function () {
+            function DateConverter() {
             }
-            return Car;
+            DateConverter.prototype.serialize = function (date) {
+                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            };
+            DateConverter.prototype.deserialize = function (date) {
+                return new Date(date);
+            };
+            return DateConverter;
+        }());
+        DateConverter = __decorate([
+            json_convert_decorators_1.JsonConverter
+        ], DateConverter);
+        var Human = (function () {
+            function Human() {
+                this.firstname = "";
+                this.lastname = "";
+            }
+            Human.prototype.getName = function () { return this.firstname + " " + this.lastname; };
+            return Human;
         }());
         __decorate([
-            json_convert_1.JsonProperty('brand', String, true)
-        ], Car.prototype, "brand", void 0);
-        Car = __decorate([
-            json_convert_1.JsonObject
-        ], Car);
-        beforeEach(function () {
-            spyOn(console, 'log');
-        });
-        describe('serializeObject', function () {
-            var car;
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
+            json_convert_decorators_1.JsonProperty("firstname", String)
+        ], Human.prototype, "firstname");
+        __decorate([
+            json_convert_decorators_1.JsonProperty("lastname", String)
+        ], Human.prototype, "lastname");
+        Human = __decorate([
+            json_convert_decorators_1.JsonObject
+        ], Human);
+        var Animal = (function () {
+            function Animal() {
+                this.name = undefined;
+                this.owner = undefined;
+            }
+            return Animal;
+        }());
+        __decorate([
+            json_convert_decorators_1.JsonProperty("name", String)
+        ], Animal.prototype, "name");
+        __decorate([
+            json_convert_decorators_1.JsonProperty("owner", Human, true)
+        ], Animal.prototype, "owner");
+        __decorate([
+            json_convert_decorators_1.JsonProperty("birthdate", DateConverter)
+        ], Animal.prototype, "birthdate");
+        Animal = __decorate([
+            json_convert_decorators_1.JsonObject
+        ], Animal);
+        var Cat = (function (_super) {
+            __extends(Cat, _super);
+            function Cat() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.district = undefined;
+                return _this;
+            }
+            return Cat;
+        }(Animal));
+        __decorate([
+            json_convert_decorators_1.JsonProperty("district", Number)
+        ], Cat.prototype, "district");
+        Cat = __decorate([
+            json_convert_decorators_1.JsonObject
+        ], Cat);
+        var Dog = (function (_super) {
+            __extends(Dog, _super);
+            function Dog() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.isBarking = undefined;
+                return _this;
+            }
+            return Dog;
+        }(Animal));
+        __decorate([
+            json_convert_decorators_1.JsonProperty("barking", Boolean)
+        ], Dog.prototype, "isBarking");
+        Dog = __decorate([
+            json_convert_decorators_1.JsonObject
+        ], Dog);
+        // TYPESCRIPT INSTANCES
+        var human1 = new Human();
+        human1.firstname = "Andreas";
+        human1.lastname = "Aeschlimann";
+        var cat1 = new Cat();
+        cat1.name = "Meowy";
+        cat1.district = 100;
+        cat1.owner = human1;
+        var cat2 = new Cat();
+        cat2.name = "Links";
+        cat2.district = 50;
+        cat2.owner = human1;
+        var dog1 = new Dog();
+        dog1.name = "Barky";
+        dog1.isBarking = true;
+        dog1.owner = null;
+        var animals = [cat1, dog1];
+        var cats = [cat1, cat2];
+        // SERIALIZE INTEGRATION
+        describe('serialize', function () {
+            it('should serialize a TypeScript object to a JSON object', function () {
+                expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
-            it('should serialize a class to a string', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var strObject = jsonConvert.serializeObject(car);
-                expect(strObject).toBe('{"brand":"Brand"}');
+            it('should serialize a TypeScript array to a JSON array', function () {
+                expect(jsonConvert.serialize(animals)).toEqual(animalJsonArray);
             });
         });
+        // DESERIALIZE INTEGRATION
         describe('deserialize', function () {
-            var strCar = '{"brand":"Brand"}';
-            var carObj = { brand: "Brand" };
-            var car;
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
+            it('should deserialize a JSON object to a TypeScript object', function () {
+                expect(jsonConvert.deserialize(dog1JsonObject, Dog)).toEqual(dog1);
             });
-            it('should serialize a string to a class', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var car = jsonConvert.deserialize(strCar, Car);
-                expect(car.constructor.name).toBe(Car.name);
-                expect(car.brand).toBe('Brand');
-            });
-            it('should serialize an object to a class', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var car = jsonConvert.deserialize(carObj, Car);
-                expect(car.constructor.name).toBe(Car.name);
-                expect(car.brand).toBe('Brand');
-            });
-        });
-        describe('deserializeString', function () {
-            var strCar = '{"brand":"Brand"}';
-            var car;
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-            });
-            it('should serialize a string to a class', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var car = jsonConvert.deserializeString(strCar, Car);
-                expect(car.constructor.name).toBe(Car.name);
-                expect(car.brand).toBe('Brand');
-            });
-        });
-        describe('deserializeObject', function () {
-            var carObj = { brand: "Brand" };
-            var car;
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-            });
-            it('should deserialize a json object to a class', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var carInstance = jsonConvert.deserializeObject(carObj, Car);
-                expect(carInstance).toEqual(car);
-            });
-        });
-        describe('deserializeArray', function () {
-            var carArr = [{ brand: "Brand" }];
-            var cars = [];
-            beforeEach(function () {
-                cars[0] = new Car();
-                cars[0].brand = 'Brand';
-            });
-            it('should deserialize a json array to a array of classes', function () {
-                var jsonConvert = new json_convert_1.JsonConvert();
-                var carsArray = jsonConvert.deserializeArray(carArr, Car);
-                expect(carsArray).toEqual(cars);
+            it('should deserialize a JSON array to a TypeScript array', function () {
+                expect(jsonConvert.deserialize(catsJsonArray, Cat)).toEqual(cats);
             });
         });
     });

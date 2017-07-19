@@ -1,142 +1,164 @@
-import { OperationMode, JsonConvert, JsonObject, JsonProperty, OperationMode } from "../src/json2typescript/json-convert";
+import { JsonConvert } from "../src/json2typescript/json-convert";
+import { OperationMode, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
+import { JsonConverter, JsonObject, JsonProperty } from "../src/json2typescript/json-convert-decorators";
+import { JsonCustomConvert } from "../src/json2typescript/json-custom-convert";
+import { Settings } from "../src/json2typescript/json-convert-options";
 
 describe('Unit tests', () => {
 
     describe('JsonConvert', () => {
 
+        // JSONCONVERT INSTANCE
         let jsonConvert = new JsonConvert();
+        jsonConvert.operationMode = OperationMode.ENABLE;
+        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+        jsonConvert.ignorePrimitiveChecks = false;
 
-        @JsonObject
-        class Car {
-            @JsonProperty('brand', String, true)
-            brand: string = null;
+        // JSON DATA
+        let human1JsonObject = {
+            firstname: "Andreas",
+            lastname: "Aeschlimann"
         }
+        let cat1JsonObject = {
+            name: "Meowy",
+            district: 100,
+            owner: human1JsonObject
+        };
+        let cat2JsonObject = {
+            name: "Links",
+            district: 50,
+            owner: human1JsonObject
+        };
+        let dog1JsonObject = {
+            name: "Barky",
+            barking: true,
+            owner: null
+        };
+        let animalJsonArray = [cat1JsonObject, dog1JsonObject];
+        let catsJsonArray = [cat1JsonObject, cat2JsonObject];
 
-        beforeEach(function () {
-            spyOn(console, 'log');
-        });
-
-        describe('serializeObject', () => {
-
-            let car: Car;
-
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-            });
-
-            it('should serialize an object to a string', () => {
-                let strObject: string = jsonConvert.serializeObject(car);
-                expect(strObject).toBe('{"brand":"Brand"}');
-            });
-
-            it('should log something when debug mode is enabled', () => {
-                jsonConvert.operationMode = OperationMode.LOGGING;
-                jsonConvert.serializeObject(car);
-                expect(console.log).toHaveBeenCalled();
-            });
-
-            it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.operationMode = OperationMode.ENABLE;
-                jsonConvert.serializeObject(car);
-                expect(console.log).not.toHaveBeenCalled();
-            });
-
-        });
-
-        describe('deserializeString', () => {
-
-            const strCar: string = '{"brand":"Brand"}';
-            let car: Car;
-
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-                spyOn(jsonConvert, 'deserializeObject').and.returnValue(car);
-            });
-
-            it('should serialize a string to a class', () => {
-                let carInstance = jsonConvert.deserializeString(strCar, Car);
-                expect(jsonConvert.deserializeObject).toHaveBeenCalled();
-                expect(carInstance.constructor.name).toBe((<any>Car).name);
-                expect(carInstance.brand).toBe(car.brand);
-            });
-
-            it('should throw an error when trying to deserialize an object', () => {
-                expect(() => {
-                    jsonConvert.deserializeString({brand: "Brand"} as any, Car)
-                }).toThrowError();
-            });
-
-            it('should log something when debug mode is enabled', () => {
-                jsonConvert.operationMode = OperationMode.LOGGING;
-                jsonConvert.deserializeString(strCar, Car);
-                expect(console.log).toHaveBeenCalled();
-            });
-
-            it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.operationMode = OperationMode.ENABLE;
-                jsonConvert.deserializeString(strCar, Car);
-                expect(console.log).not.toHaveBeenCalled();
-            });
-
-        });
-
-        describe('deserializeObject', () => {
-
-            @JsonObject
-            class Truck extends Car {
-                @JsonProperty('isBig', Boolean, true)
-                isBig: boolean = null;
+        // TYPESCRIPT CLASSES
+        @JsonConverter
+        class DateConverter implements JsonCustomConvert<Date> {
+            serialize(date: Date): any {
+                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
             }
 
-            const carStr: string = '{"brand":"Brand"}';
-            const carObj: any = {brand: "Brand"};
-            let car: Car;
+            deserialize(date: any): Date {
+                return new Date(date);
+            }
+        }
 
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-                spyOn(<any>jsonConvert, 'deserializeObject_loopProperty').and.callFake((classInstance: any, propertyKey: string, json: Object) => {
-                    classInstance[propertyKey] = json[propertyKey];
+        @JsonObject
+        class Human {
+            @JsonProperty("firstname", String)
+            firstname: string = "";
+            @JsonProperty("lastname", String)
+            lastname: string = "";
+
+            getName() {
+                return this.firstname + " " + this.lastname;
+            }
+        }
+
+        @JsonObject
+        class Animal {
+            @JsonProperty("name", String)
+            name: string = undefined;
+            @JsonProperty("owner", Human, true)
+            owner: Human = undefined;
+            @JsonProperty("birthdate", DateConverter)
+            birthdate: Date;
+        }
+
+        @JsonObject
+        class Cat extends Animal {
+            @JsonProperty("district", Number)
+            district: number = undefined;
+        }
+
+        @JsonObject
+        class Dog extends Animal {
+            @JsonProperty("barking", Boolean)
+            isBarking: boolean = undefined;
+        }
+
+        // TYPESCRIPT INSTANCES
+        let human1 = new Human();
+        human1.firstname = "Andreas";
+        human1.lastname = "Aeschlimann";
+        let cat1 = new Cat();
+        cat1.name = "Meowy";
+        cat1.district = 100;
+        cat1.owner = human1;
+        let cat2 = new Cat();
+        cat2.name = "Links";
+        cat2.district = 50;
+        cat2.owner = human1;
+        let dog1 = new Dog();
+        dog1.name = "Barky"
+        dog1.isBarking = true;
+        dog1.owner = null;
+        let animals = [cat1, dog1];
+        let cats = [cat1, cat2];
+
+        // PRIVATE METHODS
+        describe('private methods', () => {
+            it('serializeObject_loopProperty()', () => {
+                let t_cat = {};
+                (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat)
+                expect(t_cat["name"]).toBe(cat1.name);
+                (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat)
+                expect(t_cat["district"]).toBe(100);
+                (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat)
+                expect(t_cat["owner"]["firstname"]).toBe("Andreas");
+            });
+            it('deserializeObject_loopProperty()', () => {
+                let t_cat = new Cat();
+                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", { "name": "Meowy" });
+                expect(t_cat.name).toEqual("Meowy");
+                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", { "district": 100 });
+                expect(t_cat.district).toEqual(100);
+                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
+                    "owner": {
+                        firstname: "Andreas",
+                        lastname: "Aeschlimann"
+                    }
                 });
+                expect(t_cat.owner.firstname).toEqual("Andreas");
             });
+        });
 
-            it('should deserialize a json object to a class', () => {
-                let carInstance = jsonConvert.deserializeObject(carObj, Car);
-                expect((<any>jsonConvert).deserializeObject_loopProperty).toHaveBeenCalled();
-                expect(carInstance).toEqual(car);
+        // HELPER METHODS
+        describe('helper methods', () => {
+            it('classPropertyHasDecorator()', () => {
+                expect((<any>jsonConvert).classPropertyHasDecorator(cat1[Settings.MAPPING_PROPERTY], "name")).toBe(true);
+                expect((<any>jsonConvert).classPropertyHasDecorator(dog1[Settings.MAPPING_PROPERTY], "name")).toBe(true);
+                expect((<any>jsonConvert).classPropertyHasDecorator(human1[Settings.MAPPING_PROPERTY], "name")).toBe(false);
             });
-
-            it('should throw an error when not given an object and not given an array', () => {
-                expect(() => {
-                    jsonConvert.deserializeObject('{}', Car);
-                }).toThrowError();
+            it('verifyProperty()', () => {
+                expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
+                //expect((<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toThrow(undefined);
+                expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false)).toEqual(["Andreas", [true, 2.2]]);
             });
+        });
 
-            it('should throw an error when [not given an object and] given an array', () => {
-                expect(() => {
-                    jsonConvert.deserializeObject([], Car);
-                }).toThrowError();
+        // JSON2TYPESCRIPT TYPES
+        describe('json2typescript types', () => {
+            it('getExpectedType()', () => {
+                expect((<any>jsonConvert).getExpectedType(JsonConvert)).toBe("JsonConvert");
+                expect((<any>jsonConvert).getExpectedType([String, [Boolean, Number]])).toBe("[string,[boolean,number]]");
+                expect((<any>jsonConvert).getExpectedType([[null, undefined], Object])).toBe("[[any,any],any]");
             });
-
-            it('should log something when debug mode is enabled', () => {
-                jsonConvert.operationMode = OperationMode.LOGGING;
-                jsonConvert.deserializeObject(carObj, Car);
-                expect(console.log).toHaveBeenCalled();
+            it('getJsonType()', () => {
+                expect((<any>jsonConvert).getJsonType({ name: "Andreas" })).toBe("object");
+                expect((<any>jsonConvert).getJsonType(["a", 0, [true, null]])).toBe("[string,number,[boolean,null]]");
             });
-
-            it('should not log anything when debug mode is disabled', () => {
-                jsonConvert.operationMode = OperationMode.ENABLE;
-                jsonConvert.deserializeObject(carObj, Car);
-                expect(console.log).not.toHaveBeenCalled();
+            it('getTrueType()', () => {
+                expect((<any>jsonConvert).getTrueType(new JsonConvert())).toBe("object");
+                expect((<any>jsonConvert).getTrueType({ name: "Andreas" })).toBe("object");
+                expect((<any>jsonConvert).getTrueType("Andreas")).toBe("string");
             });
-
-            it('should loop through all properties of given object', () => {
-                jsonConvert.deserializeObject(new Truck(), Truck);
-                expect((<any>jsonConvert).deserializeObject_loopProperty).toHaveBeenCalledTimes(2);
-            });
-
         });
 
     });

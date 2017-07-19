@@ -1,117 +1,126 @@
-/**
- * Created by andreas on 15.07.2017.
- */
-import { JsonConvert, JsonObject, JsonProperty } from "../src/json2typescript/json-convert";
+import { JsonConvert } from  "../src/json2typescript/json-convert";
+import { JsonObject, JsonProperty, JsonConverter } from  "../src/json2typescript/json-convert-decorators";
+import { OperationMode, ValueCheckingMode } from  "../src/json2typescript/json-convert-enums";
+import { MappingOptions } from  "../src/json2typescript/json-convert-options";
+import { JsonCustomConvert } from  "../src/json2typescript/json-custom-convert";
 
 describe('Integration tests', () => {
 
     describe('JsonConvert', () => {
 
-        @JsonObject
-        class Car {
-            @JsonProperty('brand', String, true)
-            brand: string = null;
+        // JSONCONVERT INSTANCE
+        let jsonConvert = new JsonConvert();
+        jsonConvert.operationMode = OperationMode.ENABLE;
+        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+        jsonConvert.ignorePrimitiveChecks = false;
+
+        // JSON DATA
+        let human1JsonObject = {
+            firstname: "Andreas",
+            lastname: "Aeschlimann"
+        }
+        let cat1JsonObject = {
+            name: "Meowy",
+            district: 100,
+            owner: human1JsonObject
+        };
+        let cat2JsonObject = {
+            name: "Links",
+            district: 50,
+            owner: human1JsonObject
+        };
+        let dog1JsonObject = {
+            name: "Barky",
+            barking: true,
+            owner: null
+        };
+        let animalJsonArray = [cat1JsonObject, dog1JsonObject];
+        let catsJsonArray = [cat1JsonObject, cat2JsonObject];
+
+        // TYPESCRIPT CLASSES
+        @JsonConverter
+        class DateConverter implements JsonCustomConvert<Date> {
+            serialize(date: Date): any {
+                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +  date.getDate();
+            }
+            deserialize(date: any): Date {
+                return new Date(date);
+            }
         }
 
-        beforeEach(function () {
-            spyOn(console, 'log');
-        });
+        @JsonObject
+        class Human {
+            @JsonProperty("firstname", String)
+            firstname: string = "";
+            @JsonProperty("lastname", String)
+            lastname: string = "";
+            getName() { return this.firstname + " " + this.lastname; }
+        }
 
-        describe('serializeObject', () => {
+        @JsonObject
+        class Animal {
+            @JsonProperty("name", String)
+            name: string = undefined;
+            @JsonProperty("owner", Human, true)
+            owner: Human = undefined;
+            @JsonProperty("birthdate", DateConverter)
+            birthdate: Date;
+        }
 
-            let car: Car;
+        @JsonObject
+        class Cat extends Animal {
+            @JsonProperty("district", Number)
+            district: number = undefined;
+        }
 
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
+        @JsonObject
+        class Dog extends Animal {
+            @JsonProperty("barking", Boolean)
+            isBarking: boolean = undefined;
+        }
+
+        // TYPESCRIPT INSTANCES
+        let human1 = new Human();
+        human1.firstname = "Andreas";
+        human1.lastname = "Aeschlimann";
+        let cat1 = new Cat();
+        cat1.name = "Meowy";
+        cat1.district = 100;
+        cat1.owner = human1;
+        let cat2 = new Cat();
+        cat2.name = "Links";
+        cat2.district = 50;
+        cat2.owner = human1;
+        let dog1 = new Dog();
+        dog1.name = "Barky"
+        dog1.isBarking = true;
+        dog1.owner = null;
+        let animals = [cat1, dog1];
+        let cats = [cat1, cat2];
+
+
+        // SERIALIZE INTEGRATION
+        describe('serialize', () => {
+
+            it('should serialize a TypeScript object to a JSON object', () => {
+                expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
 
-            it('should serialize a class to a string', () => {
-                let jsonConvert = new JsonConvert();
-                let strObject: string = jsonConvert.serializeObject(car);
-                expect(strObject).toBe('{"brand":"Brand"}');
+            it('should serialize a TypeScript array to a JSON array', () => {
+                expect(jsonConvert.serialize(animals)).toEqual(animalJsonArray);
             });
 
         });
 
+        // DESERIALIZE INTEGRATION
         describe('deserialize', () => {
 
-            const strCar: string = '{"brand":"Brand"}';
-            const carObj: any = { brand: "Brand" };
-            let car: Car;
-
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
+            it('should deserialize a JSON object to a TypeScript object', () => {
+                expect(jsonConvert.deserialize(dog1JsonObject, Dog)).toEqual(dog1);
             });
 
-            it('should serialize a string to a class', () => {
-                let jsonConvert = new JsonConvert();
-                let car = jsonConvert.deserialize(strCar, Car);
-                expect(car.constructor.name).toBe((<any>Car).name);
-                expect(car.brand).toBe('Brand');
-            });
-
-            it('should serialize an object to a class', () => {
-                let jsonConvert = new JsonConvert();
-                let car = jsonConvert.deserialize(carObj, Car);
-                expect(car.constructor.name).toBe((<any>Car).name);
-                expect(car.brand).toBe('Brand');
-            });
-
-        });
-
-        describe('deserializeString', () => {
-
-            const strCar: string = '{"brand":"Brand"}';
-            let car: Car;
-
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-            });
-
-            it('should serialize a string to a class', () => {
-                let jsonConvert = new JsonConvert();
-                let car = jsonConvert.deserializeString(strCar, Car);
-                expect(car.constructor.name).toBe((<any>Car).name);
-                expect(car.brand).toBe('Brand');
-            });
-
-        });
-
-        describe('deserializeObject', () => {
-
-            const carObj: any = { brand: "Brand" };
-            let car: Car;
-
-            beforeEach(function () {
-                car = new Car();
-                car.brand = 'Brand';
-            });
-
-            it('should deserialize a json object to a class', () => {
-                let jsonConvert = new JsonConvert();
-                let carInstance = jsonConvert.deserializeObject(carObj, Car);
-                expect(carInstance).toEqual(car);
-            });
-
-        });
-
-        describe('deserializeArray', () => {
-
-            const carArr: any = [{ brand: "Brand" }];
-            let cars: Car[] = [];
-
-            beforeEach(function () {
-                cars[0] = new Car();
-                cars[0].brand = 'Brand';
-            });
-
-            it('should deserialize a json array to a array of classes', () => {
-                let jsonConvert = new JsonConvert();
-                let carsArray = jsonConvert.deserializeArray(carArr, Car);
-                expect(carsArray).toEqual(cars);
+            it('should deserialize a JSON array to a TypeScript array', () => {
+                expect(jsonConvert.deserialize(catsJsonArray, Cat)).toEqual(cats);
             });
 
         });

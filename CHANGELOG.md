@@ -1,4 +1,4 @@
-# v0.9.7 (2017-07-15)
+# v1.0.0 (2017-07-18)
 
 ## Bug Fixes
 
@@ -8,14 +8,17 @@
 ## Features
 
 * Allow serialization the same way as deserialization, closes [#4](https://github.com/dhlab-basel/json2typescript/issues/4)
+* Added smart methods `serialize()` and `deserialize()` for simplified usage
 * Added custom converters, closes [#6](https://github.com/dhlab-basel/json2typescript/issues/6)
 * Use class methods instead of static methods, closes [#14](https://github.com/dhlab-basel/json2typescript/issues/14)
 
 ## Breaking Changes
 
-* Use an instance of `JsonConvert` its class methods instead of the static methods.
+* Use an instance of `JsonConvert` its class methods instead of the static methods
 
-* The property `valueCheckingMode` of the `JsonConvert` class needs to be set using the exported enum `ValueCheckingMode` instead of the inner class `JsonConvert.ValueCheckingMode`. If you would like to set the `valueCheckingMode`, please make the additional import of `ValueCheckingMode` and use this.
+* The static class properties `valueCheckingMode` and `debugMode` are not static anymore. `debugMode` has been renamed to `operationMode`. Their values should be assigned through the given enums with the same name
+
+* Removed the string method `deserializeString()` due to the fact that it is the same as `jsonConvert.deserialize()` combined with `JSON.stringify()`
 
 # 0.9.6  (2017-01-18) 
 Fixed errors in ReadMe and small bug on JsonConvert.

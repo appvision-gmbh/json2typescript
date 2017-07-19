@@ -27,6 +27,10 @@ module.exports = function (config) {
                 'text': '',
                 'html': 'coverage'
             }
+        },
+        browserConsoleLogOptions: {
+            terminal: true,
+            level: ""
         }
     })
 };
