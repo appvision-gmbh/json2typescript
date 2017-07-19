@@ -22,12 +22,14 @@ describe('Unit tests', () => {
         let cat1JsonObject = {
             name: "Meowy",
             district: 100,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            talky: true
         };
         let cat2JsonObject = {
             name: "Links",
             district: 50,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            talky: true
         };
         let dog1JsonObject = {
             name: "Barky",
@@ -41,7 +43,10 @@ describe('Unit tests', () => {
         @JsonConverter
         class DateConverter implements JsonCustomConvert<Date> {
             serialize(date: Date): any {
-                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                let year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                let day = date.getDate();
+                return year + "-" + ( month < 10 ? "0" + month : month ) + "-" + ( day < 10 ? "0" + day : day );
             }
 
             deserialize(date: any): Date {
@@ -73,8 +78,10 @@ describe('Unit tests', () => {
 
         @JsonObject
         class Cat extends Animal {
-            @JsonProperty("district", Number)
+            @JsonProperty()
             district: number = undefined;
+            @JsonProperty()
+            talky: boolean = undefined;
         }
 
         @JsonObject
@@ -91,6 +98,7 @@ describe('Unit tests', () => {
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
+        cat1.talky = true;
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
@@ -101,6 +109,22 @@ describe('Unit tests', () => {
         dog1.owner = null;
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
+
+        // BASIC CHECKS
+        describe('basic checks', () => {
+            it('serialize and deserialize same data', () => {
+                let t_catJsonObject = (<any>jsonConvert).serialize(cat1);
+                expect(t_catJsonObject).toEqual(cat1JsonObject);
+                let t_cat = (<any>jsonConvert).deserialize(t_catJsonObject, Cat);
+                expect(t_cat).toEqual(cat1);
+            });
+            it('deserialize and serialize same data', () => {
+                let t_cat = (<any>jsonConvert).deserialize(cat1JsonObject, Cat);
+                expect(t_cat).toEqual(cat1);
+                let t_catJsonObject = (<any>jsonConvert).serialize(t_cat);
+                expect(t_catJsonObject).toEqual(cat1JsonObject);
+            });
+        });
 
         // PRIVATE METHODS
         describe('private methods', () => {

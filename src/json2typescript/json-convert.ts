@@ -177,7 +177,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject(instance: object): object {
+    serializeObject(instance: any): any {
 
         if (typeof(instance) !== "object" || instance instanceof Array) {
             throw new Error(
@@ -223,7 +223,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray(instanceArray: object[]): object[] {
+    serializeArray(instanceArray: any[]): any[] {
 
         if (typeof(instanceArray) !== "object" || instanceArray instanceof Array === false) {
             throw new Error(
@@ -296,7 +296,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject(jsonObject: object, classReference: { new(): any }): object {
+    deserializeObject(jsonObject: any, classReference: { new(): any }): any {
 
         if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
@@ -314,20 +314,20 @@ export class JsonConvert {
             console.log(jsonObject);
         }
 
-        let classInstance = new classReference();
+        let instance = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(classInstance)) {
-            this.deserializeObject_loopProperty(classInstance, propertyKey, jsonObject);
+        for (const propertyKey of Object.keys(instance)) {
+            this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("Returning CLASS instance:");
-            console.log(classInstance);
+            console.log(instance);
             console.log("----------");
         }
 
-        return classInstance;
+        return instance;
 
     }
 
@@ -344,7 +344,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray(jsonArray: object[], classReference: { new(): any }): object[] {
+    deserializeArray(jsonArray: any[], classReference: { new(): any }): any[] {
 
         if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
@@ -389,31 +389,31 @@ export class JsonConvert {
      * Tries to find the JSON mapping for a given class property and finally assign the value.
      *
      * @param instance the instance of the class
-     * @param propertyKey the property
+     * @param classPropertyName the property name
      * @param json the JSON object
      *
      * @throws throws an expection in case of failure
      */
-    private serializeObject_loopProperty(instance: object, propertyKey: string, json: Object): void {
+    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: Object): void {
 
         // Get the mapping array
         let mapping = instance[Settings.MAPPING_PROPERTY];
 
 
         // Check if a JSON-object mapping is possible for a property
-        if (this.classPropertyHasDecorator(mapping, propertyKey) === false) {
+        if (this.classPropertyHasDecorator(mapping, classPropertyName) === false) {
             return;
         }
 
 
         // Get expected and real values
-        let jsonPropertyMappingOptions: MappingOptions = mapping[propertyKey];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonProperty;
-        let expectedType: any = jsonPropertyMappingOptions.expectedType;
+        let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
+        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
+        let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
         let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
         let customConverter: any = jsonPropertyMappingOptions.customConverter;
 
-        let classInstancePropertyValue: any = instance[propertyKey];
+        let classInstancePropertyValue: any = instance[classPropertyName];
 
 
         // Check if the json value exists
@@ -423,8 +423,8 @@ export class JsonConvert {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JavaScript instance of class \"" + instance.constructor["name"] + "\" to JSON because the defined class property \"" + propertyKey + "\" does not exist or is not defined:\n\n" +
-                "\tClass property: \n\t\t" + propertyKey + "\n\n" +
+                "Failed to map the JavaScript instance of class \"" + instance.constructor["name"] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n"
             );
         }
@@ -432,14 +432,14 @@ export class JsonConvert {
 
         // Map the property
         try {
-            json[jsonKey] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedType, classInstancePropertyValue, true);
+            json[jsonKey] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JavaScript instance of class \"" + instance.constructor["name"] + "\" to JSON because of a type error.\n\n" +
-                "\tClass property: \n\t\t" + propertyKey + "\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tClass property value: \n\t\t" + classInstancePropertyValue + "\n\n" +
-                "\tExpected type: \n\t\t" + this.getExpectedType(expectedType) + "\n\n" +
+                "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tRuntime type: \n\t\t" + this.getTrueType(classInstancePropertyValue) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
                 e.message + "\n"
@@ -451,23 +451,22 @@ export class JsonConvert {
      * Tries to find the JSON mapping for a given class property and finally assign the value.
      *
      * @param instance the instance of the class
-     * @param propertyKey the property
+     * @param classPropertyName the property name
      * @param json the JSON object
      *
      * @throws throws an expection in case of failure
      */
-    private deserializeObject_loopProperty(instance: object, propertyKey: string, json: Object): void {
+    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: Object): void {
 
         // Get the mapping array
         let mapping = instance[Settings.MAPPING_PROPERTY];
 
-
         // Check if a object-JSON mapping is possible for a property
-        if (this.classPropertyHasDecorator(mapping, propertyKey) === false) {
+        if (this.classPropertyHasDecorator(mapping, classPropertyName) === false) {
 
             // Make sure values are not overridden by undefined json values
-            if (typeof(json[propertyKey]) !== "undefined")
-                instance[propertyKey] = json[propertyKey];
+            //if (typeof(json[classPropertyName]) !== "undefined")
+            //    instance[classPropertyName] = json[classPropertyName];
 
             return;
 
@@ -475,9 +474,9 @@ export class JsonConvert {
 
 
         // Get expected and real values
-        let jsonPropertyMappingOptions: MappingOptions = mapping[propertyKey];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonProperty;
-        let expectedType: any = jsonPropertyMappingOptions.expectedType;
+        let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
+        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
+        let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
         let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
         let customConverter: any = jsonPropertyMappingOptions.customConverter;
 
@@ -492,7 +491,7 @@ export class JsonConvert {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + instance.constructor["name"] + "\" because the defined JSON property \"" + jsonKey + "\" does not exist:\n\n" +
-                "\tClass property: \n\t\t" + propertyKey + "\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n"
             );
         }
@@ -500,13 +499,13 @@ export class JsonConvert {
 
         // Map the property
         try {
-            instance[propertyKey] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedType, jsonValue);
+            instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + instance.constructor["name"]+ "\" because of a type error.\n\n" +
-                "\tClass property: \n\t\t" + propertyKey + "\n\n" +
-                "\tExpected type: \n\t\t" + this.getExpectedType(expectedType) + "\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
+                "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
                 "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
@@ -525,19 +524,19 @@ export class JsonConvert {
      * Check if a class property has a decorator.
      *
      * @param mapping the class-JSON mapping array
-     * @param propertyName the property key
+     * @param classPropertyName the property name
      *
      * @returns {boolean} true if the mapping exists, otherwise false
      */
-    private classPropertyHasDecorator(mapping: any, propertyName: string): boolean {
-        return typeof(mapping) !== "undefined" && typeof(mapping[propertyName]) !== "undefined";
+    private classPropertyHasDecorator(mapping: any, classPropertyName: string): boolean {
+        return typeof(mapping) !== "undefined" && typeof(mapping[classPropertyName]) !== "undefined";
     }
 
     /**
-     * Compares the type of a given value with an internal expected type.
+     * Compares the type of a given value with an internal expected json type.
      * Either returns the resulting value or throws an exception.
      *
-     * @param expectedType the expected type for the property
+     * @param expectedJsonType the expected json type for the property
      * @param value the property value to verify
      * @param serialize optional param (default: false), if given, we are in serialization mode
      *
@@ -545,18 +544,18 @@ export class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private verifyProperty(expectedType: any, value: any, serialize?: boolean): any {
+    private verifyProperty(expectedJsonType: any, value: any, serialize?: boolean): any {
 
         // Map immediately if we don't care about the type
-        if (typeof(expectedType) === "undefined" || expectedType === null || expectedType === Object) {
+        if (typeof(expectedJsonType) === "undefined" || expectedJsonType === null || expectedJsonType === Object) {
             return value;
         }
 
         // Check if attempt and expected was 1-d
-        if (expectedType instanceof Array === false && value instanceof Array === false) {
+        if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (expectedType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
+            if (expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {
@@ -566,9 +565,9 @@ export class JsonConvert {
                 }
 
                 if (serialize) return this.serializeObject(value);
-                else return this.deserializeObject(value, expectedType);
+                else return this.deserializeObject(value, expectedJsonType);
 
-            } else if (expectedType === null || expectedType === Object || expectedType === undefined) { // general object
+            } else if (expectedJsonType === null || expectedJsonType === Object || expectedJsonType === undefined) { // general object
 
                 // Check if we have null value
                 if (value === null) {
@@ -579,7 +578,7 @@ export class JsonConvert {
 
                 return value;
 
-            } else if (expectedType === String || expectedType === Number || expectedType === Boolean) { // otherwise check for a primitive type
+            } else if (expectedJsonType === String || expectedJsonType === Number || expectedJsonType === Boolean) { // otherwise check for a primitive type
 
                 // Check if we have null value
                 if (value === null) {
@@ -589,9 +588,9 @@ export class JsonConvert {
 
                 // Check if the types match
                 if ( // primitive types match
-                (expectedType === String && typeof(value) === "string") ||
-                (expectedType === Number && typeof(value) === "number") ||
-                (expectedType === Boolean && typeof(value) === "boolean")
+                (expectedJsonType === String && typeof(value) === "string") ||
+                (expectedJsonType === Number && typeof(value) === "number") ||
+                (expectedJsonType === Boolean && typeof(value) === "boolean")
                 ) {
                     return value;
                 } else { // primitive types mismatch
@@ -608,7 +607,7 @@ export class JsonConvert {
         }
 
         // Check if attempt and expected was n-d
-        if (expectedType instanceof Array && value instanceof Array) {
+        if (expectedJsonType instanceof Array && value instanceof Array) {
 
             let array = [];
 
@@ -618,17 +617,17 @@ export class JsonConvert {
             }
 
             // We obviously don't care about the type, so return the value as is
-            if (expectedType.length === 0) {
+            if (expectedJsonType.length === 0) {
                 return value;
             }
 
             // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedType.length < value.length;
+            let autofillType: boolean = expectedJsonType.length < value.length;
             for (let i = 0; i < value.length; i++) {
 
-                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
+                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
 
-                array[i] = this.verifyProperty(expectedType[i], value[i]);
+                array[i] = this.verifyProperty(expectedJsonType[i], value[i]);
 
             }
 
@@ -637,7 +636,7 @@ export class JsonConvert {
         }
 
         // Check if attempt was 1-d and expected was n-d
-        if (expectedType instanceof Array && value instanceof Object) {
+        if (expectedJsonType instanceof Array && value instanceof Object) {
 
             let array = [];
 
@@ -647,18 +646,18 @@ export class JsonConvert {
             }
 
             // We obviously don't care about the type, so return the json value as is
-            if (expectedType.length === 0) {
+            if (expectedJsonType.length === 0) {
                 return value;
             }
 
             // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedType.length < Object.keys(value).length;
+            let autofillType: boolean = expectedJsonType.length < Object.keys(value).length;
             let i = 0;
             for (let key in value) {
 
-                if (autofillType && i >= expectedType.length) expectedType[i] = expectedType[i - 1];
+                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
 
-                array[key] = this.verifyProperty(expectedType[i], value[key]);
+                array[key] = this.verifyProperty(expectedJsonType[i], value[key]);
 
                 i++;
             }
@@ -668,7 +667,7 @@ export class JsonConvert {
         }
 
         // Check if attempt was 1-d and expected was n-d
-        if (expectedType instanceof Array) {
+        if (expectedJsonType instanceof Array) {
             if (value === null) {
                 if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
                 else throw new Error("\tReason: Given value is null.");
@@ -693,31 +692,31 @@ export class JsonConvert {
     
 
     /**
-     * Returns a string representation of the expected type.
+     * Returns a string representation of the expected json type.
      *
-     * @param expectedType the expected expectedType given from the decorator
+     * @param expectedJsonType the expected type given from the decorator
      *
      * @returns {string} the string representation
      */
-    private getExpectedType(expectedType: any): string {
+    private getExpectedType(expectedJsonType: any): string {
 
         let type: string = "";
 
-        if (expectedType instanceof Array) {
+        if (expectedJsonType instanceof Array) {
             type = "[";
-            for (let i = 0; i < expectedType.length; i++) {
+            for (let i = 0; i < expectedJsonType.length; i++) {
                 if (i > 0) type += ",";
-                type += this.getExpectedType(expectedType[i]);
+                type += this.getExpectedType(expectedJsonType[i]);
             }
             type += "]";
             return type;
         } else {
-            if (expectedType === undefined || expectedType === null || expectedType === Object) {
+            if (expectedJsonType === undefined || expectedJsonType === null || expectedJsonType === Object) {
                 return "any";
-            } else if (expectedType === String || expectedType == Boolean || expectedType == Number) {
-                return (new expectedType()).constructor.name.toLowerCase();
-            } else if (typeof expectedType === 'function') {
-                return (new expectedType()).constructor.name;
+            } else if (expectedJsonType === String || expectedJsonType == Boolean || expectedJsonType == Number) {
+                return (new expectedJsonType()).constructor.name.toLowerCase();
+            } else if (typeof expectedJsonType === 'function') {
+                return (new expectedJsonType()).constructor.name;
             } else {
                 return "?????";
             }

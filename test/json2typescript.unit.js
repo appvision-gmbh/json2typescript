@@ -35,12 +35,14 @@ describe('Unit tests', function () {
         var cat1JsonObject = {
             name: "Meowy",
             district: 100,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            talky: true
         };
         var cat2JsonObject = {
             name: "Links",
             district: 50,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            talky: true
         };
         var dog1JsonObject = {
             name: "Barky",
@@ -54,7 +56,10 @@ describe('Unit tests', function () {
             function DateConverter() {
             }
             DateConverter.prototype.serialize = function (date) {
-                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var day = date.getDate();
+                return year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
             };
             DateConverter.prototype.deserialize = function (date) {
                 return new Date(date);
@@ -107,13 +112,17 @@ describe('Unit tests', function () {
             function Cat() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.district = undefined;
+                _this.talky = undefined;
                 return _this;
             }
             return Cat;
         }(Animal));
         __decorate([
-            json_convert_decorators_1.JsonProperty("district", Number)
+            json_convert_decorators_1.JsonProperty()
         ], Cat.prototype, "district");
+        __decorate([
+            json_convert_decorators_1.JsonProperty()
+        ], Cat.prototype, "talky");
         Cat = __decorate([
             json_convert_decorators_1.JsonObject
         ], Cat);
@@ -140,6 +149,7 @@ describe('Unit tests', function () {
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
+        cat1.talky = true;
         var cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
@@ -150,6 +160,21 @@ describe('Unit tests', function () {
         dog1.owner = null;
         var animals = [cat1, dog1];
         var cats = [cat1, cat2];
+        // BASIC CHECKS
+        describe('basic checks', function () {
+            it('serialize and deserialize same data', function () {
+                var t_catJsonObject = jsonConvert.serialize(cat1);
+                expect(t_catJsonObject).toEqual(cat1JsonObject);
+                var t_cat = jsonConvert.deserialize(t_catJsonObject, Cat);
+                expect(t_cat).toEqual(cat1);
+            });
+            it('deserialize and serialize same data', function () {
+                var t_cat = jsonConvert.deserialize(cat1JsonObject, Cat);
+                expect(t_cat).toEqual(cat1);
+                var t_catJsonObject = jsonConvert.serialize(t_cat);
+                expect(t_catJsonObject).toEqual(cat1JsonObject);
+            });
+        });
         // PRIVATE METHODS
         describe('private methods', function () {
             it('serializeObject_loopProperty()', function () {

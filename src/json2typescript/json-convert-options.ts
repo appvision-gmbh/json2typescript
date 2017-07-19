@@ -10,9 +10,9 @@ export class Settings {
  * Internal mapping options for a property.
  */
 export class MappingOptions {
-    classProperty: string = "";
-    jsonProperty: string = "";
-    expectedType: string = undefined;
+    classPropertyName: string = "";
+    jsonPropertyName: string = "";
+    expectedJsonType: string = undefined;
     isOptional: boolean = false;
     customConverter: any = null;
 }

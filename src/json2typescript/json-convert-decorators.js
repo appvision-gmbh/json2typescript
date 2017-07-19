@@ -31,33 +31,41 @@ exports.JsonObject = JsonObject;
  *
  * If you decide to use a custom converter, make sure this class implements the interface JsonCustomConvert from this package.
  *
- * @param jsonProperty the key in the expected JSON object
+ * @param jsonPropertyName optional param (default: classPropertyName) the property name in the expected JSON object
  * @param conversionOption optional param (default: undefined), should be either the expected type (String|Boolean|Number|etc) or a custom converter class implementing JsonCustomConvert
  * @param isOptional optional param (default: false), if true, the json property does not have to be present in the object
  *
  * @returns {(target:any, key:string)=>void}
  */
-function JsonProperty(jsonProperty, conversionOption, isOptional) {
-    return function (target, classProperty) {
+function JsonProperty(jsonPropertyName, conversionOption, isOptional) {
+    return function (target, classPropertyName) {
         if (typeof (target[json_convert_options_1.Settings.MAPPING_PROPERTY]) === "undefined") {
             target[json_convert_options_1.Settings.MAPPING_PROPERTY] = [];
+        }
+        if (typeof (jsonPropertyName) === "undefined") {
+            jsonPropertyName = classPropertyName;
         }
         if (typeof (isOptional) === "undefined") {
             isOptional = false;
         }
+        if (classPropertyName === "version") {
+            //console.error(target.hasOwnProperty(classPropertyName));
+            //target[classPropertyName] = "null";
+            //console.error(target[classPropertyName]);
+        }
         var jsonPropertyMappingOptions = new json_convert_options_1.MappingOptions();
-        jsonPropertyMappingOptions.classProperty = classProperty;
-        jsonPropertyMappingOptions.jsonProperty = jsonProperty;
+        jsonPropertyMappingOptions.classPropertyName = classPropertyName;
+        jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
         // Check if conversionOption is a type or a custom converter.
         if (typeof (conversionOption) !== "undefined" && typeof (conversionOption[json_convert_options_1.Settings.MAPPER_PROPERTY]) !== "undefined") {
             jsonPropertyMappingOptions.customConverter = new conversionOption();
         }
         else {
-            jsonPropertyMappingOptions.expectedType = conversionOption;
+            jsonPropertyMappingOptions.expectedJsonType = conversionOption;
         }
         // Save the mapping info
-        target[json_convert_options_1.Settings.MAPPING_PROPERTY][classProperty] = jsonPropertyMappingOptions;
+        target[json_convert_options_1.Settings.MAPPING_PROPERTY][classPropertyName] = jsonPropertyMappingOptions;
     };
 }
 exports.JsonProperty = JsonProperty;

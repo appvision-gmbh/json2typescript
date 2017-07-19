@@ -34,17 +34,20 @@ describe('Integration tests', function () {
         var cat1JsonObject = {
             name: "Meowy",
             district: 100,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            birthdate: "2016-01-02"
         };
         var cat2JsonObject = {
             name: "Links",
             district: 50,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            birthdate: "2016-01-02"
         };
         var dog1JsonObject = {
             name: "Barky",
             barking: true,
-            owner: null
+            owner: null,
+            birthdate: "2016-01-02"
         };
         var animalJsonArray = [cat1JsonObject, dog1JsonObject];
         var catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -53,7 +56,10 @@ describe('Integration tests', function () {
             function DateConverter() {
             }
             DateConverter.prototype.serialize = function (date) {
-                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var day = date.getDate();
+                return year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
             };
             DateConverter.prototype.deserialize = function (date) {
                 return new Date(date);
@@ -84,6 +90,7 @@ describe('Integration tests', function () {
             function Animal() {
                 this.name = undefined;
                 this.owner = undefined;
+                this.birthdate = undefined;
             }
             return Animal;
         }());
@@ -137,14 +144,17 @@ describe('Integration tests', function () {
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
+        cat1.birthdate = new Date("2016-01-02");
         var cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
         cat2.owner = human1;
+        cat2.birthdate = new Date("2016-01-02");
         var dog1 = new Dog();
         dog1.name = "Barky";
         dog1.isBarking = true;
         dog1.owner = null;
+        dog1.birthdate = new Date("2016-01-02");
         var animals = [cat1, dog1];
         var cats = [cat1, cat2];
         // SERIALIZE INTEGRATION

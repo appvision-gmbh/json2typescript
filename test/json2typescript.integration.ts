@@ -21,17 +21,20 @@ describe('Integration tests', () => {
         let cat1JsonObject = {
             name: "Meowy",
             district: 100,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            birthdate: "2016-01-02"
         };
         let cat2JsonObject = {
             name: "Links",
             district: 50,
-            owner: human1JsonObject
+            owner: human1JsonObject,
+            birthdate: "2016-01-02"
         };
         let dog1JsonObject = {
             name: "Barky",
             barking: true,
-            owner: null
+            owner: null,
+            birthdate: "2016-01-02"
         };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -40,7 +43,10 @@ describe('Integration tests', () => {
         @JsonConverter
         class DateConverter implements JsonCustomConvert<Date> {
             serialize(date: Date): any {
-                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +  date.getDate();
+                let year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                let day = date.getDate();
+                return year + "-" + ( month < 10 ? "0" + month : month ) + "-" + ( day < 10 ? "0" + day : day );
             }
             deserialize(date: any): Date {
                 return new Date(date);
@@ -63,7 +69,7 @@ describe('Integration tests', () => {
             @JsonProperty("owner", Human, true)
             owner: Human = undefined;
             @JsonProperty("birthdate", DateConverter)
-            birthdate: Date;
+            birthdate: Date = undefined;
         }
 
         @JsonObject
@@ -86,14 +92,17 @@ describe('Integration tests', () => {
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
+        cat1.birthdate = new Date("2016-01-02");
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
         cat2.owner = human1;
+        cat2.birthdate = new Date("2016-01-02");
         let dog1 = new Dog();
         dog1.name = "Barky"
         dog1.isBarking = true;
         dog1.owner = null;
+        dog1.birthdate = new Date("2016-01-02");
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
 
