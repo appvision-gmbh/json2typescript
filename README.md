@@ -377,19 +377,32 @@ With this approach, you will achieve that your property `date` is going to be a 
 
 ### Public properties
 
-#### `(number) JsonConvert.operationMode`
+#### Operation mode
+
+`(number) JsonConvert.operationMode`
 
 Determines how the JsonConvert class instance should operate. 
+
 You may assign three different values:
 - `OperationMode.DISABLE`: json2typescript will be disabled, no type checking or mapping is done
 - `OperationMode.ENABLE`: json2typescript is enabled, but only errors are logged
 - `OperationMode.LOGGING`: json2typescript is enabled and detailed information is logged
 
-The default value is `OperationMode.ENABLE`.
+The default value is `OperationMode.ENABLE`. It will only print errors to the console and is suited for production.
+
+In some cases, you might consider disabling `json2typescript` in production by setting the `OperationMode.DISABLE` flag. 
+This only works in case you only use plain objects without functionality and no mapping. 
+However, disabling `json2typescript` might give you a performance disadvantage in heavy projects.
+
+In case you have issues to find bugs, you can enable additional logging by setting the `OperationMode.LOGGING` flag.
+Please note that every serializing and deserializing is heavily logged to the console and will make your application slower.
+Never use this flag in production.
 
 > Tip: Make sure you import the `ENUM` `OperationMode` when assigning a value to this property.
 
-#### `(number) JsonConvert.valueCheckingMode`
+#### Value checking mode
+
+`(number) JsonConvert.valueCheckingMode`
 
 Determines which types are allowed to be null.
 You may assign three different values:
@@ -401,13 +414,14 @@ The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 > Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
 
-#### `(bool) JsonConvert.ignorePrimitiveChecks`
+#### Ignore primitive checks
+
+`(bool) JsonConvert.ignorePrimitiveChecks`
 
 Determines whether primitive types should be checked. 
 If true, it will be allowed to assign primitive to other primitive types.
 
 The default is `false`.
-
 
 > Tip: The TypeScript developer team suggests you to avoid null values. If your JSON api doesn't return null values, you should try the last flag disallowing null values.
 
