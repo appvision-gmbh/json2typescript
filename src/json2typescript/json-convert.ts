@@ -394,7 +394,7 @@ export class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: Object): void {
+    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
         // Get the mapping array
         let mapping = instance[Settings.MAPPING_PROPERTY];
@@ -456,7 +456,7 @@ export class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: Object): void {
+    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
         // Get the mapping array
         let mapping = instance[Settings.MAPPING_PROPERTY];

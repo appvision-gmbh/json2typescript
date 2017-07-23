@@ -449,10 +449,10 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(object) serializeObject(instance: object)`
-- `(object[]) serializeArray(instanceArray: object[])`
-- `(object) deserializeObject(jsonObject: object, classReference: { new(): any })`
-- `(object[]) deserializeArray(jsonArray: object[], classReference: { new(): any })`
+- `(any) serializeObject(instance: any)`
+- `(any[]) serializeArray(instanceArray: any[])`
+- `(any) deserializeObject(jsonObject: any, classReference: { new(): any })`
+- `(any[]) deserializeArray(jsonArray: any[], classReference: { new(): any })`
 
 >
 
