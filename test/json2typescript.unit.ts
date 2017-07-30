@@ -17,7 +17,7 @@ describe('Unit tests', () => {
         // JSON DATA
         let human1JsonObject = {
             firstname: "Andreas",
-            lastname: "Aeschlimann"
+            lastname: "Muster"
         }
         let cat1JsonObject = {
             name: "Meowy",
@@ -93,7 +93,7 @@ describe('Unit tests', () => {
         // TYPESCRIPT INSTANCES
         let human1 = new Human();
         human1.firstname = "Andreas";
-        human1.lastname = "Aeschlimann";
+        human1.lastname = "Muster";
         let cat1 = new Cat();
         cat1.name = "Meowy";
         cat1.district = 100;
@@ -146,7 +146,7 @@ describe('Unit tests', () => {
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
                     "owner": {
                         firstname: "Andreas",
-                        lastname: "Aeschlimann"
+                        lastname: "Muster"
                     }
                 });
                 expect(t_cat.owner.firstname).toEqual("Andreas");

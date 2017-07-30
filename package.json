@@ -1,6 +1,6 @@
 {
   "name": "json2typescript",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Provides TypeScript methods to map a JSON object to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -41,11 +41,11 @@
     "phantomjs-prebuilt": "2.1.14",
     "typescript": "2.3.4"
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "index.js",
   "files": [
-    "dist",
-    "src"
+    "src/json2typescript",
+    "index.ts",
+    "index.js"
   ],
   "repository": {
     "type": "git",

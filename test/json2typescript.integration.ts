@@ -16,7 +16,7 @@ describe('Integration tests', () => {
         // JSON DATA
         let human1JsonObject = {
             firstname: "Andreas",
-            lastname: "Aeschlimann"
+            lastname: "Muster"
         }
         let cat1JsonObject = {
             name: "Meowy",
@@ -87,7 +87,7 @@ describe('Integration tests', () => {
         // TYPESCRIPT INSTANCES
         let human1 = new Human();
         human1.firstname = "Andreas";
-        human1.lastname = "Aeschlimann";
+        human1.lastname = "Muster";
         let cat1 = new Cat();
         cat1.name = "Meowy";
         cat1.district = 100;

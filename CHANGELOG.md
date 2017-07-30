@@ -1,4 +1,4 @@
-# v1.0.0 (2017-07-18)
+# v1.0.x (2017-07-31)
 
 ## Bug Fixes
 
@@ -14,10 +14,8 @@
 
 ## Breaking Changes
 
-* Use an instance of `JsonConvert` its class methods instead of the static methods
-
+* Use an instance of `JsonConvert` and its class methods instead of the static methods
 * The static class properties `valueCheckingMode` and `debugMode` are not static anymore. `debugMode` has been renamed to `operationMode`. Their values should be assigned through the given enums with the same name
-
 * Removed the string method `deserializeString()` due to the fact that it is the same as `jsonConvert.deserialize()` combined with `JSON.stringify()`
 
 # 0.9.6  (2017-01-18) 
