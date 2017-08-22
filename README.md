@@ -224,7 +224,13 @@ The class decorators are used infront of the class declaration and do not suppor
 export class User {}
 ```
 
-> Tip: Make sure you import `JsonObject` from `json2typescript`.
+> Tip: Make sure you import `JsonObject` from `json2typescript`.  
+> Tip: It's possible to deserialize multiple JSON-values into the same property. This can be useful if you have multiple JSON sources with inconsistent names, but want a single target object.
+```typescript
+    @JsonProperty("jsonPropName", String, true)
+    @JsonProperty("jsonPropertyName", String, true)
+    name: string = undefined;
+```
 
 ### Property decorators
 

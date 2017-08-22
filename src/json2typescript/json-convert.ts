@@ -408,7 +408,7 @@ export class JsonConvert {
 
         // Get expected and real values
         let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
+        let jsonKey: string[] = jsonPropertyMappingOptions.jsonPropertyName;
         let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
         let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
         let customConverter: any = jsonPropertyMappingOptions.customConverter;
@@ -432,7 +432,8 @@ export class JsonConvert {
 
         // Map the property
         try {
-            json[jsonKey] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+            // Each classProperty might have multiple decorators - only use the JSON-value as defined in the first one
+            json[jsonKey[0]] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -475,16 +476,25 @@ export class JsonConvert {
 
         // Get expected and real values
         let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
+        let jsonKey: string[] = jsonPropertyMappingOptions.jsonPropertyName;
         let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
         let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
         let customConverter: any = jsonPropertyMappingOptions.customConverter;
 
-        let jsonValue: any = json[jsonKey];
 
+        // Map the property
+        let jsonFound: boolean = false;
+        // Each classProperty can have multiple decorators - loop through them to see if a ny of them have a value
+        for (const key in jsonKey) {
+            let jsonValue: any = json[jsonKey[key]];
+            if (typeof(jsonValue) !== "undefined" && !jsonFound) {
+                instance[classPropertyName] = this.deserializeProperty(customConverter, jsonKey[key], jsonValue, expectedJsonType, classPropertyName, instance.constructor["name"]);
+                jsonFound = true;
+            }
+        }
 
         // Check if the json value exists
-        if (typeof(jsonValue) === "undefined") {
+        if (!jsonFound) {
 
             if (isOptional) return;
 
@@ -495,15 +505,23 @@ export class JsonConvert {
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n"
             );
         }
+    }
 
+    ////////////////////
+    // HELPER METHODS //
+    ////////////////////
 
-        // Map the property
+    /**
+     * Deserialize a property (using a custom converter, if it exists)
+     * @throws an Error in case of failure
+     */
+    private deserializeProperty(customConverter: any, jsonKey: string, jsonValue: any, expectedJsonType: any, classPropertyName: string, className: string): any {
         try {
-            instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
+            return customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance.constructor["name"]+ "\" because of a type error.\n\n" +
+                "Failed to map the JSON object to the class \"" + className+ "\" because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
@@ -513,12 +531,6 @@ export class JsonConvert {
             );
         }
     }
-
-
-    ////////////////////
-    // HELPER METHODS //
-    ////////////////////
-
 
     /**
      * Check if a class property has a decorator.
