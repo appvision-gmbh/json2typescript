@@ -1,8 +1,5 @@
 "use strict";
-exports.__esModule = true;
-/**
- * Internal constants.
- */
+Object.defineProperty(exports, "__esModule", { value: true });
 var Settings = (function () {
     function Settings() {
     }
@@ -12,9 +9,6 @@ Settings.MAPPING_PROPERTY = "__jsonconvert__mapping__";
 Settings.MAPPER_PROPERTY = "__jsonconvert__mapper__";
 exports.Settings = Settings;
 ;
-/**
- * Internal mapping options for a property.
- */
 var MappingOptions = (function () {
     function MappingOptions() {
         this.classPropertyName = "";

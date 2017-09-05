@@ -1,6 +1,6 @@
 {
   "name": "json2typescript",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Provides TypeScript methods to map a JSON object to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -28,8 +28,7 @@
   "typescript": {
     "definition": "dist/index.d.ts"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "^2.5.52",
     "jasmine": "2.6.0",
