@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_1 = require("./src/json2typescript/json-convert");
 exports.JsonConvert = json_convert_1.JsonConvert;
 var json_convert_enums_1 = require("./src/json2typescript/json-convert-enums");

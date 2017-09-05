@@ -12,7 +12,8 @@
     "removeComments": true,
     "target": "es5",
     "sourceMap": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "noImplicitAny": true
   },
   "exclude": [
     "node_modules",

@@ -609,7 +609,7 @@ export class JsonConvert {
         // Check if attempt and expected was n-d
         if (expectedJsonType instanceof Array && value instanceof Array) {
 
-            let array = [];
+            let array: any[] = [];
 
             // No data given, so return empty value
             if (value.length === 0) {
@@ -638,7 +638,7 @@ export class JsonConvert {
         // Check if attempt was 1-d and expected was n-d
         if (expectedJsonType instanceof Array && value instanceof Object) {
 
-            let array = [];
+            let array: any[] = [];
 
             // No data given, so return empty value
             if (value.length === 0) {
@@ -657,7 +657,7 @@ export class JsonConvert {
 
                 if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
 
-                array[key] = this.verifyProperty(expectedJsonType[i], value[key]);
+                array[key as any] = this.verifyProperty(expectedJsonType[i], value[key]);
 
                 i++;
             }
