@@ -44,18 +44,14 @@ export function JsonProperty(jsonPropertyName?: string, conversionOption?: any, 
             target[Settings.MAPPING_PROPERTY] = [];
         }
 
+        const className = target.constructor.name;
+
         if (typeof(jsonPropertyName) === "undefined") {
             jsonPropertyName = classPropertyName;
         }
 
         if (typeof(isOptional) === "undefined") {
             isOptional = false;
-        }
-
-        if (classPropertyName === "version") {
-            //console.error(target.hasOwnProperty(classPropertyName));
-            //target[classPropertyName] = "null";
-            //console.error(target[classPropertyName]);
         }
 
         let jsonPropertyMappingOptions = new MappingOptions();
@@ -71,7 +67,7 @@ export function JsonProperty(jsonPropertyName?: string, conversionOption?: any, 
         }
 
         // Save the mapping info
-        target[Settings.MAPPING_PROPERTY][classPropertyName] = jsonPropertyMappingOptions;
+        target[Settings.MAPPING_PROPERTY][className + "." + classPropertyName] = jsonPropertyMappingOptions;
 
     }
 

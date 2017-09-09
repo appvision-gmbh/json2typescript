@@ -396,22 +396,18 @@ export class JsonConvert {
      */
     private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
-        // Get the mapping array
-        let mapping = instance[Settings.MAPPING_PROPERTY];
-
-
         // Check if a JSON-object mapping is possible for a property
-        if (this.classPropertyHasDecorator(mapping, classPropertyName) === false) {
+        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        if (mappingOptions === null) {
             return;
         }
 
 
         // Get expected and real values
-        let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
-        let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
-        let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
-        let customConverter: any = jsonPropertyMappingOptions.customConverter;
+        let jsonKey: string = mappingOptions.jsonPropertyName;
+        let expectedJsonType: any = mappingOptions.expectedJsonType;
+        let isOptional: boolean = mappingOptions.isOptional;
+        let customConverter: any = mappingOptions.customConverter;
 
         let classInstancePropertyValue: any = instance[classPropertyName];
 
@@ -458,27 +454,16 @@ export class JsonConvert {
      */
     private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
-        // Get the mapping array
-        let mapping = instance[Settings.MAPPING_PROPERTY];
-
-        // Check if a object-JSON mapping is possible for a property
-        if (this.classPropertyHasDecorator(mapping, classPropertyName) === false) {
-
-            // Make sure values are not overridden by undefined json values
-            //if (typeof(json[classPropertyName]) !== "undefined")
-            //    instance[classPropertyName] = json[classPropertyName];
-
+        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        if (mappingOptions === null) {
             return;
-
         }
 
-
         // Get expected and real values
-        let jsonPropertyMappingOptions: MappingOptions = mapping[classPropertyName];
-        let jsonKey: string = jsonPropertyMappingOptions.jsonPropertyName;
-        let expectedJsonType: any = jsonPropertyMappingOptions.expectedJsonType;
-        let isOptional: boolean = jsonPropertyMappingOptions.isOptional;
-        let customConverter: any = jsonPropertyMappingOptions.customConverter;
+        let jsonKey: string = mappingOptions.jsonPropertyName;
+        let expectedJsonType: any = mappingOptions.expectedJsonType;
+        let isOptional: boolean = mappingOptions.isOptional;
+        let customConverter: any = mappingOptions.customConverter;
 
         let jsonValue: any = json[jsonKey];
 
@@ -503,7 +488,7 @@ export class JsonConvert {
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance.constructor["name"]+ "\" because of a type error.\n\n" +
+                "Failed to map the JSON object to the JavaScript class \"" + instance.constructor["name"]+ "\" because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
@@ -519,17 +504,35 @@ export class JsonConvert {
     // HELPER METHODS //
     ////////////////////
 
-
     /**
-     * Check if a class property has a decorator.
+     * Gets the mapping options of a given class property.
      *
-     * @param mapping the class-JSON mapping array
-     * @param classPropertyName the property name
+     * @param instance any class instance
+     * @param {string} propertyName any property name
      *
-     * @returns {boolean} true if the mapping exists, otherwise false
+     * @returns {MappingOptions}
      */
-    private classPropertyHasDecorator(mapping: any, classPropertyName: string): boolean {
-        return typeof(mapping) !== "undefined" && typeof(mapping[classPropertyName]) !== "undefined";
+    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions {
+
+        let mappings: any = instance[Settings.MAPPING_PROPERTY];
+
+        // Check if mapping is defined
+        if (typeof(mappings) === "undefined") return null;
+
+        // Get direct mapping if possible
+        const directMappingName: string = instance.constructor.name + "." + propertyName;
+        if (typeof(mappings[directMappingName]) !== "undefined") {
+            return mappings[directMappingName];
+        }
+
+        // No mapping was found, try to find some
+        const indirectMappingNames: string[] = Object.keys(mappings).filter(key => key.indexOf("." + propertyName) >= 0);
+        if (indirectMappingNames.length > 0) {
+            return mappings[indirectMappingNames[0]];
+        }
+
+        return null;
+
     }
 
     /**
@@ -609,7 +612,7 @@ export class JsonConvert {
         // Check if attempt and expected was n-d
         if (expectedJsonType instanceof Array && value instanceof Array) {
 
-            let array = [];
+            let array: any[] = [];
 
             // No data given, so return empty value
             if (value.length === 0) {
@@ -638,7 +641,7 @@ export class JsonConvert {
         // Check if attempt was 1-d and expected was n-d
         if (expectedJsonType instanceof Array && value instanceof Object) {
 
-            let array = [];
+            let array: any[] = [];
 
             // No data given, so return empty value
             if (value.length === 0) {
@@ -657,7 +660,7 @@ export class JsonConvert {
 
                 if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
 
-                array[key] = this.verifyProperty(expectedJsonType[i], value[key]);
+                array[key as any] = this.verifyProperty(expectedJsonType[i], value[key]);
 
                 i++;
             }

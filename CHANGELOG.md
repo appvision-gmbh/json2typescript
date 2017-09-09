@@ -1,4 +1,14 @@
-# v1.0.x (2017-07-31)
+# v1.0.3 (2017-09-10)
+
+## Bug Fixes
+
+* Fixed issue with class properties when extending another class, closes [#22](https://github.com/dhlab-basel/json2typescript/issues/22)
+
+## Features
+
+* Allow `json2typescript` to work with `noImplicitAny`, closes [#23](https://github.com/dhlab-basel/json2typescript/issues/23)
+
+# v1.0.2 (2017-07-31)
 
 ## Bug Fixes
 

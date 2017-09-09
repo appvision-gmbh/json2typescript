@@ -15,7 +15,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_1 = require("../src/json2typescript/json-convert");
 var json_convert_decorators_1 = require("../src/json2typescript/json-convert-decorators");
 var json_convert_enums_1 = require("../src/json2typescript/json-convert-enums");
@@ -29,13 +29,13 @@ describe('Integration tests', function () {
         // JSON DATA
         var human1JsonObject = {
             firstname: "Andreas",
-            lastname: "Aeschlimann"
+            lastname: "Muster"
         };
         var cat1JsonObject = {
             name: "Meowy",
             district: 100,
             owner: human1JsonObject,
-            birthdate: "2016-01-02"
+            birthdate: "2016-01-02",
         };
         var cat2JsonObject = {
             name: "Links",
@@ -79,10 +79,10 @@ describe('Integration tests', function () {
         }());
         __decorate([
             json_convert_decorators_1.JsonProperty("firstname", String)
-        ], Human.prototype, "firstname");
+        ], Human.prototype, "firstname", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("lastname", String)
-        ], Human.prototype, "lastname");
+        ], Human.prototype, "lastname", void 0);
         Human = __decorate([
             json_convert_decorators_1.JsonObject
         ], Human);
@@ -96,13 +96,13 @@ describe('Integration tests', function () {
         }());
         __decorate([
             json_convert_decorators_1.JsonProperty("name", String)
-        ], Animal.prototype, "name");
+        ], Animal.prototype, "name", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("owner", Human, true)
-        ], Animal.prototype, "owner");
+        ], Animal.prototype, "owner", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("birthdate", DateConverter)
-        ], Animal.prototype, "birthdate");
+        ], Animal.prototype, "birthdate", void 0);
         Animal = __decorate([
             json_convert_decorators_1.JsonObject
         ], Animal);
@@ -117,7 +117,7 @@ describe('Integration tests', function () {
         }(Animal));
         __decorate([
             json_convert_decorators_1.JsonProperty("district", Number)
-        ], Cat.prototype, "district");
+        ], Cat.prototype, "district", void 0);
         Cat = __decorate([
             json_convert_decorators_1.JsonObject
         ], Cat);
@@ -132,14 +132,14 @@ describe('Integration tests', function () {
         }(Animal));
         __decorate([
             json_convert_decorators_1.JsonProperty("barking", Boolean)
-        ], Dog.prototype, "isBarking");
+        ], Dog.prototype, "isBarking", void 0);
         Dog = __decorate([
             json_convert_decorators_1.JsonObject
         ], Dog);
         // TYPESCRIPT INSTANCES
         var human1 = new Human();
         human1.firstname = "Andreas";
-        human1.lastname = "Aeschlimann";
+        human1.lastname = "Muster";
         var cat1 = new Cat();
         cat1.name = "Meowy";
         cat1.district = 100;
@@ -160,6 +160,8 @@ describe('Integration tests', function () {
         // SERIALIZE INTEGRATION
         describe('serialize', function () {
             it('should serialize a TypeScript object to a JSON object', function () {
+                console.log(JSON.stringify(jsonConvert.serialize(cat1)));
+                console.log(JSON.stringify(cat1JsonObject));
                 expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
             it('should serialize a TypeScript array to a JSON array', function () {

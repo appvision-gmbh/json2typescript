@@ -15,11 +15,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_1 = require("../src/json2typescript/json-convert");
 var json_convert_enums_1 = require("../src/json2typescript/json-convert-enums");
 var json_convert_decorators_1 = require("../src/json2typescript/json-convert-decorators");
-var json_convert_options_1 = require("../src/json2typescript/json-convert-options");
 describe('Unit tests', function () {
     describe('JsonConvert', function () {
         // JSONCONVERT INSTANCE
@@ -30,24 +29,27 @@ describe('Unit tests', function () {
         // JSON DATA
         var human1JsonObject = {
             firstname: "Andreas",
-            lastname: "Aeschlimann"
+            lastname: "Muster"
         };
         var cat1JsonObject = {
             name: "Meowy",
             district: 100,
             owner: human1JsonObject,
-            talky: true
+            talky: true,
+            other: "cute"
         };
         var cat2JsonObject = {
             name: "Links",
             district: 50,
             owner: human1JsonObject,
-            talky: true
+            talky: true,
+            other: "sweet"
         };
         var dog1JsonObject = {
             name: "Barky",
             barking: true,
-            owner: null
+            owner: null,
+            other: 1.1
         };
         var animalJsonArray = [cat1JsonObject, dog1JsonObject];
         var catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -81,10 +83,10 @@ describe('Unit tests', function () {
         }());
         __decorate([
             json_convert_decorators_1.JsonProperty("firstname", String)
-        ], Human.prototype, "firstname");
+        ], Human.prototype, "firstname", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("lastname", String)
-        ], Human.prototype, "lastname");
+        ], Human.prototype, "lastname", void 0);
         Human = __decorate([
             json_convert_decorators_1.JsonObject
         ], Human);
@@ -97,13 +99,13 @@ describe('Unit tests', function () {
         }());
         __decorate([
             json_convert_decorators_1.JsonProperty("name", String)
-        ], Animal.prototype, "name");
+        ], Animal.prototype, "name", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("owner", Human, true)
-        ], Animal.prototype, "owner");
+        ], Animal.prototype, "owner", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty("birthdate", DateConverter)
-        ], Animal.prototype, "birthdate");
+        ], Animal.prototype, "birthdate", void 0);
         Animal = __decorate([
             json_convert_decorators_1.JsonObject
         ], Animal);
@@ -113,16 +115,20 @@ describe('Unit tests', function () {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.district = undefined;
                 _this.talky = undefined;
+                _this.other = undefined;
                 return _this;
             }
             return Cat;
         }(Animal));
         __decorate([
             json_convert_decorators_1.JsonProperty()
-        ], Cat.prototype, "district");
+        ], Cat.prototype, "district", void 0);
         __decorate([
             json_convert_decorators_1.JsonProperty()
-        ], Cat.prototype, "talky");
+        ], Cat.prototype, "talky", void 0);
+        __decorate([
+            json_convert_decorators_1.JsonProperty("other", String)
+        ], Cat.prototype, "other", void 0);
         Cat = __decorate([
             json_convert_decorators_1.JsonObject
         ], Cat);
@@ -131,33 +137,40 @@ describe('Unit tests', function () {
             function Dog() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.isBarking = undefined;
+                _this.other = undefined;
                 return _this;
             }
             return Dog;
         }(Animal));
         __decorate([
             json_convert_decorators_1.JsonProperty("barking", Boolean)
-        ], Dog.prototype, "isBarking");
+        ], Dog.prototype, "isBarking", void 0);
+        __decorate([
+            json_convert_decorators_1.JsonProperty("other", Number)
+        ], Dog.prototype, "other", void 0);
         Dog = __decorate([
             json_convert_decorators_1.JsonObject
         ], Dog);
         // TYPESCRIPT INSTANCES
         var human1 = new Human();
         human1.firstname = "Andreas";
-        human1.lastname = "Aeschlimann";
+        human1.lastname = "Muster";
         var cat1 = new Cat();
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
         cat1.talky = true;
+        cat1.other = "cute";
         var cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
         cat2.owner = human1;
+        cat2.other = "sweet";
         var dog1 = new Dog();
         dog1.name = "Barky";
         dog1.isBarking = true;
         dog1.owner = null;
+        dog1.other = 1.1;
         var animals = [cat1, dog1];
         var cats = [cat1, cat2];
         // BASIC CHECKS
@@ -195,7 +208,7 @@ describe('Unit tests', function () {
                 jsonConvert.deserializeObject_loopProperty(t_cat, "owner", {
                     "owner": {
                         firstname: "Andreas",
-                        lastname: "Aeschlimann"
+                        lastname: "Muster"
                     }
                 });
                 expect(t_cat.owner.firstname).toEqual("Andreas");
@@ -203,10 +216,10 @@ describe('Unit tests', function () {
         });
         // HELPER METHODS
         describe('helper methods', function () {
-            it('classPropertyHasDecorator()', function () {
-                expect(jsonConvert.classPropertyHasDecorator(cat1[json_convert_options_1.Settings.MAPPING_PROPERTY], "name")).toBe(true);
-                expect(jsonConvert.classPropertyHasDecorator(dog1[json_convert_options_1.Settings.MAPPING_PROPERTY], "name")).toBe(true);
-                expect(jsonConvert.classPropertyHasDecorator(human1[json_convert_options_1.Settings.MAPPING_PROPERTY], "name")).toBe(false);
+            it('getClassPropertyMappingOptions()', function () {
+                expect(jsonConvert.getClassPropertyMappingOptions(cat1, "name")).not.toBeNull();
+                expect(jsonConvert.getClassPropertyMappingOptions(dog1, "name")).not.toBeNull();
+                expect(jsonConvert.getClassPropertyMappingOptions(human1, "name")).toBeNull();
             });
             it('verifyProperty()', function () {
                 expect(jsonConvert.verifyProperty(String, "Andreas", false)).toBe("Andreas");

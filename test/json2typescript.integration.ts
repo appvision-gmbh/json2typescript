@@ -22,7 +22,7 @@ describe('Integration tests', () => {
             name: "Meowy",
             district: 100,
             owner: human1JsonObject,
-            birthdate: "2016-01-02"
+            birthdate: "2016-01-02",
         };
         let cat2JsonObject = {
             name: "Links",
@@ -111,6 +111,8 @@ describe('Integration tests', () => {
         describe('serialize', () => {
 
             it('should serialize a TypeScript object to a JSON object', () => {
+                console.log(JSON.stringify(jsonConvert.serialize(cat1)));
+                console.log(JSON.stringify(cat1JsonObject));
                 expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
 

@@ -23,18 +23,21 @@ describe('Unit tests', () => {
             name: "Meowy",
             district: 100,
             owner: human1JsonObject,
-            talky: true
+            talky: true,
+            other: "cute"
         };
         let cat2JsonObject = {
             name: "Links",
             district: 50,
             owner: human1JsonObject,
-            talky: true
+            talky: true,
+            other: "sweet"
         };
         let dog1JsonObject = {
             name: "Barky",
             barking: true,
-            owner: null
+            owner: null,
+            other: 1.1
         };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -82,12 +85,16 @@ describe('Unit tests', () => {
             district: number = undefined;
             @JsonProperty()
             talky: boolean = undefined;
+            @JsonProperty("other", String)
+            other: string = undefined;
         }
 
         @JsonObject
         class Dog extends Animal {
             @JsonProperty("barking", Boolean)
             isBarking: boolean = undefined;
+            @JsonProperty("other", Number)
+            other: number = undefined;
         }
 
         // TYPESCRIPT INSTANCES
@@ -99,14 +106,17 @@ describe('Unit tests', () => {
         cat1.district = 100;
         cat1.owner = human1;
         cat1.talky = true;
+        cat1.other = "cute";
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
         cat2.owner = human1;
+        cat2.other = "sweet";
         let dog1 = new Dog();
-        dog1.name = "Barky"
+        dog1.name = "Barky";
         dog1.isBarking = true;
         dog1.owner = null;
+        dog1.other = 1.1;
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
 
@@ -155,10 +165,10 @@ describe('Unit tests', () => {
 
         // HELPER METHODS
         describe('helper methods', () => {
-            it('classPropertyHasDecorator()', () => {
-                expect((<any>jsonConvert).classPropertyHasDecorator(cat1[Settings.MAPPING_PROPERTY], "name")).toBe(true);
-                expect((<any>jsonConvert).classPropertyHasDecorator(dog1[Settings.MAPPING_PROPERTY], "name")).toBe(true);
-                expect((<any>jsonConvert).classPropertyHasDecorator(human1[Settings.MAPPING_PROPERTY], "name")).toBe(false);
+            it('getClassPropertyMappingOptions()', () => {
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(cat1, "name")).not.toBeNull();
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog1, "name")).not.toBeNull();
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(human1, "name")).toBeNull();
             });
             it('verifyProperty()', () => {
                 expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");

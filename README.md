@@ -519,9 +519,15 @@ export class User {
 
 ---
 
-# Authors
+# Contributors
 
-This NPM package was originally created by the **Digital Humanities Lab** of **University of Basel** in 2016.
-We make use of it in our new website of http://www.salsah.org.
+This NPM package was originally created by **Andreas Aeschlimann**, scientific researcher of the **Digital Humanities Lab** (DHlab) of **University of Basel** in 2016. 
 
-More information on http://dhlab.unibas.ch
+The Digital Humanities Lab makes use of `json2typescript` in several Angular web applications, for example in the new website of http://www.salsah.org. You may find more information about us on http://dhlab.unibas.ch
+
+## Special thanks
+
+Thanks for the input and pull requests by:
+- @gempain for fixing several issues and adding karma tests.
+- @mrwogu for fixing the `noImplicitAny` issue.
+- @bblommers for the support of multiple decorators.

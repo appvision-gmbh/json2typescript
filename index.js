@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_1 = require("./src/json2typescript/json-convert");
 exports.JsonConvert = json_convert_1.JsonConvert;
 var json_convert_enums_1 = require("./src/json2typescript/json-convert-enums");
@@ -9,3 +9,4 @@ var json_convert_decorators_1 = require("./src/json2typescript/json-convert-deco
 exports.JsonObject = json_convert_decorators_1.JsonObject;
 exports.JsonProperty = json_convert_decorators_1.JsonProperty;
 exports.JsonConverter = json_convert_decorators_1.JsonConverter;
+//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/index.js.map
