@@ -1,3 +1,9 @@
+# v1.0.4 (2017-09-12)
+
+## Bug Fixes
+
+* Fixed bug in serialization mode
+
 # v1.0.3 (2017-09-10)
 
 ## Bug Fixes
