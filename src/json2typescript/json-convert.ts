@@ -278,7 +278,7 @@ export class JsonConvert {
 
         throw new Error(
             "Fatal error in JsonConvert. " +
-            "Passed parameter json in JsonConvert.deserialize() is not in valid json format (object or array)."
+            "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)."
         );
 
     };
@@ -630,7 +630,7 @@ export class JsonConvert {
 
                 if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
 
-                array[i] = this.verifyProperty(expectedJsonType[i], value[i]);
+                array[i] = this.verifyProperty(expectedJsonType[i], value[i], serialize);
 
             }
 
