@@ -109,7 +109,7 @@ export class City {
     // This maps the JSON key "data" to the class property "data".
     // We are not sure about the type, so we omit the second parameter.
     // There will be an exception if the JSON value is missing.
-    @JsonProperty("data") // is the same as @JsonProperty("data", undefined)
+    @JsonProperty("data") // is the same as @JsonProperty("data", Any)
     data: any = undefined;
     
     // This maps the JSON key "keywords" to the class property "keywords".
@@ -207,6 +207,10 @@ export class AppComponent implements OnInit {
 ```
 Play around with the JSON to provocate exceptions when deserializing the object.
 
+## Important notes
+
+Avoid circular depencencies on the classes that use `json2typescript`. Even if you don't have any errors in your IDE, `json2typescript` will not properly work in this case.
+
 ---
 
 # Detailed reference
@@ -253,7 +257,7 @@ In our case, `json["jsonPropertyName"]` gets mapped to `user.name`.
 #### Second parameter (optional): conversionOption
 
 The second parameter of `@JsonProperty` describes what happens when doing the mapping between JSON and TypeScript objects.
-This parameter is optional; the default value is `undefined` (which means no type check is done when the mapping happens).
+This parameter is optional; the default value is `Any` (which means no type check is done when the mapping happens).
 
 ##### Use of expected type
 
@@ -262,7 +266,8 @@ check according to given TypeScript types, you can pass a type you
 expect. Follow the following guide when doing that:
 
 - Make sure you pass the class name and not an instance of the class.
-- In case of primitive types, you have to use the upper case names. 
+- In case of primitive types, you have to use the upper case names.
+- In case of `any` type, import from `json2typescript` the class `Any`.
 
 See the following cheat sheet for reference:
 
@@ -272,13 +277,13 @@ See the following cheat sheet for reference:
 | Number                    | number                |
 | Boolean                   | boolean               | 
 | User                      | User                  |
-| undefined                 | any                   |
+| Any                       | any                   |
 |                           |                       | 
 | [String]                  | string[]              | 
 | [Number]                  | number[]              |
 | [Boolean]                 | boolean[]             | 
 | [User]                    | User[]                | 
-| [undefined] or []         | any[]                 | 
+| [Any]                     | any[]                 | 
 
 At first, our array notation on the left looks odd. 
 But this notation allows you to define even nested arrays. 
@@ -323,7 +328,7 @@ The same applies for the case when you try to serialize a TypeScript object to a
 * Make sure you define the expected type as accurate as possible, even if you expect primitive types.
 * By default, casting primitives into other primitives is not allowed. Check the public properties below in this document to change this behaviour.
 * By default, primitives are not allowed to be null. Check the public properties below in this document to change this.
-* If you don't know the type, you may use `undefined` as expected type. You may also omit the second parameter of `@JsonProperty`.
+* If you don't know the type, you may use `Any` as expected type. You may also omit the second parameter of `@JsonProperty`.
 
 #### More about the array syntax
 

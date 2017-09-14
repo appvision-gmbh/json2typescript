@@ -1,3 +1,13 @@
+# v1.0.5 (2017-09-14)
+
+## Features
+
+* Added README note about circular dependency issues
+
+## Breaking Changes
+
+* `json2typescript` will now throw an exception if the `JsonProperty` decorator has `undefined` as second parameter. Pass `null` if you want to skip the type check instead or don't pass the second parameter at all.
+
 # v1.0.4 (2017-09-12)
 
 ## Bug Fixes

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_enums_1 = require("./json-convert-enums");
 var json_convert_options_1 = require("./json-convert-options");
+var any_1 = require("./any");
 var JsonConvert = (function () {
     function JsonConvert(operationMode, valueCheckingMode, ignorePrimitiveChecks) {
         this._operationMode = json_convert_enums_1.OperationMode.ENABLE;
@@ -224,7 +225,7 @@ var JsonConvert = (function () {
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
                 "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
-                e.message + "\n");
+                e.message + "\n\n");
         }
     };
     JsonConvert.prototype.getClassPropertyMappingOptions = function (instance, propertyName) {
@@ -242,11 +243,11 @@ var JsonConvert = (function () {
         return null;
     };
     JsonConvert.prototype.verifyProperty = function (expectedJsonType, value, serialize) {
-        if (typeof (expectedJsonType) === "undefined" || expectedJsonType === null || expectedJsonType === Object) {
+        if (expectedJsonType === any_1.Any || expectedJsonType === null || expectedJsonType === Object) {
             return value;
         }
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
-            if (expectedJsonType.hasOwnProperty(json_convert_options_1.Settings.MAPPING_PROPERTY)) {
+            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(json_convert_options_1.Settings.MAPPING_PROPERTY)) {
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
                         return null;
@@ -258,7 +259,7 @@ var JsonConvert = (function () {
                 else
                     return this.deserializeObject(value, expectedJsonType);
             }
-            else if (expectedJsonType === null || expectedJsonType === Object || expectedJsonType === undefined) {
+            else if (expectedJsonType === any_1.Any || expectedJsonType === null || expectedJsonType === Object) {
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
                         return null;
@@ -286,7 +287,7 @@ var JsonConvert = (function () {
                 }
             }
             else {
-                throw new Error("\tReason: Expected type is unknown. You are either missing the decorator @JsonObject (for object mapping) or @JsonConverter (for custom mapping) before your class definition.");
+                throw new Error("\tReason: Expected type is unknown. There might be multiple reasons for this:\n\t- You are missing the decorator @JsonObject (for object mapping)\n\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n\t- Your given class is undefined in the decorator because of circular dependencies");
             }
         }
         if (expectedJsonType instanceof Array && value instanceof Array) {
@@ -350,7 +351,7 @@ var JsonConvert = (function () {
             return type;
         }
         else {
-            if (expectedJsonType === undefined || expectedJsonType === null || expectedJsonType === Object) {
+            if (expectedJsonType === any_1.Any || expectedJsonType === null || expectedJsonType === Object) {
                 return "any";
             }
             else if (expectedJsonType === String || expectedJsonType == Boolean || expectedJsonType == Number) {
@@ -358,6 +359,9 @@ var JsonConvert = (function () {
             }
             else if (typeof expectedJsonType === 'function') {
                 return (new expectedJsonType()).constructor.name;
+            }
+            else if (expectedJsonType === undefined) {
+                return "undefined";
             }
             else {
                 return "?????";

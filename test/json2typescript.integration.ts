@@ -2,6 +2,7 @@ import { JsonConvert } from  "../src/json2typescript/json-convert";
 import { JsonObject, JsonProperty, JsonConverter } from  "../src/json2typescript/json-convert-decorators";
 import { OperationMode, ValueCheckingMode } from  "../src/json2typescript/json-convert-enums";
 import { JsonCustomConvert } from  "../src/json2typescript/json-custom-convert";
+import { Any } from "../src/json2typescript/any";
 
 describe('Integration tests', () => {
 
@@ -23,18 +24,21 @@ describe('Integration tests', () => {
             district: 100,
             owner: human1JsonObject,
             birthdate: "2016-01-02",
-        };
-        let cat2JsonObject = {
-            name: "Links",
-            district: 50,
-            owner: human1JsonObject,
-            birthdate: "2016-01-02"
+            friends: []
         };
         let dog1JsonObject = {
             name: "Barky",
             barking: true,
             owner: null,
-            birthdate: "2016-01-02"
+            birthdate: "2016-01-02",
+            friends: []
+        };
+        let cat2JsonObject = {
+            name: "Links",
+            district: 50,
+            owner: human1JsonObject,
+            birthdate: "2016-01-02",
+            friends: [cat1JsonObject, dog1JsonObject]
         };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -70,6 +74,8 @@ describe('Integration tests', () => {
             owner: Human = undefined;
             @JsonProperty("birthdate", DateConverter)
             birthdate: Date = undefined;
+            @JsonProperty("friends", [Any], true)
+            friends: any[] = [];
         }
 
         @JsonObject
@@ -93,16 +99,17 @@ describe('Integration tests', () => {
         cat1.district = 100;
         cat1.owner = human1;
         cat1.birthdate = new Date("2016-01-02");
-        let cat2 = new Cat();
-        cat2.name = "Links";
-        cat2.district = 50;
-        cat2.owner = human1;
-        cat2.birthdate = new Date("2016-01-02");
         let dog1 = new Dog();
         dog1.name = "Barky"
         dog1.isBarking = true;
         dog1.owner = null;
         dog1.birthdate = new Date("2016-01-02");
+        let cat2 = new Cat();
+        cat2.name = "Links";
+        cat2.district = 50;
+        cat2.owner = human1;
+        cat2.birthdate = new Date("2016-01-02");
+        cat2.friends = [cat1JsonObject, dog1JsonObject];
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
 
@@ -111,8 +118,6 @@ describe('Integration tests', () => {
         describe('serialize', () => {
 
             it('should serialize a TypeScript object to a JSON object', () => {
-                console.log(JSON.stringify(jsonConvert.serialize(cat1)));
-                console.log(JSON.stringify(cat1JsonObject));
                 expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
 

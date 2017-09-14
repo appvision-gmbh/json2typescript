@@ -19,6 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_1 = require("../src/json2typescript/json-convert");
 var json_convert_enums_1 = require("../src/json2typescript/json-convert-enums");
 var json_convert_decorators_1 = require("../src/json2typescript/json-convert-decorators");
+var any_1 = require("../src/json2typescript/any");
 describe('Unit tests', function () {
     describe('JsonConvert', function () {
         // JSONCONVERT INSTANCE
@@ -232,7 +233,7 @@ describe('Unit tests', function () {
             it('getExpectedType()', function () {
                 expect(jsonConvert.getExpectedType(json_convert_1.JsonConvert)).toBe("JsonConvert");
                 expect(jsonConvert.getExpectedType([String, [Boolean, Number]])).toBe("[string,[boolean,number]]");
-                expect(jsonConvert.getExpectedType([[null, undefined], Object])).toBe("[[any,any],any]");
+                expect(jsonConvert.getExpectedType([[null, any_1.Any], Object])).toBe("[[any,any],any]");
             });
             it('getJsonType()', function () {
                 expect(jsonConvert.getJsonType({ name: "Andreas" })).toBe("object");

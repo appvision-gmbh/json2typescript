@@ -9,4 +9,6 @@ var json_convert_decorators_1 = require("./src/json2typescript/json-convert-deco
 exports.JsonObject = json_convert_decorators_1.JsonObject;
 exports.JsonProperty = json_convert_decorators_1.JsonProperty;
 exports.JsonConverter = json_convert_decorators_1.JsonConverter;
+var any_1 = require("./src/json2typescript/any");
+exports.Any = any_1.Any;
 //# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/index.js.map

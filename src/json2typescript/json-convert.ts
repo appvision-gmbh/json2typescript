@@ -1,5 +1,6 @@
 import { OperationMode, ValueCheckingMode } from "./json-convert-enums";
 import { MappingOptions, Settings } from "./json-convert-options";
+import { Any } from "./any";
 
 /**
  * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
@@ -494,7 +495,7 @@ export class JsonConvert {
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
                 "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
-                e.message + "\n"
+                e.message + "\n\n"
             );
         }
     }
@@ -550,7 +551,7 @@ export class JsonConvert {
     private verifyProperty(expectedJsonType: any, value: any, serialize?: boolean): any {
 
         // Map immediately if we don't care about the type
-        if (typeof(expectedJsonType) === "undefined" || expectedJsonType === null || expectedJsonType === Object) {
+        if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) {
             return value;
         }
 
@@ -558,7 +559,7 @@ export class JsonConvert {
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
+            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {
@@ -570,7 +571,7 @@ export class JsonConvert {
                 if (serialize) return this.serializeObject(value);
                 else return this.deserializeObject(value, expectedJsonType);
 
-            } else if (expectedJsonType === null || expectedJsonType === Object || expectedJsonType === undefined) { // general object
+            } else if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) { // general object
 
                 // Check if we have null value
                 if (value === null) {
@@ -603,7 +604,7 @@ export class JsonConvert {
 
             } else { // other weird types
 
-                throw new Error("\tReason: Expected type is unknown. You are either missing the decorator @JsonObject (for object mapping) or @JsonConverter (for custom mapping) before your class definition.");
+                throw new Error("\tReason: Expected type is unknown. There might be multiple reasons for this:\n\t- You are missing the decorator @JsonObject (for object mapping)\n\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n\t- Your given class is undefined in the decorator because of circular dependencies");
 
             }
 
@@ -714,12 +715,14 @@ export class JsonConvert {
             type += "]";
             return type;
         } else {
-            if (expectedJsonType === undefined || expectedJsonType === null || expectedJsonType === Object) {
+            if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) {
                 return "any";
             } else if (expectedJsonType === String || expectedJsonType == Boolean || expectedJsonType == Number) {
                 return (new expectedJsonType()).constructor.name.toLowerCase();
             } else if (typeof expectedJsonType === 'function') {
                 return (new expectedJsonType()).constructor.name;
+            } else if (expectedJsonType === undefined) {
+                return "undefined"
             } else {
                 return "?????";
             }

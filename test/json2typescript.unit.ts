@@ -3,6 +3,7 @@ import { OperationMode, ValueCheckingMode } from "../src/json2typescript/json-co
 import { JsonConverter, JsonObject, JsonProperty } from "../src/json2typescript/json-convert-decorators";
 import { JsonCustomConvert } from "../src/json2typescript/json-custom-convert";
 import { Settings } from "../src/json2typescript/json-convert-options";
+import { Any } from "../src/json2typescript/any";
 
 describe('Unit tests', () => {
 
@@ -182,7 +183,7 @@ describe('Unit tests', () => {
             it('getExpectedType()', () => {
                 expect((<any>jsonConvert).getExpectedType(JsonConvert)).toBe("JsonConvert");
                 expect((<any>jsonConvert).getExpectedType([String, [Boolean, Number]])).toBe("[string,[boolean,number]]");
-                expect((<any>jsonConvert).getExpectedType([[null, undefined], Object])).toBe("[[any,any],any]");
+                expect((<any>jsonConvert).getExpectedType([[null, Any], Object])).toBe("[[any,any],any]");
             });
             it('getJsonType()', () => {
                 expect((<any>jsonConvert).getJsonType({ name: "Andreas" })).toBe("object");
