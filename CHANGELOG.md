@@ -1,4 +1,4 @@
-# v1.0.5 (2017-09-14)
+# v1.1.0 (2017-09-14)
 
 ## Features
 
@@ -6,7 +6,7 @@
 
 ## Breaking Changes
 
-* `json2typescript` will now throw an exception if the `JsonProperty` decorator has `undefined` as second parameter. Pass `null` if you want to skip the type check instead or don't pass the second parameter at all.
+* `json2typescript` will now throw an exception if the `JsonProperty` decorator has `undefined` as second parameter. Pass `Any` if you want to skip the type check instead or don't pass the second parameter at all. `Any` is a type from `json2typescript` and needs to be imported
 
 # v1.0.4 (2017-09-12)
 
