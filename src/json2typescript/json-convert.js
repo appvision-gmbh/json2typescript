@@ -8,9 +8,9 @@ var JsonConvert = (function () {
         this._operationMode = json_convert_enums_1.OperationMode.ENABLE;
         this._valueCheckingMode = json_convert_enums_1.ValueCheckingMode.ALLOW_OBJECT_NULL;
         this._ignorePrimitiveChecks = false;
-        if (operationMode in json_convert_enums_1.OperationMode)
+        if (operationMode && operationMode in json_convert_enums_1.OperationMode)
             this.operationMode = operationMode;
-        if (valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
+        if (valueCheckingMode && valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
             this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks)
             this.ignorePrimitiveChecks = ignorePrimitiveChecks;
@@ -392,4 +392,4 @@ var JsonConvert = (function () {
     return JsonConvert;
 }());
 exports.JsonConvert = JsonConvert;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
+//# sourceMappingURL=/Users/jndonald3/Documents/json2typescript/src/json2typescript/json-convert.js.map
