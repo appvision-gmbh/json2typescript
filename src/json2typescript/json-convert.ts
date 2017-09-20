@@ -131,8 +131,8 @@ export class JsonConvert {
      * @param ignorePrimitiveChecks optional param (default: false)
      */
     constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
-        if (operationMode in OperationMode) this.operationMode = operationMode;
-        if (valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
+        if (operationMode != null && operationMode in OperationMode) this.operationMode = operationMode;
+        if (valueCheckingMode != null && valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
     }
 
@@ -398,7 +398,7 @@ export class JsonConvert {
     private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
         // Check if a JSON-object mapping is possible for a property
-        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -455,7 +455,7 @@ export class JsonConvert {
      */
     private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
-        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -513,7 +513,7 @@ export class JsonConvert {
      *
      * @returns {MappingOptions}
      */
-    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions {
+    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions | null {
 
         let mappings: any = instance[Settings.MAPPING_PROPERTY];
 
