@@ -45,7 +45,9 @@
   },
   "main": "index.js",
   "files": [
-    "src",
+    "src/**/*.js",
+    "src/**/*.js.map",
+    "src/**/*.d.ts",
     "index.d.ts",
     "index.js"
   ],
