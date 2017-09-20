@@ -1,6 +1,6 @@
 {
-  "name": "json2typescript",
-  "version": "1.0.5",
+  "name": "json2typescript-kirakishin",
+  "version": "1.0.7",
   "description": "Provides TypeScript methods to map a JSON object to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -26,7 +26,7 @@
     "dist": "npm run build && npm pack"
   },
   "typescript": {
-    "definition": "dist/index.d.ts"
+    "definition": "src/index.d.ts"
   },
   "dependencies": {},
   "devDependencies": {
@@ -42,8 +42,11 @@
   },
   "main": "index.js",
   "files": [
-    "src/json2typescript",
-    "index.ts",
+    "src/json2typescript/*.map",
+    "src/json2typescript/*.d.ts",
+    "src/json2typescript/*.js",
+    "index.d.ts",
+    "index.map",
     "index.js"
   ],
   "repository": {
