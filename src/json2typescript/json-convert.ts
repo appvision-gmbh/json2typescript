@@ -318,7 +318,10 @@ export class JsonConvert {
         let instance = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance)) {
+        const explicitKeys = Settings.classProperties.get(instance) || [];
+        const extraKeys = explicitKeys.filter(k => !(k in instance));
+        const propertyKeys = [...Object.keys(instance), ...extraKeys];
+        for (const propertyKey of propertyKeys) {
             this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
         }
 

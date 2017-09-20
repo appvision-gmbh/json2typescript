@@ -128,8 +128,11 @@ var JsonConvert = (function () {
             console.log(jsonObject);
         }
         var instance = new classReference();
-        for (var _i = 0, _a = Object.keys(instance); _i < _a.length; _i++) {
-            var propertyKey = _a[_i];
+        var explicitKeys = json_convert_options_1.Settings.classProperties.get(instance) || [];
+        var extraKeys = explicitKeys.filter(function (k) { return !(k in instance); });
+        var propertyKeys = Object.keys(instance).concat(extraKeys);
+        for (var _i = 0, propertyKeys_1 = propertyKeys; _i < propertyKeys_1.length; _i++) {
+            var propertyKey = propertyKeys_1[_i];
             this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
         }
         if (this.operationMode === json_convert_enums_1.OperationMode.LOGGING) {

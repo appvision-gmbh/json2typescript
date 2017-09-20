@@ -24,7 +24,7 @@
     "test": "karma start karma.conf.js",
     "build": "npm run test && tsc",
     "build:watch": "tsc -w",
-    "clean": "rimraf src/**/*.js src/**/*.js.map src/**/*.d.ts",
+    "clean": "rimraf src/**/*.js src/**/*.js.map src/**/*.d.ts test/**/*.js test/**/*.js.map test/**/*.d.ts",
     "dist": "npm run clean && npm run build && npm pack"
   },
   "typescript": {
@@ -43,7 +43,7 @@
     "karma-typescript": "^3.0.3",
     "phantomjs-prebuilt": "2.1.14",
     "rimraf": "^2.6.2",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.2"
   },
   "main": "index.js",
   "files": [

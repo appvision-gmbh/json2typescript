@@ -47,13 +47,14 @@ describe('Integration tests', () => {
         @JsonConverter
         class DateConverter implements JsonCustomConvert<Date> {
             serialize(date: Date): any {
-                let year = date.getFullYear();
-                let month = date.getMonth() + 1;
-                let day = date.getDate();
+                let year = date.getUTCFullYear();
+                let month = date.getUTCMonth() + 1;
+                let day = date.getUTCDate();
                 return year + "-" + ( month < 10 ? "0" + month : month ) + "-" + ( day < 10 ? "0" + day : day );
             }
+
             deserialize(date: any): Date {
-                return new Date(date);
+                return new Date(date + "T00:00:00.000Z");
             }
         }
 
@@ -69,11 +70,11 @@ describe('Integration tests', () => {
         @JsonObject
         class Animal {
             @JsonProperty("name", String)
-            name: string = undefined;
+            name: string;
             @JsonProperty("owner", Human, true)
-            owner: Human = undefined;
+            owner: Human;
             @JsonProperty("birthdate", DateConverter)
-            birthdate: Date = undefined;
+            birthdate: Date;
             @JsonProperty("friends", [Any], true)
             friends: any[] = [];
         }
@@ -81,13 +82,13 @@ describe('Integration tests', () => {
         @JsonObject
         class Cat extends Animal {
             @JsonProperty("district", Number)
-            district: number = undefined;
+            district: number;
         }
 
         @JsonObject
         class Dog extends Animal {
             @JsonProperty("barking", Boolean)
-            isBarking: boolean = undefined;
+            isBarking: boolean;
         }
 
         // TYPESCRIPT INSTANCES
