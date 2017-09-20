@@ -131,8 +131,8 @@ export class JsonConvert {
      * @param ignorePrimitiveChecks optional param (default: false)
      */
     constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
-        if (operationMode in OperationMode) this.operationMode = operationMode;
-        if (valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
+        if (operationMode != null && operationMode in OperationMode) this.operationMode = operationMode;
+        if (valueCheckingMode != null && valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
     }
 
@@ -318,7 +318,10 @@ export class JsonConvert {
         let instance = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance)) {
+        const explicitKeys = Settings.classProperties.get(instance) || [];
+        const extraKeys = explicitKeys.filter(k => !(k in instance));
+        const propertyKeys = [...Object.keys(instance), ...extraKeys];
+        for (const propertyKey of propertyKeys) {
             this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
         }
 
@@ -398,7 +401,7 @@ export class JsonConvert {
     private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
         // Check if a JSON-object mapping is possible for a property
-        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -455,7 +458,7 @@ export class JsonConvert {
      */
     private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
-        const mappingOptions: MappingOptions = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -513,9 +516,9 @@ export class JsonConvert {
      *
      * @returns {MappingOptions}
      */
-    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions {
+    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions | null {
 
-        let mappings: any = instance[Settings.MAPPING_PROPERTY];
+        let mappings: any = Settings.mapping.get(instance);
 
         // Check if mapping is defined
         if (typeof(mappings) === "undefined") return null;
@@ -559,7 +562,7 @@ export class JsonConvert {
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
+            if (typeof(expectedJsonType) !== "undefined" && Settings.mapping.hasOwn(expectedJsonType)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {

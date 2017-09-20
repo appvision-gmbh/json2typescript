@@ -7,7 +7,7 @@ import { Any } from "./any";
  * @param target the class
  */
 export function JsonConverter(target: any) {
-    target[Settings.MAPPER_PROPERTY] = "";
+    Settings.mapper.set("", target);
 }
 
 /**
@@ -16,7 +16,7 @@ export function JsonConverter(target: any) {
  * @param target the class
  */
 export function JsonObject(target: any) {
-    target[Settings.MAPPING_PROPERTY] = [];
+    Settings.mapping.set([], target);
 }
 
 /**
@@ -38,42 +38,50 @@ export function JsonObject(target: any) {
  * @returns {(target:any, key:string)=>void}
  */
 export function JsonProperty(...params: any[]): any {
+    
+    let overrideJsonPropertyName: string | null = null;
+    let conversionOption: any = Any;
+    let isOptional: boolean = false;
+    let isError = false;
 
-    return function (target: any, classPropertyName: string): void {
+    switch (params.length) {
+        case 0:
+            break;
+        case 1:
+            overrideJsonPropertyName = params[0];
+            break;
+        case 2:
+            if (params[1] === undefined) {
+                isError = true;
+                break; 
+            }
+            overrideJsonPropertyName = params[0];
+            conversionOption = params[1];
+            break;
+        case 3:
+            overrideJsonPropertyName = params[0];
+            conversionOption = params[1];
+            isOptional = params[2];
+            break;
+        default:
+            break;
+    }
 
-        let jsonPropertyName: string = classPropertyName;
-        let conversionOption: any = Any;
-        let isOptional: boolean = false;
+    return function (target: any, classPropertyName: string, descriptor: PropertyDescriptor): void {
 
-        switch (params.length) {
-            case 0:
-                break;
-            case 1:
-                jsonPropertyName = params[0];
-                break;
-            case 2:
-                if (params[1] === undefined) throw new Error(
-                    "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitely pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
-                    "\tClass name: \n\t\t" + target.constructor.name + "\n\n" +
-                    "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                    "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"
-                );
-                jsonPropertyName = params[0];
-                conversionOption = params[1];
-                break;
-            case 3:
-                jsonPropertyName = params[0];
-                conversionOption = params[1];
-                isOptional = params[2];
-                break;
-            default:
-                break;
+        if (isError) {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "It's not allowed to explicitely pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+                "\tClass name: \n\t\t" + target.constructor.name + "\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
+                "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"
+            );
         }
 
-
-        if (typeof(target[Settings.MAPPING_PROPERTY]) === "undefined") {
-            target[Settings.MAPPING_PROPERTY] = [];
+        let jsonPropertyName: string = classPropertyName;
+        if (overrideJsonPropertyName != null) {
+            jsonPropertyName = overrideJsonPropertyName
         }
 
         const className = target.constructor.name;
@@ -89,15 +97,20 @@ export function JsonProperty(...params: any[]): any {
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
 
         // Check if conversionOption is a type or a custom converter.
-        if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(conversionOption[Settings.MAPPER_PROPERTY]) !== "undefined") {
+        if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(Settings.mapper.get(conversionOption)) !== "undefined") {
             jsonPropertyMappingOptions.customConverter = new conversionOption();
         } else {
             jsonPropertyMappingOptions.expectedJsonType = conversionOption;
         }
 
         // Save the mapping info
-        target[Settings.MAPPING_PROPERTY][className + "." + classPropertyName] = jsonPropertyMappingOptions;
-
+        const mapping = Settings.mapping.getOwnOrInitFromAncestors(target, (a) => ({ ...a }));
+        mapping[className + "." + classPropertyName] = jsonPropertyMappingOptions;
+        
+        // Save that key
+        Settings.classProperties.getOwnOrInitFromAncestors(target, (a) => [...(a || [])]).push(classPropertyName);
+        // console.log("Mapping Info", (target as any).constructor.name, Settings.mapping.get(target));
+        // console.log("class properties", (target as any).constructor.name, Settings.classProperties.get(target));
     }
 
 }

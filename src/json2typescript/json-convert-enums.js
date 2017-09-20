@@ -14,4 +14,4 @@ var ValueCheckingMode;
     ValueCheckingMode[ValueCheckingMode["DISALLOW_NULL"] = 3] = "DISALLOW_NULL";
 })(ValueCheckingMode = exports.ValueCheckingMode || (exports.ValueCheckingMode = {}));
 ;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert-enums.js.map
+//# sourceMappingURL=D:/files/work/mc/prime/www/json2typescript/json2typescript/json-convert-enums.js.map

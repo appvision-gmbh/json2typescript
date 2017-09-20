@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": [
@@ -12,7 +12,7 @@
     "removeComments": true,
     "target": "es5",
     "sourceMap": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": true
   },
   "exclude": [
@@ -20,12 +20,7 @@
     "test",
     "**/*.spec.ts"
   ],
-  "files": [
-    "index.ts",
-    "src/json2typescript/json-convert",
-    "src/json2typescript/json-convert-decorators.ts",
-    "src/json2typescript/json-convert-enums.ts",
-    "src/json2typescript/json-convert-options.ts",
-    "src/json2typescript/json-custom-convert.ts"
+  "include": [
+    "src/**/*.ts"
   ]
 }

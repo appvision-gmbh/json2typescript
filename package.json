@@ -1,6 +1,6 @@
 {
   "name": "json2typescript",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Provides TypeScript methods to map a JSON object to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -23,12 +23,16 @@
   "scripts": {
     "test": "karma start karma.conf.js",
     "build": "npm run test && tsc",
-    "dist": "npm run build && npm pack"
+    "build:watch": "tsc -w",
+    "clean": "rimraf src/**/*.js src/**/*.js.map src/**/*.d.ts test/**/*.js test/**/*.js.map test/**/*.d.ts",
+    "dist": "npm run clean && npm run build && npm pack"
   },
   "typescript": {
     "definition": "dist/index.d.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "reflect-metadata": "^0.1.10"
+  },
   "devDependencies": {
     "@types/jasmine": "^2.5.52",
     "jasmine": "2.6.0",
@@ -38,12 +42,15 @@
     "karma-phantomjs-launcher": "1.0.4",
     "karma-typescript": "^3.0.3",
     "phantomjs-prebuilt": "2.1.14",
-    "typescript": "2.3.4"
+    "rimraf": "^2.6.2",
+    "typescript": "^2.5.2"
   },
   "main": "index.js",
   "files": [
-    "src/json2typescript",
-    "index.ts",
+    "src/**/*.js",
+    "src/**/*.js.map",
+    "src/**/*.d.ts",
+    "index.d.ts",
     "index.js"
   ],
   "repository": {

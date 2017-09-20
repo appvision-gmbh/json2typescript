@@ -8,9 +8,9 @@ var JsonConvert = (function () {
         this._operationMode = json_convert_enums_1.OperationMode.ENABLE;
         this._valueCheckingMode = json_convert_enums_1.ValueCheckingMode.ALLOW_OBJECT_NULL;
         this._ignorePrimitiveChecks = false;
-        if (operationMode in json_convert_enums_1.OperationMode)
+        if (operationMode != null && operationMode in json_convert_enums_1.OperationMode)
             this.operationMode = operationMode;
-        if (valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
+        if (valueCheckingMode != null && valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
             this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks)
             this.ignorePrimitiveChecks = ignorePrimitiveChecks;
@@ -128,8 +128,11 @@ var JsonConvert = (function () {
             console.log(jsonObject);
         }
         var instance = new classReference();
-        for (var _i = 0, _a = Object.keys(instance); _i < _a.length; _i++) {
-            var propertyKey = _a[_i];
+        var explicitKeys = json_convert_options_1.Settings.classProperties.get(instance) || [];
+        var extraKeys = explicitKeys.filter(function (k) { return !(k in instance); });
+        var propertyKeys = Object.keys(instance).concat(extraKeys);
+        for (var _i = 0, propertyKeys_1 = propertyKeys; _i < propertyKeys_1.length; _i++) {
+            var propertyKey = propertyKeys_1[_i];
             this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
         }
         if (this.operationMode === json_convert_enums_1.OperationMode.LOGGING) {
@@ -229,7 +232,7 @@ var JsonConvert = (function () {
         }
     };
     JsonConvert.prototype.getClassPropertyMappingOptions = function (instance, propertyName) {
-        var mappings = instance[json_convert_options_1.Settings.MAPPING_PROPERTY];
+        var mappings = json_convert_options_1.Settings.mapping.get(instance);
         if (typeof (mappings) === "undefined")
             return null;
         var directMappingName = instance.constructor.name + "." + propertyName;
@@ -247,7 +250,7 @@ var JsonConvert = (function () {
             return value;
         }
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
-            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(json_convert_options_1.Settings.MAPPING_PROPERTY)) {
+            if (typeof (expectedJsonType) !== "undefined" && json_convert_options_1.Settings.mapping.hasOwn(expectedJsonType)) {
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
                         return null;
@@ -392,4 +395,4 @@ var JsonConvert = (function () {
     return JsonConvert;
 }());
 exports.JsonConvert = JsonConvert;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
+//# sourceMappingURL=D:/files/work/mc/prime/www/json2typescript/json2typescript/json-convert.js.map
