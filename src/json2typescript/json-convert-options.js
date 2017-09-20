@@ -1,14 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Settings = (function () {
-    function Settings() {
+require("reflect-metadata");
+var MetadataTool = (function () {
+    function MetadataTool(metadataKey) {
+        this.metadataKey = metadataKey;
     }
-    Settings.MAPPING_PROPERTY = "__jsonconvert__mapping__";
-    Settings.MAPPER_PROPERTY = "__jsonconvert__mapper__";
-    return Settings;
+    MetadataTool.prototype.get = function (target) {
+        return Reflect.getMetadata(this.metadataKey, target);
+    };
+    MetadataTool.prototype.getOwn = function (target) {
+        return Reflect.getOwnMetadata(this.metadataKey, target);
+    };
+    MetadataTool.prototype.hasOwn = function (target) {
+        return Reflect.hasOwnMetadata(this.metadataKey, target);
+    };
+    MetadataTool.prototype.set = function (value, target) {
+        return Reflect.defineMetadata(this.metadataKey, value, target);
+    };
+    return MetadataTool;
 }());
-exports.Settings = Settings;
-;
+exports.MetadataTool = MetadataTool;
+var Settings;
+(function (Settings) {
+    Settings.mapping = new MetadataTool("__jsonconvert__mapping__");
+    Settings.mapper = new MetadataTool("__jsonconvert__mapper__");
+    Settings.propertyClass = new MetadataTool("__jsonconvert__property_class__");
+})(Settings = exports.Settings || (exports.Settings = {}));
 var MappingOptions = (function () {
     function MappingOptions() {
         this.classPropertyName = "";

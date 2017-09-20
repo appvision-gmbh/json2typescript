@@ -30,7 +30,9 @@
   "typescript": {
     "definition": "dist/index.d.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "reflect-metadata": "^0.1.10"
+  },
   "devDependencies": {
     "@types/jasmine": "^2.5.52",
     "jasmine": "2.6.0",

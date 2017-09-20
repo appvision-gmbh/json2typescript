@@ -7,7 +7,7 @@ import { Any } from "./any";
  * @param target the class
  */
 export function JsonConverter(target: any) {
-    target[Settings.MAPPER_PROPERTY] = "";
+    Settings.mapper.set("", target);
 }
 
 /**
@@ -16,7 +16,7 @@ export function JsonConverter(target: any) {
  * @param target the class
  */
 export function JsonObject(target: any) {
-    target[Settings.MAPPING_PROPERTY] = [];
+    Settings.mapping.set([], target);
 }
 
 /**
@@ -71,9 +71,9 @@ export function JsonProperty(...params: any[]): any {
                 break;
         }
 
-
-        if (typeof(target[Settings.MAPPING_PROPERTY]) === "undefined") {
-            target[Settings.MAPPING_PROPERTY] = [];
+        
+        if (typeof(Settings.mapping.get(target)) === "undefined") {
+            Settings.mapping.set([], target)
         }
 
         const className = target.constructor.name;
@@ -89,14 +89,14 @@ export function JsonProperty(...params: any[]): any {
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
 
         // Check if conversionOption is a type or a custom converter.
-        if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(conversionOption[Settings.MAPPER_PROPERTY]) !== "undefined") {
+        if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(Settings.mapper.get(conversionOption)) !== "undefined") {
             jsonPropertyMappingOptions.customConverter = new conversionOption();
         } else {
             jsonPropertyMappingOptions.expectedJsonType = conversionOption;
         }
 
         // Save the mapping info
-        target[Settings.MAPPING_PROPERTY][className + "." + classPropertyName] = jsonPropertyMappingOptions;
+        Settings.mapping.get(target)[className + "." + classPropertyName] = jsonPropertyMappingOptions;
 
     }
 

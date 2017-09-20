@@ -229,7 +229,7 @@ var JsonConvert = (function () {
         }
     };
     JsonConvert.prototype.getClassPropertyMappingOptions = function (instance, propertyName) {
-        var mappings = instance[json_convert_options_1.Settings.MAPPING_PROPERTY];
+        var mappings = json_convert_options_1.Settings.mapping.get(instance);
         if (typeof (mappings) === "undefined")
             return null;
         var directMappingName = instance.constructor.name + "." + propertyName;
@@ -247,7 +247,7 @@ var JsonConvert = (function () {
             return value;
         }
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
-            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(json_convert_options_1.Settings.MAPPING_PROPERTY)) {
+            if (typeof (expectedJsonType) !== "undefined" && json_convert_options_1.Settings.mapping.hasOwn(expectedJsonType)) {
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
                         return null;

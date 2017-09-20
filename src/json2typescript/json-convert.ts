@@ -515,7 +515,7 @@ export class JsonConvert {
      */
     private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions | null {
 
-        let mappings: any = instance[Settings.MAPPING_PROPERTY];
+        let mappings: any = Settings.mapping.get(instance);
 
         // Check if mapping is defined
         if (typeof(mappings) === "undefined") return null;
@@ -559,7 +559,7 @@ export class JsonConvert {
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
+            if (typeof(expectedJsonType) !== "undefined" && Settings.mapping.hasOwn(expectedJsonType)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {

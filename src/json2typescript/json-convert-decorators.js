@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_options_1 = require("./json-convert-options");
 var any_1 = require("./any");
 function JsonConverter(target) {
-    target[json_convert_options_1.Settings.MAPPER_PROPERTY] = "";
+    json_convert_options_1.Settings.mapper.set("", target);
 }
 exports.JsonConverter = JsonConverter;
 function JsonObject(target) {
-    target[json_convert_options_1.Settings.MAPPING_PROPERTY] = [];
+    json_convert_options_1.Settings.mapping.set([], target);
 }
 exports.JsonObject = JsonObject;
 function JsonProperty() {
@@ -43,8 +43,8 @@ function JsonProperty() {
             default:
                 break;
         }
-        if (typeof (target[json_convert_options_1.Settings.MAPPING_PROPERTY]) === "undefined") {
-            target[json_convert_options_1.Settings.MAPPING_PROPERTY] = [];
+        if (typeof (json_convert_options_1.Settings.mapping.get(target)) === "undefined") {
+            json_convert_options_1.Settings.mapping.set([], target);
         }
         var className = target.constructor.name;
         if (typeof (jsonPropertyName) === "undefined") {
@@ -54,13 +54,13 @@ function JsonProperty() {
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
         jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
-        if (typeof (conversionOption) !== "undefined" && conversionOption !== null && typeof (conversionOption[json_convert_options_1.Settings.MAPPER_PROPERTY]) !== "undefined") {
+        if (typeof (conversionOption) !== "undefined" && conversionOption !== null && typeof (json_convert_options_1.Settings.mapper.get(conversionOption)) !== "undefined") {
             jsonPropertyMappingOptions.customConverter = new conversionOption();
         }
         else {
             jsonPropertyMappingOptions.expectedJsonType = conversionOption;
         }
-        target[json_convert_options_1.Settings.MAPPING_PROPERTY][className + "." + classPropertyName] = jsonPropertyMappingOptions;
+        json_convert_options_1.Settings.mapping.get(target)[className + "." + classPropertyName] = jsonPropertyMappingOptions;
     };
 }
 exports.JsonProperty = JsonProperty;
