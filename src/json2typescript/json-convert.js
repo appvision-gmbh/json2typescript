@@ -392,4 +392,4 @@ var JsonConvert = (function () {
     return JsonConvert;
 }());
 exports.JsonConvert = JsonConvert;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
+//# sourceMappingURL=C:/git/github/kirakishin/json2typescript/src/json2typescript/json-convert.js.map
