@@ -527,7 +527,7 @@ export class JsonConvert {
         }
 
         // No mapping was found, try to find some
-        const indirectMappingNames: string[] = Object.keys(mappings).filter(key => key.indexOf("." + propertyName) >= 0);
+        const indirectMappingNames: string[] = Object.keys(mappings).filter(key => key.endsWith("." + propertyName));
         if (indirectMappingNames.length > 0) {
             return mappings[indirectMappingNames[0]];
         }
