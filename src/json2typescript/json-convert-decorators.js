@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_options_1 = require("./json-convert-options");
 var any_1 = require("./any");
 function JsonConverter(target) {
@@ -13,7 +12,7 @@ exports.JsonObject = JsonObject;
 function JsonProperty() {
     var params = [];
     for (var _i = 0; _i < arguments.length; _i++) {
-        params[_i] = arguments[_i];
+        params[_i - 0] = arguments[_i];
     }
     return function (target, classPropertyName) {
         var jsonPropertyName = classPropertyName;
@@ -64,4 +63,4 @@ function JsonProperty() {
     };
 }
 exports.JsonProperty = JsonProperty;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert-decorators.js.map
+//# sourceMappingURL=/Users/andreas/Documents/Git/git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert-decorators.js.map

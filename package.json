@@ -26,24 +26,27 @@
     "dist": "npm run build && npm pack"
   },
   "typescript": {
-    "definition": "dist/index.d.ts"
+    "definition": "src/index.d.ts"
   },
   "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "^2.5.52",
-    "jasmine": "2.6.0",
+    "jasmine": "2.8.0",
     "karma": "^1.7.0",
     "karma-jasmine": "1.1.0",
     "karma-mocha-reporter": "^2.2.3",
     "karma-phantomjs-launcher": "1.0.4",
     "karma-typescript": "^3.0.3",
-    "phantomjs-prebuilt": "2.1.14",
-    "typescript": "2.3.4"
+    "phantomjs-prebuilt": "2.1.15",
+    "typescript": "2.5.3"
   },
   "main": "index.js",
   "files": [
-    "src/json2typescript",
-    "index.ts",
+    "src/json2typescript/*.d.ts",
+    "src/json2typescript/*.map",
+    "src/json2typescript/*.js",
+    "index.d.ts",
+    "index.map",
     "index.js"
   ],
   "repository": {

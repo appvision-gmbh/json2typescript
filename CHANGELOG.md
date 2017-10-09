@@ -1,8 +1,13 @@
-# v1.1.0 (2017-09-14)
+# v1.0.5 (2017-10-09)
+
+## Bug Fixes
+
+* Fixed issues with activated `strictNullChecks`
 
 ## Features
 
 * Added README note about circular dependency issues
+* Removed ts files from publishing, added declaration files instead
 
 ## Breaking Changes
 

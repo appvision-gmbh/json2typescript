@@ -2,7 +2,6 @@ import { JsonConvert } from "../src/json2typescript/json-convert";
 import { OperationMode, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
 import { JsonConverter, JsonObject, JsonProperty } from "../src/json2typescript/json-convert-decorators";
 import { JsonCustomConvert } from "../src/json2typescript/json-custom-convert";
-import { Settings } from "../src/json2typescript/json-convert-options";
 import { Any } from "../src/json2typescript/any";
 
 describe('Unit tests', () => {

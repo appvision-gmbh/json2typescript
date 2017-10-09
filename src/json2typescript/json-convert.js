@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_enums_1 = require("./json-convert-enums");
 var json_convert_options_1 = require("./json-convert-options");
 var any_1 = require("./any");
@@ -8,9 +7,9 @@ var JsonConvert = (function () {
         this._operationMode = json_convert_enums_1.OperationMode.ENABLE;
         this._valueCheckingMode = json_convert_enums_1.ValueCheckingMode.ALLOW_OBJECT_NULL;
         this._ignorePrimitiveChecks = false;
-        if (operationMode in json_convert_enums_1.OperationMode)
+        if (operationMode && operationMode in json_convert_enums_1.OperationMode)
             this.operationMode = operationMode;
-        if (valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
+        if (valueCheckingMode && valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
             this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks)
             this.ignorePrimitiveChecks = ignorePrimitiveChecks;
@@ -236,7 +235,7 @@ var JsonConvert = (function () {
         if (typeof (mappings[directMappingName]) !== "undefined") {
             return mappings[directMappingName];
         }
-        var indirectMappingNames = Object.keys(mappings).filter(function (key) { return key.indexOf("." + propertyName) >= 0; });
+        var indirectMappingNames = Object.keys(mappings).filter(function (key) { return key.match("\\." + propertyName + "$"); });
         if (indirectMappingNames.length > 0) {
             return mappings[indirectMappingNames[0]];
         }
@@ -392,4 +391,4 @@ var JsonConvert = (function () {
     return JsonConvert;
 }());
 exports.JsonConvert = JsonConvert;
-//# sourceMappingURL=/Users/andreas/Documents/GIT/appvision@git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
+//# sourceMappingURL=/Users/andreas/Documents/Git/git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
