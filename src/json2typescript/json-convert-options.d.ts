@@ -1,4 +1,3 @@
-import "reflect-metadata";
 export declare class MetadataTool<T> {
     metadataKey: string;
     constructor(metadataKey: string);

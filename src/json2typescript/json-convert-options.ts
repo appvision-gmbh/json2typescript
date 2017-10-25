@@ -1,4 +1,4 @@
-import "reflect-metadata";
+const Reflect = require('../../Reflect');
 
 export class MetadataTool<T> {
     constructor(public metadataKey: string) {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-require("reflect-metadata");
+var Reflect = require('../../Reflect');
 var MetadataTool = (function () {
     function MetadataTool(metadataKey) {
         this.metadataKey = metadataKey;
