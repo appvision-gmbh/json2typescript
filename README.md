@@ -221,12 +221,26 @@ Decorators should be used whenever you would like to map JSON with TypeScript da
 
 ### Class decorators
 
-The class decorators are used infront of the class declaration and do not support any parameters:
+The class decorators are used infront of the class declaration. An optional parameter
+can be sent to the decorator specifying a custom ID for the object. By default the ID
+will the constructor name ('User' in the example).
+
+
 
 ```typescript
 @JsonObject
 export class User {}
 ```
+
+```typescript
+@JsonObject("Admin")
+export class User {}
+```
+
+> Warning: Minification removes the actual names of certain classes. This can
+in certain cases cause the deserializer to not work as same class names will
+overwrite the property descriptors. It is advised to explicitly ID your 
+objects as above.
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 

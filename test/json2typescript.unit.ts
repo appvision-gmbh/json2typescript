@@ -3,6 +3,7 @@ import { OperationMode, ValueCheckingMode } from "../src/json2typescript/json-co
 import { JsonConverter, JsonObject, JsonProperty } from "../src/json2typescript/json-convert-decorators";
 import { JsonCustomConvert } from "../src/json2typescript/json-custom-convert";
 import { Any } from "../src/json2typescript/any";
+import {Settings} from "../src/json2typescript/json-convert-options";
 
 describe('Unit tests', () => {
 
@@ -89,7 +90,7 @@ describe('Unit tests', () => {
             other: string = undefined;
         }
 
-        @JsonObject
+        @JsonObject("Chihuahua")
         class Dog extends Animal {
             @JsonProperty("barking", Boolean)
             isBarking: boolean = undefined;
@@ -122,6 +123,10 @@ describe('Unit tests', () => {
 
         // BASIC CHECKS
         describe('basic checks', () => {
+            it('should allow custom class names', () => {
+               expect((<any>Cat)[Settings.CLASS_NAME_PROPERTY]).toEqual("Cat");
+               expect((<any>Dog)[Settings.CLASS_NAME_PROPERTY]).toEqual("Chihuahua");
+            });
             it('serialize and deserialize same data', () => {
                 let t_catJsonObject = (<any>jsonConvert).serialize(cat1);
                 expect(t_catJsonObject).toEqual(cat1JsonObject);

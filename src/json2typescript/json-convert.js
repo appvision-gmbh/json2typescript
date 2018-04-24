@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var json_convert_enums_1 = require("./json-convert-enums");
 var json_convert_options_1 = require("./json-convert-options");
 var any_1 = require("./any");
@@ -231,7 +232,7 @@ var JsonConvert = (function () {
         var mappings = instance[json_convert_options_1.Settings.MAPPING_PROPERTY];
         if (typeof (mappings) === "undefined")
             return null;
-        var directMappingName = instance.constructor.name + "." + propertyName;
+        var directMappingName = instance.constructor[json_convert_options_1.Settings.CLASS_NAME_PROPERTY] + "." + propertyName;
         if (typeof (mappings[directMappingName]) !== "undefined") {
             return mappings[directMappingName];
         }
@@ -391,4 +392,4 @@ var JsonConvert = (function () {
     return JsonConvert;
 }());
 exports.JsonConvert = JsonConvert;
-//# sourceMappingURL=/Users/andreas/Documents/Git/git.appvision.ch/unibasel/json2typescript/src/json2typescript/json-convert.js.map
+//# sourceMappingURL=/home/zoltan.fodor/Documents/json2typescript/src/json2typescript/json-convert.js.map

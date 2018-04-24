@@ -521,7 +521,7 @@ export class JsonConvert {
         if (typeof(mappings) === "undefined") return null;
 
         // Get direct mapping if possible
-        const directMappingName: string = instance.constructor.name + "." + propertyName;
+        const directMappingName: string = instance.constructor[Settings.CLASS_NAME_PROPERTY] + "." + propertyName;
         if (typeof(mappings[directMappingName]) !== "undefined") {
             return mappings[directMappingName];
         }
