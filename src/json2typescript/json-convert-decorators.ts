@@ -13,10 +13,42 @@ export function JsonConverter(target: any) {
 /**
  * Decorator of a class that comes from a JSON object.
  *
- * @param target the class
+ * @param name The target class or the name of the class.
  */
-export function JsonObject(target: any) {
-    target[Settings.MAPPING_PROPERTY] = [];
+export function JsonObject(name: any | string): any {
+    const decorator = function (target: any) {
+        target[Settings.MAPPING_PROPERTY] = [];
+        target[Settings.CLASS_NAME_PROPERTY] = name;
+
+        const mapping = target.prototype[Settings.MAPPING_PROPERTY];
+        if (!mapping) {
+            return;
+        }
+
+        let unmappedKeys = Object.keys(mapping)
+            .filter((val) => val.indexOf("[[UNMAPPED]].") === 0);
+
+        for (let key of unmappedKeys) {
+            mapping[key.replace("[[UNMAPPED]]", name)] =
+                mapping[key];
+
+            delete mapping[key];
+        }
+
+        target.prototype[Settings.MAPPING_PROPERTY] = mapping;
+    };
+
+    // We allow default mode and declarative class names. In case
+    // we have string we add that as name, in case only the target
+    // then we default to constructor name.
+    if (typeof name !== "string") {
+        const target = name;
+        name = name.name;
+        decorator(target);
+        return;
+    }
+
+    return decorator;
 }
 
 /**
@@ -76,7 +108,9 @@ export function JsonProperty(...params: any[]): any {
             target[Settings.MAPPING_PROPERTY] = [];
         }
 
-        const className = target.constructor.name;
+        // We set it unmapped, so that the json object decorator can
+        // actually set the desired on default class name.
+        const className = '[[UNMAPPED]]';
 
         if (typeof(jsonPropertyName) === "undefined") {
             jsonPropertyName = classPropertyName;
