@@ -7,9 +7,8 @@
       "es6",
       "dom"
     ],
-    "mapRoot": "./",
     "module": "commonjs",
-    "removeComments": true,
+    "removeComments": false,
     "target": "es5",
     "sourceMap": true,
     "strictNullChecks": true,
