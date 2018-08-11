@@ -1,6 +1,6 @@
 {
   "name": "json2typescript",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Provides TypeScript methods to map a JSON object to a JavaScript object on runtime",
   "keywords": [
     "convert",
@@ -36,8 +36,8 @@
     "karma-jasmine": "1.1.0",
     "karma-mocha-reporter": "^2.2.3",
     "karma-phantomjs-launcher": "1.0.4",
-    "karma-typescript": "^3.0.3",
-    "phantomjs-prebuilt": "2.1.15",
+    "karma-typescript": "^3.0.13",
+    "phantomjs-prebuilt": "^2.1.16",
     "typescript": "2.5.3"
   },
   "main": "index.js",

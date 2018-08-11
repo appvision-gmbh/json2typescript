@@ -1,3 +1,12 @@
+# v1.0.6 (2018-08-12)
+
+## Bug Fixes
+
+* Fixed serialization and deserialization of `null` and `undefined` values, closes [#33](https://github.com/dhlab-basel/json2typescript/issues/33) and [#69](https://github.com/dhlab-basel/json2typescript/issues/69)
+* Adjusted README to close [#40](https://github.com/dhlab-basel/json2typescript/issues/40)
+* Removed js map files, closes [#60](https://github.com/dhlab-basel/json2typescript/issues/60)
+* Allowed custom class identifiers in the `@JsonObject` property, closes [#66](https://github.com/dhlab-basel/json2typescript/issues/66)
+
 # v1.0.5 (2017-10-09)
 
 ## Bug Fixes

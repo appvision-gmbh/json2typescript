@@ -29,6 +29,8 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
+> Tip: Starting from version 1.0.6, we recommend to use unique class identifiers in the `@JsonObject` decorator. Read below how to use the decorators properly.
+
 > Tip: Version 1.0.0 has several breaking changes. When upgrading from `json2typescript` < 1.0.0, please make sure you fix these issues.
 
 ---
@@ -37,7 +39,7 @@ See the changelog in the seperate file for bug fixes, new features and breaking 
 
 ## Requirements
 
-We developed **json2typescript** for Angular2. In this document, we only cover this use case. However, you may use our package for pure TypeScript or even JavaScript applications.
+We developed **json2typescript** for Angular 2+. In this document, we only cover this use case. However, you may use our package for pure TypeScript or even JavaScript applications.
 
 ## Setup a Test Application
 
@@ -68,8 +70,8 @@ Now you are ready to use the package.
 
 In order to use the **json2typescript** package, all you need to do is write decorators and import the package. The following things need to be done if you would like to map JSON to existing classes:
 
-* Classes need to be preceeded by `@JsonObject`
-* Properties need to be preceeded by `@JsonProperty(key, options)`
+* Classes need to be preceeded by `@JsonObject(classIdentifier)`
+* Properties need to be preceeded by `@JsonProperty(jsonProperty, conversionOption, isOptional)`
 * Properties need to have a default value (or undefined), otherwise the mapper will not work
 
 See below an example so you can learn from it how **json2typescript** works best.
@@ -79,14 +81,12 @@ Assuming that you have created the **testApplication** in the step before and in
 ```typescript
 import {JsonObject, JsonProperty} from "json2typescript";
 
-@JsonObject
+@JsonObject("City")
 export class City {
 
     // This property has no @JsonProperty. 
-    // It will only be mapped if our JSON object contains a key named "id".
-    // If there is no such element, no exception is thrown.
-    // There will be no type checking at all.
-    id: number = undefined; // <- assign a value or undefined to enable the mapper!
+    // It will not be mapped.
+    id: number = 123;
 
     // This maps the value of the JSON key "name" to the class property "name".
     // If the JSON value is not of type string (or missing), there will be an exception.
@@ -134,7 +134,7 @@ Now create a file **country.ts** with the following content:
 import {City} from "./city";
 import {JsonObject, JsonProperty} from "json2typescript";
 
-@JsonObject
+@JsonObject("Country")
 export class Country {
 
     // This maps the value of the JSON key "countryName" to the class property "name".
@@ -221,21 +221,27 @@ Decorators should be used whenever you would like to map JSON with TypeScript da
 
 ### Class decorators
 
-The class decorators are used infront of the class declaration and do not support any parameters:
+The class decorators are used infront of the class declaration and do support one parameter:
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {}
 ```
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
+
+#### First parameter: classIdentifier (optional)
+
+The first parameter of `@JsonObject` is meant to be a unique class identifier, usually just the class name.
+In many applications, developers deploy minified code which also minifies class names. 
+Adding a class identifier is highly recommended because it will prevent collision of class names.
 
 ### Property decorators
 
 Property decorators are a vital part for type checking. It is important that the type in the decorator matches the TypeScript type.
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {
     @JsonProperty("jsonPropertyName", String, false)
     name: string = undefined;
@@ -305,7 +311,7 @@ Assume you would like to transform `1893-11-15` (string from JSON) to a TypeScri
 and pass it as second param in `@JsonProperty` as below:
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {
     @JsonProperty("birthdate", DateConverter)
     birthdate: Date = undefined;
@@ -367,7 +373,7 @@ Assume that in your JSON you have a date in a standardized format, such as `2017
 
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {
     @JsonProperty("date", DateConverter)
     date: Date = undefined;
@@ -488,7 +494,7 @@ In the following example, `jsonKeyOfWeirdKeywords` is a key in the JSON object d
 As we have an array of array of strings, you can define the expected type like this:
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], [String, String]])
     keywords: any = undefined;
@@ -513,7 +519,7 @@ In the following example, `JSONKeyOfWeirdKeywords` is a key in the JSON object d
 You can define the expected type in your class like this:
 
 ```typescript
-@JsonObject
+@JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], Number])
     keywords: any = undefined;
@@ -536,3 +542,4 @@ Thanks for the input and pull requests by:
 - @gempain for fixing several issues and adding karma tests.
 - @mrwogu for fixing the `noImplicitAny` issue.
 - @bblommers for the support of multiple decorators.
+- @archfz for fixing the constructor.name issue
