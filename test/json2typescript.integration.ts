@@ -117,6 +117,8 @@ describe('Integration tests', () => {
         // SERIALIZE INTEGRATION
         describe('serialize', () => {
 
+            jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+
             it('should serialize a TypeScript object to a JSON object', () => {
                 expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
             });
@@ -129,6 +131,8 @@ describe('Integration tests', () => {
 
         // DESERIALIZE INTEGRATION
         describe('deserialize', () => {
+
+            jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
             it('should deserialize a JSON object to a TypeScript object', () => {
                 expect(jsonConvert.deserialize(dog1JsonObject, Dog)).toEqual(dog1);

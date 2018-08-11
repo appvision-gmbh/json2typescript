@@ -156,13 +156,39 @@ export class JsonConvert {
      */
     serialize(data: any): any {
 
-        if (data.constructor === Array) return this.serializeArray(data);
-        if (typeof data === "object") return this.serializeObject(data); // must be last due to the fact that an array is an object in TypeScript!
+        if (data === undefined) {
 
-        throw new Error(
-            "Fatal error in JsonConvert. " +
-            "Passed parameter json in JsonConvert.serialize() is not in valid format (object or array)."
-        );
+            if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+                throw new Error(
+                    "Fatal error in JsonConvert. " +
+                    "Passed parameter json in JsonConvert.serialize() is undefined. You have specified to disallow null values."
+                );
+            } else {
+                return null;
+            }
+
+        } else if (data === null) {
+
+            if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+                throw new Error(
+                    "Fatal error in JsonConvert. " +
+                    "Passed parameter json in JsonConvert.serialize() is undefined. You have specified to disallow null values."
+                );
+            } else {
+                return null;
+            }
+
+        } else if (data) {
+
+            if (data.constructor === Array) return this.serializeArray(data);
+            if (typeof data === "object") return this.serializeObject(data); // must be last due to the fact that an array is an object in TypeScript!
+
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.serialize() is not in valid format (object or array)."
+            );
+
+        }
 
     }
 
@@ -274,13 +300,36 @@ export class JsonConvert {
      */
     deserialize(json: any, classReference: { new(): any }): any {
 
-        if (json.constructor === Array) return this.deserializeArray(json, classReference);
-        if (typeof json === "object") return this.deserializeObject(json, classReference); // must be last due to the fact that an array is an object in TypeScript!
+        if (json === undefined) {
 
-        throw new Error(
-            "Fatal error in JsonConvert. " +
-            "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)."
-        );
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is undefined. This is not a valid JSON format."
+            );
+
+
+        } else if (json === null) {
+
+            if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+                throw new Error(
+                    "Fatal error in JsonConvert. " +
+                    "Passed parameter json in JsonConvert.deserialize() is undefined. You have specified to disallow null values."
+                );
+            } else {
+                return null;
+            }
+
+        } else if (json) {
+
+            if (json.constructor === Array) return this.deserializeArray(json, classReference);
+            if (typeof json === "object") return this.deserializeObject(json, classReference); // must be last due to the fact that an array is an object in TypeScript!
+
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)."
+            );
+
+        }
 
     };
 
@@ -420,7 +469,7 @@ export class JsonConvert {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JavaScript instance of class \"" + instance.constructor["name"] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
+                "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n"
             );
@@ -433,7 +482,7 @@ export class JsonConvert {
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JavaScript instance of class \"" + instance.constructor["name"] + "\" to JSON because of a type error.\n\n" +
+                "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tClass property value: \n\t\t" + classInstancePropertyValue + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
@@ -476,7 +525,7 @@ export class JsonConvert {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance.constructor["name"] + "\" because the defined JSON property \"" + jsonKey + "\" does not exist:\n\n" +
+                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonKey + "\" does not exist:\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n"
             );
@@ -489,7 +538,7 @@ export class JsonConvert {
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the JavaScript class \"" + instance.constructor["name"]+ "\" because of a type error.\n\n" +
+                "Failed to map the JSON object to the JavaScript class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
@@ -521,7 +570,7 @@ export class JsonConvert {
         if (typeof(mappings) === "undefined") return null;
 
         // Get direct mapping if possible
-        const directMappingName: string = instance.constructor.name + "." + propertyName;
+        const directMappingName: string = instance[Settings.CLASS_IDENTIFIER] + "." + propertyName;
         if (typeof(mappings[directMappingName]) !== "undefined") {
             return mappings[directMappingName];
         }
@@ -559,7 +608,7 @@ export class JsonConvert {
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.hasOwnProperty(Settings.MAPPING_PROPERTY)) { // only decorated custom objects have this injected property
+            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {
@@ -604,7 +653,12 @@ export class JsonConvert {
 
             } else { // other weird types
 
-                throw new Error("\tReason: Expected type is unknown. There might be multiple reasons for this:\n\t- You are missing the decorator @JsonObject (for object mapping)\n\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n\t- Your given class is undefined in the decorator because of circular dependencies");
+                throw new Error(
+                    "\tReason: Expected type is unknown. There might be multiple reasons for this:\n" +
+                    "\t- You are missing the decorator @JsonObject (for object mapping)\n" +
+                    "\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n" +
+                    "\t- Your given class is undefined in the decorator because of circular dependencies"
+                );
 
             }
 
@@ -717,7 +771,7 @@ export class JsonConvert {
         } else {
             if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) {
                 return "any";
-            } else if (expectedJsonType === String || expectedJsonType == Boolean || expectedJsonType == Number) {
+            } else if (expectedJsonType === String || expectedJsonType === Boolean || expectedJsonType === Number) {
                 return (new expectedJsonType()).constructor.name.toLowerCase();
             } else if (typeof expectedJsonType === 'function') {
                 return (new expectedJsonType()).constructor.name;
