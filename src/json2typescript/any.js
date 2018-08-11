@@ -1,8 +1,12 @@
 "use strict";
-var Any = (function () {
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Virtual any type for the property decorator.
+ */
+var Any = /** @class */ (function () {
     function Any() {
     }
     return Any;
 }());
 exports.Any = Any;
-//# sourceMappingURL=/Users/andreas/Documents/Git/git.appvision.ch/unibasel/json2typescript/src/json2typescript/any.js.map
+//# sourceMappingURL=any.js.map
