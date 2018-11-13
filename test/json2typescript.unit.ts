@@ -21,14 +21,14 @@ describe('Unit tests', () => {
             lastname: "Muster"
         }
         let cat1JsonObject = {
-            name: "Meowy",
+            catName: "Meowy",
             district: 100,
             owner: human1JsonObject,
             talky: true,
             other: "cute"
         };
         let cat2JsonObject = {
-            name: "Links",
+            catName: "Links",
             district: 50,
             owner: human1JsonObject,
             talky: true,
@@ -84,6 +84,8 @@ describe('Unit tests', () => {
 
         @JsonObject("Kitty")
         class Cat extends Animal {
+            @JsonProperty("catName", String)
+            name: string = undefined;
             @JsonProperty()
             district: number = undefined;
             @JsonProperty()
@@ -172,13 +174,13 @@ describe('Unit tests', () => {
 
         // BASIC CHECKS
         describe('basic checks', () => {
-
             jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
             it('serialize and deserialize same data', () => {
                 let t_catJsonObject = (<any>jsonConvert).serialize(cat1);
                 expect(t_catJsonObject).toEqual(cat1JsonObject);
                 let t_cat = (<any>jsonConvert).deserialize(t_catJsonObject, Cat);
+
                 expect(t_cat).toEqual(cat1);
             });
             it('deserialize and serialize same data', () => {
@@ -197,7 +199,7 @@ describe('Unit tests', () => {
             it('serializeObject_loopProperty()', () => {
                 let t_cat = {};
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat)
-                expect(t_cat["name"]).toBe(cat1.name);
+                expect(t_cat["catName"]).toBe(cat1.name);
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat)
                 expect(t_cat["district"]).toBe(100);
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat)
@@ -205,7 +207,7 @@ describe('Unit tests', () => {
             });
             it('deserializeObject_loopProperty()', () => {
                 let t_cat = new Cat();
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", { "name": "Meowy" });
+                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", { "catName": "Meowy" });
                 expect(t_cat.name).toEqual("Meowy");
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", { "district": 100 });
                 expect(t_cat.district).toEqual(100);

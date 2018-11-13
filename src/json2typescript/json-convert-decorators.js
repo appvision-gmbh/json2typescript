@@ -26,16 +26,18 @@ function JsonObject(target) {
     var decorator = function (target) {
         target.prototype[json_convert_options_1.Settings.CLASS_IDENTIFIER] = classIdentifier.length > 0 ? classIdentifier : target.name;
         var mapping = target.prototype[json_convert_options_1.Settings.MAPPING_PROPERTY];
-        var newMapping = [];
         // Make sure we replace the mapping names of all properties of this class
         if (!mapping)
             return;
-        for (var _i = 0, _a = Object.keys(mapping); _i < _a.length; _i++) {
-            var key = _a[_i];
-            var newKey = key.replace(json_convert_options_1.Settings.CLASS_IDENTIFIER + ".", target.prototype[json_convert_options_1.Settings.CLASS_IDENTIFIER] + ".");
-            newMapping[newKey] = mapping[key];
+        var unmappedKeys = Object.keys(mapping)
+            .filter(function (val) { return val.indexOf(json_convert_options_1.Settings.CLASS_IDENTIFIER + ".") === 0; });
+        for (var _i = 0, unmappedKeys_1 = unmappedKeys; _i < unmappedKeys_1.length; _i++) {
+            var key = unmappedKeys_1[_i];
+            mapping[key.replace(json_convert_options_1.Settings.CLASS_IDENTIFIER, target.prototype[json_convert_options_1.Settings.CLASS_IDENTIFIER])] =
+                mapping[key];
+            delete mapping[key];
         }
-        target.prototype[json_convert_options_1.Settings.MAPPING_PROPERTY] = newMapping;
+        target.prototype[json_convert_options_1.Settings.MAPPING_PROPERTY] = mapping;
     };
     var type = typeof target;
     switch (type) {

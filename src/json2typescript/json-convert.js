@@ -512,7 +512,7 @@ var JsonConvert = /** @class */ (function () {
         // Check if attempt and expected was 1-d
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
             // Check the type
-            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(json_convert_options_1.Settings.CLASS_IDENTIFIER)) {
+            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(json_convert_options_1.Settings.CLASS_IDENTIFIER)) { // only decorated custom objects have this injected property
                 // Check if we have null value
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
@@ -525,7 +525,7 @@ var JsonConvert = /** @class */ (function () {
                 else
                     return this.deserializeObject(value, expectedJsonType);
             }
-            else if (expectedJsonType === any_1.Any || expectedJsonType === null || expectedJsonType === Object) {
+            else if (expectedJsonType === any_1.Any || expectedJsonType === null || expectedJsonType === Object) { // general object
                 // Check if we have null value
                 if (value === null) {
                     if (this.valueCheckingMode !== json_convert_enums_1.ValueCheckingMode.DISALLOW_NULL)
@@ -535,7 +535,7 @@ var JsonConvert = /** @class */ (function () {
                 }
                 return value;
             }
-            else if (expectedJsonType === String || expectedJsonType === Number || expectedJsonType === Boolean) {
+            else if (expectedJsonType === String || expectedJsonType === Number || expectedJsonType === Boolean) { // otherwise check for a primitive type
                 // Check if we have null value
                 if (value === null) {
                     if (this.valueCheckingMode === json_convert_enums_1.ValueCheckingMode.ALLOW_NULL)
@@ -544,18 +544,19 @@ var JsonConvert = /** @class */ (function () {
                         throw new Error("\tReason: Given value is null.");
                 }
                 // Check if the types match
-                if ((expectedJsonType === String && typeof (value) === "string") ||
+                if ( // primitive types match
+                (expectedJsonType === String && typeof (value) === "string") ||
                     (expectedJsonType === Number && typeof (value) === "number") ||
                     (expectedJsonType === Boolean && typeof (value) === "boolean")) {
                     return value;
                 }
-                else {
+                else { // primitive types mismatch
                     if (this.ignorePrimitiveChecks)
                         return value;
                     throw new Error("\tReason: Given object does not match the expected primitive type.");
                 }
             }
-            else {
+            else { // other weird types
                 throw new Error("\tReason: Expected type is unknown. There might be multiple reasons for this:\n" +
                     "\t- You are missing the decorator @JsonObject (for object mapping)\n" +
                     "\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n" +
