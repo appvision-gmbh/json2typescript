@@ -28,18 +28,21 @@ export function JsonObject(target?: string | any): any {
         target.prototype[Settings.CLASS_IDENTIFIER] = classIdentifier.length > 0 ? classIdentifier : target.name;
 
         const mapping: any = target.prototype[Settings.MAPPING_PROPERTY];
-        let newMapping: any = [];
 
         // Make sure we replace the mapping names of all properties of this class
         if (!mapping) return;
 
-        for (const key of Object.keys(mapping)) {
-            const newKey: string = key.replace(Settings.CLASS_IDENTIFIER + ".", target.prototype[Settings.CLASS_IDENTIFIER] + ".");
-            newMapping[newKey] = mapping[key];
+        let unmappedKeys = Object.keys(mapping)
+            .filter((val) => val.indexOf(`${Settings.CLASS_IDENTIFIER}.`) === 0);
+
+        for (let key of unmappedKeys) {
+            mapping[key.replace(Settings.CLASS_IDENTIFIER, target.prototype[Settings.CLASS_IDENTIFIER])] =
+                mapping[key];
+
+            // We must delete the mapping without associated class since it will
+            // cause issues with inheritance of mappings and overrides.
+            delete mapping[key];
         }
-
-        target.prototype[Settings.MAPPING_PROPERTY] = newMapping;
-
     };
 
     const type: string = typeof target;

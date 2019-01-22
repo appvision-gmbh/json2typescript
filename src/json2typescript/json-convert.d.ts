@@ -24,14 +24,14 @@ export declare class JsonConvert {
      * @returns {number}
      */
     /**
-     * Determines how the JsonConvert class instance should operate.
-     *
-     * You may assign three different values:
-     * - OperationMode.DISABLE: json2typescript will be disabled, no type checking or mapping is done
-     * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
-     * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
-     * @param value
-     */
+    * Determines how the JsonConvert class instance should operate.
+    *
+    * You may assign three different values:
+    * - OperationMode.DISABLE: json2typescript will be disabled, no type checking or mapping is done
+    * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
+    * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
+    * @param value
+    */
     operationMode: number;
     /**
      * Determines which types are allowed to be null.
@@ -53,15 +53,15 @@ export declare class JsonConvert {
      * @returns {number}
      */
     /**
-     * Determines which types are allowed to be null.
-     *
-     * You may assign three different values:
-     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
-     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
-     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
-     *
-     * @param value
-     */
+    * Determines which types are allowed to be null.
+    *
+    * You may assign three different values:
+    * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
+    * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
+    * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+    *
+    * @param value
+    */
     valueCheckingMode: number;
     /**
      * Determines whether primitive types should be checked.
@@ -75,11 +75,11 @@ export declare class JsonConvert {
      * @returns {boolean}
      */
     /**
-     * Determines whether primitive types should be checked.
-     * If true, it will be allowed to assign primitive to other primitive types.
-     *
-     * @param value
-     */
+    * Determines whether primitive types should be checked.
+    * If true, it will be allowed to assign primitive to other primitive types.
+    *
+    * @param value
+    */
     ignorePrimitiveChecks: boolean;
     /**
      * Constructor.
@@ -187,7 +187,7 @@ export declare class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private serializeObject_loopProperty(instance, classPropertyName, json);
+    private serializeObject_loopProperty;
     /**
      * Tries to find the JSON mapping for a given class property and finally assign the value.
      *
@@ -197,7 +197,7 @@ export declare class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private deserializeObject_loopProperty(instance, classPropertyName, json);
+    private deserializeObject_loopProperty;
     /**
      * Gets the mapping options of a given class property.
      *
@@ -206,7 +206,7 @@ export declare class JsonConvert {
      *
      * @returns {MappingOptions|null}
      */
-    private getClassPropertyMappingOptions(instance, propertyName);
+    private getClassPropertyMappingOptions;
     /**
      * Compares the type of a given value with an internal expected json type.
      * Either returns the resulting value or throws an exception.
@@ -219,7 +219,7 @@ export declare class JsonConvert {
      *
      * @throws throws an expection in case of failure
      */
-    private verifyProperty(expectedJsonType, value, serialize?);
+    private verifyProperty;
     /**
      * Returns a string representation of the expected json type.
      *
@@ -227,7 +227,7 @@ export declare class JsonConvert {
      *
      * @returns {string} the string representation
      */
-    private getExpectedType(expectedJsonType);
+    private getExpectedType;
     /**
      * Returns a string representation of the JSON value type.
      *
@@ -235,7 +235,7 @@ export declare class JsonConvert {
      *
      * @returns {string} the string representation
      */
-    private getJsonType(jsonValue);
+    private getJsonType;
     /**
      * Returns a string representation of the true TypeScript type.
      *
@@ -243,5 +243,5 @@ export declare class JsonConvert {
      *
      * @returns {string} the string representation
      */
-    private getTrueType(trueValue);
+    private getTrueType;
 }

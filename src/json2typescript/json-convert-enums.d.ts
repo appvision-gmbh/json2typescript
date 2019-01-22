@@ -12,7 +12,7 @@
 export declare enum OperationMode {
     DISABLE = 0,
     ENABLE = 1,
-    LOGGING = 2,
+    LOGGING = 2
 }
 /**
  * Enum for the value checking mode of a JsonConvert instance.
@@ -28,5 +28,5 @@ export declare enum OperationMode {
 export declare enum ValueCheckingMode {
     ALLOW_NULL = 1,
     ALLOW_OBJECT_NULL = 2,
-    DISALLOW_NULL = 3,
+    DISALLOW_NULL = 3
 }
