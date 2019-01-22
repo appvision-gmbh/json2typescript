@@ -1,3 +1,14 @@
+# v1.0.7 (2019-01-22)
+
+## Bug Fixes
+
+* Implemented pull request that fixes an issue with child class properties, closes [#80](https://github.com/dhlab-basel/json2typescript/pull/80)
+* Fixed bug in constructor properties, closes [#82](https://github.com/dhlab-basel/json2typescript/issues/82)
+
+## Features
+
+* Allow case insensitive lookup in json deserializing, closes [#81](https://github.com/dhlab-basel/json2typescript/issues/81)
+
 # v1.0.6 (2018-08-12)
 
 ## Bug Fixes
