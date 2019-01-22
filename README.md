@@ -228,6 +228,11 @@ The class decorators are used infront of the class declaration and do support on
 export class User {}
 ```
 
+> Warning: Minification removes the actual names of certain classes. This can
+in certain cases cause the deserializer to not work as same class names will
+overwrite the property descriptors. It is advised to explicitly ID your 
+objects as above.
+
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 
 #### First parameter: classIdentifier (optional)
