@@ -131,9 +131,9 @@ export class JsonConvert {
      * @param ignorePrimitiveChecks optional param (default: false)
      */
     constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
-        if (operationMode && operationMode in OperationMode) this.operationMode = operationMode;
-        if (valueCheckingMode && valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
-        if (ignorePrimitiveChecks) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
+        if (operationMode !== undefined && operationMode in OperationMode) this.operationMode = operationMode;
+        if (valueCheckingMode !== undefined && valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
+        if (ignorePrimitiveChecks !== undefined) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
     }
 
 
