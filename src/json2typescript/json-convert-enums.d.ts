@@ -15,6 +15,20 @@ export declare enum OperationMode {
     LOGGING = 2
 }
 /**
+ * Enum for the property matching mode of a JsonConvert instance.
+ *
+ * The values should be used as follows:
+ * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+ * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+ *
+ * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+ * @see https://www.npmjs.com/package/json2typescript full documentation
+ */
+export declare enum PropertyMatchingRule {
+    CASE_STRICT = 1,
+    CASE_INSENSITIVE = 2
+}
+/**
  * Enum for the value checking mode of a JsonConvert instance.
  *
  * The values should be used as follows:

@@ -25,6 +25,7 @@ export function JsonObject(target?: string | any): any {
     let classIdentifier = "";
 
     const decorator = (target: any): void => {
+
         target.prototype[Settings.CLASS_IDENTIFIER] = classIdentifier.length > 0 ? classIdentifier : target.name;
 
         const mapping: any = target.prototype[Settings.MAPPING_PROPERTY];
@@ -32,10 +33,10 @@ export function JsonObject(target?: string | any): any {
         // Make sure we replace the mapping names of all properties of this class
         if (!mapping) return;
 
-        let unmappedKeys = Object.keys(mapping)
+        const unmappedKeys = Object.keys(mapping)
             .filter((val) => val.indexOf(`${Settings.CLASS_IDENTIFIER}.`) === 0);
 
-        for (let key of unmappedKeys) {
+        for (const key of unmappedKeys) {
             mapping[key.replace(Settings.CLASS_IDENTIFIER, target.prototype[Settings.CLASS_IDENTIFIER])] =
                 mapping[key];
 
@@ -43,6 +44,7 @@ export function JsonObject(target?: string | any): any {
             // cause issues with inheritance of mappings and overrides.
             delete mapping[key];
         }
+
     };
 
     const type: string = typeof target;

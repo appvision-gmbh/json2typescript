@@ -82,6 +82,31 @@ export declare class JsonConvert {
     */
     ignorePrimitiveChecks: boolean;
     /**
+     * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     *
+     * You may assign the following values:
+     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     */
+    private _propertyMatchingRule;
+    /**
+     * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     *
+     * You may assign the following values:
+     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * @returns {number}
+     */
+    /**
+    *  Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+    *
+    * You may assign the following values:
+    * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+    * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+    * @param value
+    */
+    propertyMatchingRule: number;
+    /**
      * Constructor.
      *
      * To learn more about the params, check the documentation of the equally named class properties.
@@ -89,8 +114,9 @@ export declare class JsonConvert {
      * @param operationMode optional param (default: OperationMode.ENABLE)
      * @param valueCheckingMode optional param (default: ValueCheckingMode.ALLOW_OBJECT_NULL)
      * @param ignorePrimitiveChecks optional param (default: false)
+     * @param propertyMatchingRule optional param (default: PropertyMatchingRule.CASE_STRICT)
      */
-    constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean);
+    constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean, propertyMatchingRule?: number);
     /**
      * Tries to serialize a TypeScript object or array of objects to JSON.
      *

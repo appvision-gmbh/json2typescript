@@ -18,7 +18,7 @@ describe('Integration tests', () => {
         let human1JsonObject = {
             firstname: "Andreas",
             lastname: "Muster"
-        }
+        };
         let cat1JsonObject = {
             name: "Meowy",
             district: 100,

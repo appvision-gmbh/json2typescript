@@ -35,9 +35,10 @@ function JsonObject(target) {
             var key = unmappedKeys_1[_i];
             mapping[key.replace(json_convert_options_1.Settings.CLASS_IDENTIFIER, target.prototype[json_convert_options_1.Settings.CLASS_IDENTIFIER])] =
                 mapping[key];
+            // We must delete the mapping without associated class since it will
+            // cause issues with inheritance of mappings and overrides.
             delete mapping[key];
         }
-        target.prototype[json_convert_options_1.Settings.MAPPING_PROPERTY] = mapping;
     };
     var type = typeof target;
     switch (type) {

@@ -21,8 +21,9 @@ var JsonConvert = /** @class */ (function () {
      * @param operationMode optional param (default: OperationMode.ENABLE)
      * @param valueCheckingMode optional param (default: ValueCheckingMode.ALLOW_OBJECT_NULL)
      * @param ignorePrimitiveChecks optional param (default: false)
+     * @param propertyMatchingRule optional param (default: PropertyMatchingRule.CASE_STRICT)
      */
-    function JsonConvert(operationMode, valueCheckingMode, ignorePrimitiveChecks) {
+    function JsonConvert(operationMode, valueCheckingMode, ignorePrimitiveChecks, propertyMatchingRule) {
         ////////////////
         // PROPERTIES //
         ////////////////
@@ -49,12 +50,22 @@ var JsonConvert = /** @class */ (function () {
          * If true, it will be allowed to assign primitive to other primitive types.
          */
         this._ignorePrimitiveChecks = false;
-        if (operationMode && operationMode in json_convert_enums_1.OperationMode)
+        /**
+         * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+         *
+         * You may assign the following values:
+         * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+         * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+         */
+        this._propertyMatchingRule = json_convert_enums_1.PropertyMatchingRule.CASE_STRICT;
+        if (operationMode !== undefined && operationMode in json_convert_enums_1.OperationMode)
             this.operationMode = operationMode;
-        if (valueCheckingMode && valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
+        if (valueCheckingMode !== undefined && valueCheckingMode in json_convert_enums_1.ValueCheckingMode)
             this.valueCheckingMode = valueCheckingMode;
-        if (ignorePrimitiveChecks)
+        if (ignorePrimitiveChecks !== undefined)
             this.ignorePrimitiveChecks = ignorePrimitiveChecks;
+        if (propertyMatchingRule !== undefined)
+            this.propertyMatchingRule = propertyMatchingRule;
     }
     Object.defineProperty(JsonConvert.prototype, "operationMode", {
         /**
@@ -134,6 +145,33 @@ var JsonConvert = /** @class */ (function () {
          */
         set: function (value) {
             this._ignorePrimitiveChecks = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(JsonConvert.prototype, "propertyMatchingRule", {
+        /**
+         * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+         *
+         * You may assign the following values:
+         * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+         * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+         * @returns {number}
+         */
+        get: function () {
+            return this._propertyMatchingRule;
+        },
+        /**
+         *  Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+         *
+         * You may assign the following values:
+         * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+         * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+         * @param value
+         */
+        set: function (value) {
+            if (value in json_convert_enums_1.PropertyMatchingRule)
+                this._propertyMatchingRule = value;
         },
         enumerable: true,
         configurable: true
@@ -440,6 +478,15 @@ var JsonConvert = /** @class */ (function () {
         var isOptional = mappingOptions.isOptional;
         var customConverter = mappingOptions.customConverter;
         var jsonValue = json[jsonKey];
+        // Try to find other key in case insensitive mode
+        if (typeof (jsonValue) === "undefined" && this.propertyMatchingRule === json_convert_enums_1.PropertyMatchingRule.CASE_INSENSITIVE) {
+            // Make a key mapping for the json object so that jsonKeys[lowerCaseKey] = originalKey
+            var jsonKeys = Object.keys(json).reduce(function (keys, key) {
+                keys[key.toLowerCase()] = key;
+                return keys;
+            }, {});
+            jsonValue = json[jsonKeys[jsonKey.toLowerCase()]];
+        }
         // Check if the json value exists
         if (typeof (jsonValue) === "undefined") {
             if (isOptional)
