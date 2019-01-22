@@ -1,6 +1,6 @@
-import { OperationMode, ValueCheckingMode } from "./json-convert-enums";
-import { MappingOptions, Settings } from "./json-convert-options";
-import { Any } from "./any";
+import {OperationMode, PropertyMatchingRule, ValueCheckingMode} from "./json-convert-enums";
+import {MappingOptions, Settings} from "./json-convert-options";
+import {Any} from "./any";
 
 /**
  * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
@@ -115,6 +115,39 @@ export class JsonConvert {
         this._ignorePrimitiveChecks = value;
     }
 
+    /**
+     * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     *
+     * You may assign the following values:
+     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     */
+    private _propertyMatchingRule: number = PropertyMatchingRule.CASE_STRICT;
+
+    /**
+     * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     *
+     * You may assign the following values:
+     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * @returns {number}
+     */
+    get propertyMatchingRule(): number {
+        return this._propertyMatchingRule;
+    }
+
+    /**
+     *  Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     *
+     * You may assign the following values:
+     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * @param value
+     */
+    set propertyMatchingRule(value: number) {
+        if (value in PropertyMatchingRule) this._propertyMatchingRule = value;
+    }
+
 
     /////////////////
     // CONSTRUCTOR //
@@ -129,11 +162,13 @@ export class JsonConvert {
      * @param operationMode optional param (default: OperationMode.ENABLE)
      * @param valueCheckingMode optional param (default: ValueCheckingMode.ALLOW_OBJECT_NULL)
      * @param ignorePrimitiveChecks optional param (default: false)
+     * @param propertyMatchingRule optional param (default: PropertyMatchingRule.CASE_STRICT)
      */
-    constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean) {
+    constructor(operationMode?: number, valueCheckingMode?: number, ignorePrimitiveChecks?: boolean, propertyMatchingRule?: number) {
         if (operationMode !== undefined && operationMode in OperationMode) this.operationMode = operationMode;
         if (valueCheckingMode !== undefined && valueCheckingMode in ValueCheckingMode) this.valueCheckingMode = valueCheckingMode;
         if (ignorePrimitiveChecks !== undefined) this.ignorePrimitiveChecks = ignorePrimitiveChecks;
+        if (propertyMatchingRule !== undefined) this.propertyMatchingRule = propertyMatchingRule;
     }
 
 
@@ -516,6 +551,19 @@ export class JsonConvert {
         let customConverter: any = mappingOptions.customConverter;
 
         let jsonValue: any = json[jsonKey];
+
+
+        // Try to find other key in case insensitive mode
+        if (typeof(jsonValue) === "undefined" && this.propertyMatchingRule === PropertyMatchingRule.CASE_INSENSITIVE) {
+
+            // Make a key mapping for the json object so that jsonKeys[lowerCaseKey] = originalKey
+            let jsonKeys: any = Object.keys(json).reduce((keys: string[], key: string) => {
+                keys[<any> key.toLowerCase()] = key;
+                return keys;
+            }, {});
+            jsonValue = json[jsonKeys[jsonKey.toLowerCase()]];
+
+        }
 
 
         // Check if the json value exists
