@@ -206,7 +206,6 @@ describe('Unit tests', () => {
                 let t_catJsonObject = (<any>jsonConvert).serialize(cat1);
                 expect(t_catJsonObject).toEqual(cat1JsonObject);
                 let t_cat = (<any>jsonConvert).deserialize(t_catJsonObject, Cat);
-
                 expect(t_cat).toEqual(cat1);
             });
             it('deserialize and serialize same data', () => {
@@ -235,6 +234,11 @@ describe('Unit tests', () => {
                 let t_cat = new Cat();
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catName": "Meowy"});
                 expect(t_cat.name).toEqual("Meowy");
+
+                let t_dog = new Dog();
+                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", { "name": "Barky" });
+                expect(t_dog.name).toEqual("Barky");
+
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", {"district": 100});
                 expect(t_cat.district).toEqual(100);
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
