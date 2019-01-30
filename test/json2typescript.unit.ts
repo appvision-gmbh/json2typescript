@@ -1,167 +1,109 @@
-import {JsonConvert} from "../src/json2typescript/json-convert";
-import {OperationMode, PropertyMatchingRule, ValueCheckingMode} from "../src/json2typescript/json-convert-enums";
-import {JsonConverter, JsonObject, JsonProperty} from "../src/json2typescript/json-convert-decorators";
-import {JsonCustomConvert} from "../src/json2typescript/json-custom-convert";
-import {Any} from "../src/json2typescript/any";
-import {Settings} from "../src/json2typescript/json-convert-options";
+import { JsonConvert } from "../src/json2typescript/json-convert";
+import { OperationMode, PropertyMatchingRule, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
+import { Any } from "../src/json2typescript/any";
+import { Settings } from "../src/json2typescript/json-convert-options";
+import { Human } from "./model/typescript/human";
+import { Cat } from "./model/typescript/cat";
+import { Dog } from "./model/typescript/dog";
+import { IHuman } from "./model/json/i-human";
+import { ICat } from "./model/json/i-cat";
+import { IDog } from "./model/json/i-dog";
 
 describe('Unit tests', () => {
 
+    const jsonConvert = new JsonConvert();
+
     describe('JsonConvert', () => {
 
-        // JSONCONVERT INSTANCE
-        let jsonConvert = new JsonConvert();
-        jsonConvert.operationMode = OperationMode.ENABLE;
-        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
-        jsonConvert.ignorePrimitiveChecks = false;
-
         // JSON DATA
-        let human1JsonObject = {
-            firstname: "Andreas",
-            lastname: "Muster"
+        let human1JsonObject: IHuman = {
+            givenName: "Andreas",
+            lastName: "Muster"
         };
-        let cat1JsonObject = {
+        let cat1JsonObject: ICat = {
             catName: "Meowy",
             district: 100,
             owner: human1JsonObject,
             talky: true,
-            other: "cute"
+            other: "cute",
+            birthdate: null,
+            friends: []
         };
-        let cat2JsonObject = {
+        let cat2JsonObject: ICat = {
             catName: "Links",
             district: 50,
             owner: human1JsonObject,
             talky: true,
-            other: "sweet"
+            other: "sweet",
+            birthdate: "2014-09-01",
         };
-        let dog1JsonObject = {
+        let dog1JsonObject: IDog = {
             name: "Barky",
             barking: true,
             owner: null,
-            other: 1.1
+            other: 1.1,
         };
-        let animalJsonArray = [cat1JsonObject, dog1JsonObject];
-        let catsJsonArray = [cat1JsonObject, cat2JsonObject];
-
-        // TYPESCRIPT CLASSES
-        @JsonConverter
-        class DateConverter implements JsonCustomConvert<Date> {
-            serialize(date: Date): any {
-                let year = date.getFullYear();
-                let month = date.getMonth() + 1;
-                let day = date.getDate();
-                return year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
-            }
-
-            deserialize(date: any): Date {
-                return new Date(date);
-            }
-        }
-
-        @JsonObject()
-        class Human {
-            @JsonProperty("firstname", String)
-            firstname: string = "";
-            @JsonProperty("lastname", String)
-            lastname: string = "";
-
-            getName() {
-                return this.firstname + " " + this.lastname;
-            }
-
-            constructor() {
-                this.firstname = "-";
-            }
-        }
-
-        @JsonObject("Animal")
-        class Animal {
-            @JsonProperty("name", String)
-            name: string = undefined;
-            @JsonProperty("owner", Human, true)
-            owner: Human = undefined;
-            @JsonProperty("birthdate", DateConverter)
-            birthdate: Date;
-        }
-
-        @JsonObject("Kitty")
-        class Cat extends Animal {
-            @JsonProperty("catName", String)
-            name: string = undefined;
-            @JsonProperty()
-            district: number = undefined;
-            @JsonProperty()
-            talky: boolean = undefined;
-            @JsonProperty("other", String)
-            other: string = undefined;
-        }
-
-        @JsonObject
-        class Dog extends Animal {
-            @JsonProperty("barking", Boolean)
-            isBarking: boolean = undefined;
-            @JsonProperty("other", Number)
-            other: number = undefined;
-        }
 
         // TYPESCRIPT INSTANCES
         let human1 = new Human();
         human1.firstname = "Andreas";
         human1.lastname = "Muster";
+
         let human2 = new Human();
         human2.lastname = "-";
+
         let cat1 = new Cat();
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
         cat1.talky = true;
         cat1.other = "cute";
+
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
         cat2.owner = human1;
         cat2.other = "sweet";
+        cat2.birthdate = new Date("2014-09-01");
+
         let dog1 = new Dog();
         dog1.name = "Barky";
         dog1.isBarking = true;
         dog1.owner = null;
         dog1.other = 1.1;
-        let animals = [cat1, dog1];
-        let cats = [cat1, cat2];
-
-        console.log(JSON.stringify((<any> Human)[Settings.MAPPING_PROPERTY]));
-        console.log(JSON.stringify((<any> cat1)[Settings.MAPPING_PROPERTY]));
 
         // SETUP CHECKS
         describe('setup checks', () => {
             it('JsonConvert instance', () => {
 
-                jsonConvert = new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.ALLOW_OBJECT_NULL, false);
-                expect(jsonConvert.operationMode).toEqual(OperationMode.ENABLE);
-                expect(jsonConvert.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
-                expect(jsonConvert.ignorePrimitiveChecks).toEqual(false);
+                let jsonConvertTest: JsonConvert;
 
-                jsonConvert = new JsonConvert(OperationMode.DISABLE, ValueCheckingMode.ALLOW_NULL, true);
-                expect(jsonConvert.operationMode).toEqual(OperationMode.DISABLE);
-                expect(jsonConvert.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_NULL);
-                expect(jsonConvert.ignorePrimitiveChecks).toEqual(true);
+                jsonConvertTest = new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.ALLOW_OBJECT_NULL, false);
+                expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
+                expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
+                expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
 
-                jsonConvert = new JsonConvert(OperationMode.LOGGING, ValueCheckingMode.DISALLOW_NULL, false);
-                expect(jsonConvert.operationMode).toEqual(OperationMode.LOGGING);
-                expect(jsonConvert.valueCheckingMode).toEqual(ValueCheckingMode.DISALLOW_NULL);
-                expect(jsonConvert.ignorePrimitiveChecks).toEqual(false);
+                jsonConvertTest = new JsonConvert(OperationMode.DISABLE, ValueCheckingMode.ALLOW_NULL, true);
+                expect(jsonConvertTest.operationMode).toEqual(OperationMode.DISABLE);
+                expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_NULL);
+                expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(true);
 
-                jsonConvert = new JsonConvert();
-                expect(jsonConvert.operationMode).toEqual(OperationMode.ENABLE);
-                expect(jsonConvert.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
-                expect(jsonConvert.ignorePrimitiveChecks).toEqual(false);
+                jsonConvertTest = new JsonConvert(OperationMode.LOGGING, ValueCheckingMode.DISALLOW_NULL, false);
+                expect(jsonConvertTest.operationMode).toEqual(OperationMode.LOGGING);
+                expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.DISALLOW_NULL);
+                expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+
+                jsonConvertTest = new JsonConvert();
+                expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
+                expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
+                expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
 
             });
 
             it('JsonObject decorator', () => {
-                expect((<any> human1)[Settings.CLASS_IDENTIFIER]).toEqual("Human");
-                expect((<any> cat1)[Settings.CLASS_IDENTIFIER]).toEqual("Kitty");
-                expect((<any> dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Dog");
+                expect((<any>human1)[Settings.CLASS_IDENTIFIER]).toEqual("Human");
+                expect((<any>cat1)[Settings.CLASS_IDENTIFIER]).toEqual("Kitty");
+                expect((<any>dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Dog");
             });
         });
 
@@ -224,11 +166,11 @@ describe('Unit tests', () => {
             it('serializeObject_loopProperty()', () => {
                 let t_cat = {};
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat);
-                expect((<any> t_cat)["catName"]).toBe(cat1.name);
+                expect((<any>t_cat)["catName"]).toBe(cat1.name);
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat);
-                expect((<any> t_cat)["district"]).toBe(100);
+                expect((<any>t_cat)["district"]).toBe(100);
                 (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat);
-                expect((<any> t_cat)["owner"]["firstname"]).toBe("Andreas");
+                expect((<any>t_cat)["owner"]["givenName"]).toBe("Andreas");
             });
             it('deserializeObject_loopProperty()', () => {
                 let t_cat = new Cat();
@@ -236,15 +178,15 @@ describe('Unit tests', () => {
                 expect(t_cat.name).toEqual("Meowy");
 
                 let t_dog = new Dog();
-                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", { "name": "Barky" });
+                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", {"name": "Barky"});
                 expect(t_dog.name).toEqual("Barky");
 
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", {"district": 100});
                 expect(t_cat.district).toEqual(100);
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
                     "owner": {
-                        firstname: "Andreas",
-                        lastname: "Muster"
+                        givenName: "Andreas",
+                        lastName: "Muster"
                     }
                 });
 
@@ -287,6 +229,8 @@ describe('Unit tests', () => {
                 expect((<any>jsonConvert).getExpectedType(JsonConvert)).toBe("JsonConvert");
                 expect((<any>jsonConvert).getExpectedType([String, [Boolean, Number]])).toBe("[string,[boolean,number]]");
                 expect((<any>jsonConvert).getExpectedType([[null, Any], Object])).toBe("[[any,any],any]");
+                expect((<any>jsonConvert).getExpectedType(undefined)).toBe("undefined");
+                expect((<any>jsonConvert).getExpectedType("?")).toBe("?????");
             });
             it('getJsonType()', () => {
                 expect((<any>jsonConvert).getJsonType({name: "Andreas"})).toBe("object");
