@@ -233,7 +233,15 @@ in certain cases cause the deserializer to not work as same class names will
 overwrite the property descriptors. It is advised to explicitly ID your 
 objects as above.
 
-> Tip: Make sure you import `JsonObject` from `json2typescript`.
+> Tip: Make sure you import `JsonObject` from `json2typescript`.  
+
+> Tip: It is possible to deserialize multiple JSON-values into the same property. This can be useful if you have multiple JSON sources with inconsistent names, but want a single target object. In the process of serialization, the first value will be used.
+
+```typescript
+    @JsonProperty("jsonPropName", String, true)
+    @JsonProperty("jsonPropertyName", String, true)
+    name: string = undefined;
+```
 
 #### First parameter: classIdentifier (optional)
 

@@ -489,7 +489,7 @@ export class JsonConvert {
 
 
         // Get expected and real values
-        let jsonKey: string = mappingOptions.jsonPropertyName;
+        let jsonPropertyName: string[] = mappingOptions.jsonPropertyName;
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
@@ -506,14 +506,15 @@ export class JsonConvert {
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonKey + "\n\n"
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
             );
         }
 
 
         // Map the property
         try {
-            json[jsonKey] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+            // Each class property might have multiple decorators - only use the JSON property name as defined in the first one
+            json[jsonPropertyName[0]] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -522,7 +523,7 @@ export class JsonConvert {
                 "\tClass property value: \n\t\t" + classInstancePropertyValue + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
                 "\tRuntime type: \n\t\t" + this.getTrueType(classInstancePropertyValue) + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n" +
                 e.message + "\n"
             );
         }
@@ -545,23 +546,21 @@ export class JsonConvert {
         }
 
         // Get expected and real values
-        let jsonKey: string = mappingOptions.jsonPropertyName;
+        let jsonPropertyName: string[] = mappingOptions.jsonPropertyName;
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
 
-        let jsonValue: any = json[jsonKey];
+        let jsonValue: any = undefined;
 
 
-        // Try to find other key in case insensitive mode
-        if (typeof(jsonValue) === "undefined" && this.propertyMatchingRule === PropertyMatchingRule.CASE_INSENSITIVE) {
+        // Loop all properties and try to find the value for it
+        for (const n of jsonPropertyName) {
 
-            // Make a key mapping for the json object so that jsonKeys[lowerCaseKey] = originalKey
-            let jsonKeys: any = Object.keys(json).reduce((keys: string[], key: string) => {
-                keys[<any> key.toLowerCase()] = key;
-                return keys;
-            }, {});
-            jsonValue = json[jsonKeys[jsonKey.toLowerCase()]];
+            try {
+                jsonValue = this.getObjectValue(json, n);
+                break;
+            } catch {}
 
         }
 
@@ -573,9 +572,9 @@ export class JsonConvert {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonKey + "\" does not exist:\n\n" +
+                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonPropertyName + "\" does not exist:\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonKey + "\n\n"
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
             );
         }
 
@@ -586,10 +585,10 @@ export class JsonConvert {
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the JavaScript class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because of a type error.\n\n" +
+                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because of a type error.\n\n" +
                 "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
                 "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonKey + "\n\n" +
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n" +
                 "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
                 e.message + "\n\n"
@@ -788,6 +787,42 @@ export class JsonConvert {
 
         // All other attempts are fatal
         throw new Error("\tReason: Mapping failed because of an unknown error.");
+
+    }
+
+    /**
+     * Gets the value of an object for a given value.
+     * If the object does not have the specific key, an Error is thrown.
+     *
+     * @param data
+     * @param key
+     *
+     * @returns returns the value
+     *
+     * @throws an Error in case of the key was not found in the object
+     */
+    private getObjectValue(data: any, key: string): any {
+
+        // If we do not care about the case of the key, ad
+        if (this.propertyMatchingRule === PropertyMatchingRule.CASE_INSENSITIVE) {
+
+            // Create a mapping of the keys: keys[lowercase]=normalcase
+            const keyMapping: any = Object.keys(data).reduce((keys: string[], key: string) => {
+                keys[<any>key.toLowerCase()] = key;
+                return keys;
+            }, {});
+
+            // Define the new key
+            key = keyMapping[key.toLowerCase()];
+
+        }
+
+        // Throw an error if the key is not in the object
+        if (key in data === false) {
+            throw new Error();
+        }
+
+        return data[key];
 
     }
 

@@ -166,7 +166,7 @@ export function JsonProperty(...params: any[]): any {
 
         let jsonPropertyMappingOptions = new MappingOptions();
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
-        jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
+        jsonPropertyMappingOptions.jsonPropertyName.push(jsonPropertyName);
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
 
         // Check if conversionOption is a type or a custom converter.
@@ -177,7 +177,13 @@ export function JsonProperty(...params: any[]): any {
         }
 
         // Save the mapping info
-        target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName] = jsonPropertyMappingOptions;
+        if (typeof(target[Settings.MAPPING_PROPERTY][classPropertyName]) === "undefined") {
+            // First decorator for this classProperty
+            target[Settings.MAPPING_PROPERTY][classPropertyName] = jsonPropertyMappingOptions;
+        } else {
+            // Second decorator - just add the alternative JSON-name for this classProperty
+            target[Settings.MAPPING_PROPERTY][classPropertyName].jsonPropertyName.push(jsonPropertyName);
+        }
 
     }
 
