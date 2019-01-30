@@ -1,6 +1,6 @@
-import {OperationMode, PropertyMatchingRule, ValueCheckingMode} from "./json-convert-enums";
-import {MappingOptions, Settings} from "./json-convert-options";
-import {Any} from "./any";
+import { OperationMode, PropertyMatchingRule, ValueCheckingMode } from "./json-convert-enums";
+import { MappingOptions, Settings } from "./json-convert-options";
+import { Any } from "./any";
 
 /**
  * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
@@ -184,7 +184,7 @@ export class JsonConvert {
      *
      * @returns {any} the JSON object
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
@@ -234,14 +234,14 @@ export class JsonConvert {
      *
      * @returns {any} the JSON object
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     serializeObject(instance: any): any {
 
-        if (typeof(instance) !== "object" || instance instanceof Array) {
+        if (typeof (instance) !== "object" || instance instanceof Array) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Passed parameter jsonArray in JsonConvert.serializeObject() is not of type object."
@@ -280,14 +280,14 @@ export class JsonConvert {
      *
      * @returns {any[]} the JSON array
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     serializeArray(instanceArray: any[]): any[] {
 
-        if (typeof(instanceArray) !== "object" || instanceArray instanceof Array === false) {
+        if (typeof (instanceArray) !== "object" || instanceArray instanceof Array === false) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Passed parameter jsonArray in JsonConvert.serializeArray() is not of type array."
@@ -328,7 +328,7 @@ export class JsonConvert {
      *
      * @returns {any} the deserialized data (TypeScript instance or array of TypeScript instances)
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
@@ -376,14 +376,14 @@ export class JsonConvert {
      *
      * @returns {any} the deserialized TypeScript instance
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     deserializeObject(jsonObject: any, classReference: { new(): any }): any {
 
-        if (typeof(jsonObject) !== "object" || jsonObject instanceof Array) {
+        if (typeof (jsonObject) !== "object" || jsonObject instanceof Array) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Passed parameter jsonObject in JsonConvert.deserializeObject() is not of type object."
@@ -424,14 +424,14 @@ export class JsonConvert {
      *
      * @returns {any[]} the deserialized array of TypeScript instances
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     deserializeArray(jsonArray: any[], classReference: { new(): any }): any[] {
 
-        if (typeof(jsonArray) !== "object" || jsonArray instanceof Array === false) {
+        if (typeof (jsonArray) !== "object" || jsonArray instanceof Array === false) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Passed parameter jsonArray in JsonConvert.deserializeArray() is not of type array."
@@ -477,12 +477,12 @@ export class JsonConvert {
      * @param classPropertyName the property name
      * @param json the JSON object
      *
-     * @throws throws an expection in case of failure
+     * @throws throws an Error in case of failure
      */
     private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
         // Check if a JSON-object mapping is possible for a property
-        const mappingOptions: MappingOptions|null = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -498,7 +498,7 @@ export class JsonConvert {
 
 
         // Check if the json value exists
-        if (typeof(classInstancePropertyValue) === "undefined") {
+        if (typeof (classInstancePropertyValue) === "undefined") {
 
             if (isOptional) return;
 
@@ -536,11 +536,11 @@ export class JsonConvert {
      * @param classPropertyName the property name
      * @param json the JSON object
      *
-     * @throws throws an expection in case of failure
+     * @throws throws an Error in case of failure
      */
     private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
 
-        const mappingOptions: MappingOptions|null = this.getClassPropertyMappingOptions(instance, classPropertyName);
+        const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
@@ -566,7 +566,7 @@ export class JsonConvert {
 
 
         // Check if the json value exists
-        if (typeof(jsonValue) === "undefined") {
+        if (typeof (jsonValue) === "undefined") {
 
             if (isOptional) return;
 
@@ -591,11 +591,11 @@ export class JsonConvert {
                 "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n" +
                 "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
                 "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
-                e.message + "\n\n"
+                e.message + "\n"
             );
         }
-    }
 
+    }
 
     ////////////////////
     // HELPER METHODS //
@@ -609,16 +609,16 @@ export class JsonConvert {
      *
      * @returns {MappingOptions|null}
      */
-    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions|null {
+    private getClassPropertyMappingOptions(instance: any, propertyName: string): MappingOptions | null {
 
         let mappings: any = instance[Settings.MAPPING_PROPERTY];
 
         // Check if mapping is defined
-        if (typeof(mappings) === "undefined") return null;
+        if (typeof (mappings) === "undefined") return null;
 
         // Get direct mapping if possible
         const directMappingName: string = instance[Settings.CLASS_IDENTIFIER] + "." + propertyName;
-        if (typeof(mappings[directMappingName]) !== "undefined") {
+        if (typeof (mappings[directMappingName]) !== "undefined") {
             return mappings[directMappingName];
         }
 
@@ -642,7 +642,7 @@ export class JsonConvert {
      *
      * @returns returns the resulted mapped property
      *
-     * @throws throws an expection in case of failure
+     * @throws an error in case of failure
      */
     private verifyProperty(expectedJsonType: any, value: any, serialize?: boolean): any {
 
@@ -655,7 +655,7 @@ export class JsonConvert {
         if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
 
             // Check the type
-            if (typeof(expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) { // only decorated custom objects have this injected property
+            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) { // only decorated custom objects have this injected property
 
                 // Check if we have null value
                 if (value === null) {
@@ -688,9 +688,9 @@ export class JsonConvert {
 
                 // Check if the types match
                 if ( // primitive types match
-                (expectedJsonType === String && typeof(value) === "string") ||
-                (expectedJsonType === Number && typeof(value) === "number") ||
-                (expectedJsonType === Boolean && typeof(value) === "boolean")
+                    (expectedJsonType === String && typeof (value) === "string") ||
+                    (expectedJsonType === Number && typeof (value) === "number") ||
+                    (expectedJsonType === Boolean && typeof (value) === "boolean")
                 ) {
                     return value;
                 } else { // primitive types mismatch
@@ -830,7 +830,7 @@ export class JsonConvert {
     ///////////////////////////
     // JSON2TYPESCRIPT TYPES //
     ///////////////////////////
-    
+
 
     /**
      * Returns a string representation of the expected json type.
@@ -889,7 +889,7 @@ export class JsonConvert {
             type += "]";
             return type;
         } else {
-            return typeof(jsonValue);
+            return typeof (jsonValue);
         }
 
     }
@@ -902,7 +902,7 @@ export class JsonConvert {
      * @returns {string} the string representation
      */
     private getTrueType(trueValue: any): string {
-        return typeof(trueValue);
+        return typeof (trueValue);
     }
 
 }
