@@ -1,4 +1,5 @@
 export interface IHuman {
     givenName: string;
-    lastName: string;
+    name?: string;
+    lastName?: string;
 }

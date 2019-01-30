@@ -16,7 +16,7 @@ export class Animal {
     @JsonProperty("birthdate", DateConverter, true)
     birthdate: Date | null = null;
 
-    @JsonProperty("friends", [Any], true)
-    friends: any[] = [];
+    @JsonProperty("friends", Any, true)
+    friends: Any[] | null = null;
 
 }

@@ -20,6 +20,10 @@ describe('Unit tests', () => {
             givenName: "Andreas",
             lastName: "Muster"
         };
+        let human2JsonObject: IHuman = {
+            givenName: "Michael",
+            name: "Meier"
+        };
         let cat1JsonObject: ICat = {
             catName: "Meowy",
             district: 100,
@@ -32,10 +36,11 @@ describe('Unit tests', () => {
         let cat2JsonObject: ICat = {
             catName: "Links",
             district: 50,
-            owner: human1JsonObject,
+            owner: human2JsonObject,
             talky: true,
             other: "sweet",
             birthdate: "2014-09-01",
+            friends: null
         };
         let dog1JsonObject: IDog = {
             name: "Barky",
@@ -50,7 +55,8 @@ describe('Unit tests', () => {
         human1.lastname = "Muster";
 
         let human2 = new Human();
-        human2.lastname = "-";
+        human2.firstname = "Michael";
+        human2.lastname = "Meier";
 
         let cat1 = new Cat();
         cat1.name = "Meowy";
@@ -58,13 +64,16 @@ describe('Unit tests', () => {
         cat1.owner = human1;
         cat1.talky = true;
         cat1.other = "cute";
+        cat1.friends = [];
 
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
-        cat2.owner = human1;
+        cat2.owner = human2;
         cat2.other = "sweet";
         cat2.birthdate = new Date("2014-09-01");
+        cat2.friends = null;
+        cat2.talky = true;
 
         let dog1 = new Dog();
         dog1.name = "Barky";
@@ -216,6 +225,16 @@ describe('Unit tests', () => {
                 expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
                 expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false)).toEqual(["Andreas", [true, 2.2]]);
                 expect(() => (<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toThrow();
+            });
+            it('getObjectValue()', () => {
+                expect((<any>jsonConvert).getObjectValue({ "name": "Andreas" }, "name")).toBe("Andreas");
+                expect(() => (<any>jsonConvert).getObjectValue({ "nAmE": "Andreas" }, "NaMe")).toThrow();
+
+                jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_INSENSITIVE;
+
+                expect((<any>jsonConvert).getObjectValue({ "nAmE": "Andreas" }, "NaMe")).toBe("Andreas");
+
+                jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_STRICT;
             });
 
         });
