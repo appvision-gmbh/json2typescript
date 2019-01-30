@@ -177,12 +177,12 @@ export function JsonProperty(...params: any[]): any {
         }
 
         // Save the mapping info
-        if (typeof(target[Settings.MAPPING_PROPERTY][classPropertyName]) === "undefined") {
+        if (typeof(target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName]) === "undefined") {
             // First decorator for this classProperty
-            target[Settings.MAPPING_PROPERTY][classPropertyName] = jsonPropertyMappingOptions;
+            target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName] = jsonPropertyMappingOptions;
         } else {
             // Second decorator - just add the alternative JSON-name for this classProperty
-            target[Settings.MAPPING_PROPERTY][classPropertyName].jsonPropertyName.push(jsonPropertyName);
+            target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName].jsonPropertyName.unshift(jsonPropertyName);
         }
 
     }
