@@ -138,12 +138,6 @@ describe('Unit tests', () => {
                 jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
                 expect(() => (<any>jsonConvert).deserialize(undefined, Cat)).toThrowError();
-                let t_catJsonObject = (<any>jsonConvert).serialize(undefined);
-                expect(t_catJsonObject).toEqual(null);
-
-                jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
-
-                expect(() => (<any>jsonConvert).deserialize(undefined, Cat)).toThrowError();
                 expect(() => (<any>jsonConvert).serialize(undefined)).toThrowError();
 
             });
