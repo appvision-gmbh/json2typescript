@@ -166,7 +166,7 @@ export function JsonProperty(...params: any[]): any {
 
         let jsonPropertyMappingOptions = new MappingOptions();
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
-        jsonPropertyMappingOptions.jsonPropertyName.push(jsonPropertyName);
+        jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
 
         // Check if conversionOption is a type or a custom converter.
@@ -178,11 +178,14 @@ export function JsonProperty(...params: any[]): any {
 
         // Save the mapping info
         if (typeof(target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName]) === "undefined") {
-            // First decorator for this classProperty
             target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName] = jsonPropertyMappingOptions;
         } else {
-            // Second decorator - just add the alternative JSON-name for this classProperty
-            target[Settings.MAPPING_PROPERTY][Settings.CLASS_IDENTIFIER + "." + classPropertyName].jsonPropertyName.unshift(jsonPropertyName);
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "It is not allowed to add multiple decorators for the same property.\n\n" +
+                "\tClass property: \n" +
+                "\t\t" + classPropertyName + "\n\n"
+            );
         }
 
     }

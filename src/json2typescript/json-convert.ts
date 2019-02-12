@@ -567,7 +567,7 @@ export class JsonConvert {
 
 
         // Get expected and real values
-        let jsonPropertyName: string[] = mappingOptions.jsonPropertyName;
+        let jsonPropertyName: string = mappingOptions.jsonPropertyName;
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
@@ -592,7 +592,7 @@ export class JsonConvert {
         // Map the property
         try {
             // Each class property might have multiple decorators - only use the JSON property name as defined in the first one
-            json[jsonPropertyName[0]] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+            json[jsonPropertyName] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -624,24 +624,15 @@ export class JsonConvert {
         }
 
         // Get expected and real values
-        let jsonPropertyName: string[] = mappingOptions.jsonPropertyName;
+        let jsonPropertyName: string = mappingOptions.jsonPropertyName;
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
 
         let jsonValue: any = undefined;
-
-
-        // Loop all properties and try to find the value for it
-        for (const n of jsonPropertyName) {
-
-            try {
-                jsonValue = this.getObjectValue(json, n);
-                break;
-            } catch {
-            }
-
-        }
+        try {
+            jsonValue = this.getObjectValue(json, jsonPropertyName);
+        } catch {}
 
 
         // Check if the json value exists

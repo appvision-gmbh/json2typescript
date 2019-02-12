@@ -7,8 +7,6 @@ export class Human {
     firstname: string = "";
 
     @JsonProperty("lastName", String)
-    @JsonProperty("name", String)
-    @JsonProperty("secondName", String)
     lastname: string = "";
 
     get name(): string {

@@ -12,7 +12,7 @@ export class Settings {
  */
 export class MappingOptions {
     classPropertyName: string = "";
-    jsonPropertyName: string[] = [];
+    jsonPropertyName: string = "";
     expectedJsonType?: string = undefined;
     isOptional: boolean = false;
     customConverter: any = null;

@@ -1,10 +1,9 @@
-# v1.1.0 (2019-01-31)
+# v1.1.0 (2019-02-12)
 
 ## Bug Fixes
 
-* Included old pull request to support multiple property decorators, closes [#26](https://github.com/dhlab-basel/json2typescript/pull/26)
 * Implemented pull request that fixes an issue with child class properties, closes [#80](https://github.com/dhlab-basel/json2typescript/pull/80)
-* Fixed bug in constructor properties, closes [#82](https://github.com/dhlab-basel/json2typescript/issues/82)
+* Fixed bug in constructor parameters, closes [#82](https://github.com/dhlab-basel/json2typescript/issues/82)
 
 ## Features
 
