@@ -70,7 +70,7 @@ export function JsonObject(target?: string | any): any {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
-                "It's mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
+                "It is mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
                 "Use either @JsonObject or @JsonObject(classId) where classId is a string.\n\n"
             );
 
@@ -111,7 +111,7 @@ export function JsonProperty(...params: any[]): any {
             case 1:
                 if (params[0] === undefined) throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                    "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                     "\tClass property: \n" +
                     "\t\t" + classPropertyName + "\n\n" +
                     "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n"
@@ -121,14 +121,14 @@ export function JsonProperty(...params: any[]): any {
             case 2:
                 if (params[0] === undefined) throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                    "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                     "\tClass property: \n" +
                     "\t\t" + classPropertyName + "\n\n" +
                     "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n"
                 );
                 if (params[1] === undefined) throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+                    "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
                     "\tClass property: \n" +
                     "\t\t" + classPropertyName + "\n\n" +
                     "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"
@@ -139,14 +139,14 @@ export function JsonProperty(...params: any[]): any {
             case 3:
                 if (params[0] === undefined) throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                    "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                     "\tClass property: \n" +
                     "\t\t" + classPropertyName + "\n\n" +
                     "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n"
                 );
                 if (params[1] === undefined) throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "It's not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+                    "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
                     "\tClass property: \n" +
                     "\t\t" + classPropertyName + "\n\n" +
                     "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"

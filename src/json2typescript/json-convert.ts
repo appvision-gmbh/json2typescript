@@ -119,8 +119,8 @@ export class JsonConvert {
      * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
      *
      * You may assign the following values:
-     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
      */
     private _propertyMatchingRule: number = PropertyMatchingRule.CASE_STRICT;
 
@@ -128,8 +128,8 @@ export class JsonConvert {
      * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
      *
      * You may assign the following values:
-     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
      * @returns {number}
      */
     get propertyMatchingRule(): number {
@@ -137,11 +137,11 @@ export class JsonConvert {
     }
 
     /**
-     *  Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+     * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
      *
      * You may assign the following values:
-     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
      * @param value
      */
     set propertyMatchingRule(value: number) {
