@@ -56,7 +56,7 @@ function JsonObject(target) {
         // Decorator was @JsonObject(123)
         default:
             throw new Error("Fatal error in JsonConvert. " +
-                "It's mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
+                "It is mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
                 "Use either @JsonObject or @JsonObject(classId) where classId is a string.\n\n");
     }
 }
@@ -95,7 +95,7 @@ function JsonProperty() {
             case 1:
                 if (params[0] === undefined)
                     throw new Error("Fatal error in JsonConvert. " +
-                        "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                        "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                         "\tClass property: \n" +
                         "\t\t" + classPropertyName + "\n\n" +
                         "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n");
@@ -104,13 +104,13 @@ function JsonProperty() {
             case 2:
                 if (params[0] === undefined)
                     throw new Error("Fatal error in JsonConvert. " +
-                        "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                        "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                         "\tClass property: \n" +
                         "\t\t" + classPropertyName + "\n\n" +
                         "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n");
                 if (params[1] === undefined)
                     throw new Error("Fatal error in JsonConvert. " +
-                        "It's not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+                        "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
                         "\tClass property: \n" +
                         "\t\t" + classPropertyName + "\n\n" +
                         "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n");
@@ -120,13 +120,13 @@ function JsonProperty() {
             case 3:
                 if (params[0] === undefined)
                     throw new Error("Fatal error in JsonConvert. " +
-                        "It's not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+                        "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
                         "\tClass property: \n" +
                         "\t\t" + classPropertyName + "\n\n" +
                         "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n");
                 if (params[1] === undefined)
                     throw new Error("Fatal error in JsonConvert. " +
-                        "It's not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+                        "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
                         "\tClass property: \n" +
                         "\t\t" + classPropertyName + "\n\n" +
                         "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n");
@@ -152,7 +152,15 @@ function JsonProperty() {
             jsonPropertyMappingOptions.expectedJsonType = conversionOption;
         }
         // Save the mapping info
-        target[json_convert_options_1.Settings.MAPPING_PROPERTY][json_convert_options_1.Settings.CLASS_IDENTIFIER + "." + classPropertyName] = jsonPropertyMappingOptions;
+        if (typeof (target[json_convert_options_1.Settings.MAPPING_PROPERTY][json_convert_options_1.Settings.CLASS_IDENTIFIER + "." + classPropertyName]) === "undefined") {
+            target[json_convert_options_1.Settings.MAPPING_PROPERTY][json_convert_options_1.Settings.CLASS_IDENTIFIER + "." + classPropertyName] = jsonPropertyMappingOptions;
+        }
+        else {
+            throw new Error("Fatal error in JsonConvert. " +
+                "It is not allowed to add multiple decorators for the same property.\n\n" +
+                "\tClass property: \n" +
+                "\t\t" + classPropertyName + "\n\n");
+        }
     };
 }
 exports.JsonProperty = JsonProperty;

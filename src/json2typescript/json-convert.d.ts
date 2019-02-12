@@ -85,24 +85,24 @@ export declare class JsonConvert {
      * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
      *
      * You may assign the following values:
-     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
      */
     private _propertyMatchingRule;
     /**
      * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
      *
      * You may assign the following values:
-     * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
      * @returns {number}
      */
     /**
-    *  Determines the rule of how JSON properties shall be matched with class properties during deserialization.
+    * Determines the rule of how JSON properties shall be matched with class properties during deserialization.
     *
     * You may assign the following values:
-    * - CASE_STRICT: JSON properties need to match exactly the names in the decorators
-    * - CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+    * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
+    * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
     * @param value
     */
     propertyMatchingRule: number;
@@ -122,88 +122,88 @@ export declare class JsonConvert {
      *
      * @param data object or array of objects
      *
-     * @returns {any} the JSON object
+     * @returns the JSON object
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize(data: any): any;
+    serialize<T>(data: T | T[]): any | any[];
     /**
      * Tries to serialize a TypeScript object to a JSON object.
      *
      * @param instance TypeScript instance
      *
-     * @returns {any} the JSON object
+     * @returns the JSON object
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject(instance: any): any;
+    serializeObject<T>(instance: T): any;
     /**
      * Tries to serialize a TypeScript array to a JSON array.
      *
      * @param instanceArray array of TypeScript instances
      *
-     * @returns {any[]} the JSON array
+     * @returns the JSON array
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray(instanceArray: any[]): any[];
+    serializeArray<T>(instanceArray: T[]): any[];
     /**
      * Tries to deserialize given JSON to a TypeScript object or array of objects.
      *
      * @param json the JSON as object or array
      * @param classReference the class reference
      *
-     * @returns {any} the deserialized data (TypeScript instance or array of TypeScript instances)
+     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize(json: any, classReference: {
-        new (): any;
-    }): any;
+    deserialize<T>(json: any, classReference: {
+        new (): T;
+    }): T | T[];
     /**
      * Tries to deserialize a JSON object to a TypeScript object.
      *
      * @param jsonObject the JSON object
      * @param classReference the class reference
      *
-     * @returns {any} the deserialized TypeScript instance
+     * @returns the deserialized TypeScript instance
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject(jsonObject: any, classReference: {
-        new (): any;
-    }): any;
+    deserializeObject<T>(jsonObject: any, classReference: {
+        new (): T;
+    }): T;
     /**
      * Tries to deserialize a JSON array to a TypeScript array.
      *
      * @param jsonArray the JSON array
      * @param classReference the object class
      *
-     * @returns {any[]} the deserialized array of TypeScript instances
+     * @returns the deserialized array of TypeScript instances
      *
-     * @throws an exception in case of failure
+     * @throws an Error in case of failure
      *
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray(jsonArray: any[], classReference: {
-        new (): any;
-    }): any[];
+    deserializeArray<T>(jsonArray: any[], classReference: {
+        new (): T;
+    }): T[];
     /**
      * Tries to find the JSON mapping for a given class property and finally assign the value.
      *
@@ -211,7 +211,7 @@ export declare class JsonConvert {
      * @param classPropertyName the property name
      * @param json the JSON object
      *
-     * @throws throws an expection in case of failure
+     * @throws throws an Error in case of failure
      */
     private serializeObject_loopProperty;
     /**
@@ -221,7 +221,7 @@ export declare class JsonConvert {
      * @param classPropertyName the property name
      * @param json the JSON object
      *
-     * @throws throws an expection in case of failure
+     * @throws throws an Error in case of failure
      */
     private deserializeObject_loopProperty;
     /**
@@ -243,9 +243,21 @@ export declare class JsonConvert {
      *
      * @returns returns the resulted mapped property
      *
-     * @throws throws an expection in case of failure
+     * @throws an error in case of failure
      */
     private verifyProperty;
+    /**
+     * Gets the value of an object for a given value.
+     * If the object does not have the specific key, an Error is thrown.
+     *
+     * @param data
+     * @param key
+     *
+     * @returns returns the value
+     *
+     * @throws an Error in case of the key was not found in the object
+     */
+    private getObjectValue;
     /**
      * Returns a string representation of the expected json type.
      *
