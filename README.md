@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/npm/v/json2typescript.svg)](https://www.npmjs.com/package/json2typescript)
+
 # json2typescript
 
 In Angular applications, everyone consumes JSON API's from an external source. 
