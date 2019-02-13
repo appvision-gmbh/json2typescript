@@ -30,10 +30,13 @@ Make sure you catch the errors in production!
 
 See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
+> Tip: At version 1.1.0 we introduced some soft breaking changes. 
+`undefined` is an invalid value now for serializing or deserializing. 
+If you are working with TypeScript, you might receive some type issues after the update to v1.1.0.
+This is due to the addition of generics; they now help the compiler to detect invalid return types in the serialize and deserialize methods.
+
 > Tip: Starting from version 1.0.6, we recommend to use unique class identifiers in the `@JsonObject` decorator. 
 Read below how to use the decorators properly.
-
-> Tip: Version 1.0.0 has several breaking changes. When upgrading from `json2typescript` < 1.0.0, please make sure you fix these issues.
 
 ---
 
