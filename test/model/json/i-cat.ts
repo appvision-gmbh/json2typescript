@@ -1,6 +1,6 @@
 export interface ICat {
     catName: string;
-    owner?: object;
+    owner?: object | null;
     birthdate?: string | null;
     friends?: any[] | null;
     district: number;

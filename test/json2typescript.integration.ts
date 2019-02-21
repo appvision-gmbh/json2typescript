@@ -31,7 +31,6 @@ describe('Integration tests', () => {
         let dog1JsonObject: IDog = {
             name: "Barky",
             barking: true,
-            owner: null,
             birthdate: "2016-01-02",
             friends: [],
             other: 0
@@ -39,10 +38,7 @@ describe('Integration tests', () => {
         let cat2JsonObject: ICat = {
             catName: "Links",
             district: 50,
-            owner: human1JsonObject,
             birthdate: "2016-01-02",
-            //friends: [cat1JsonObject, dog1JsonObject],
-            friends: null,
             talky: true,
             other: ""
         };
@@ -64,16 +60,13 @@ describe('Integration tests', () => {
         let dog1 = new Dog();
         dog1.name = "Barky";
         dog1.isBarking = true;
-        dog1.owner = null;
         dog1.birthdate = new Date("2016-01-02");
         dog1.friends = [];
 
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
-        cat2.owner = human1;
         cat2.birthdate = new Date("2016-01-02");
-        //cat2.friends = [cat1, dog1];
         cat2.talky = true;
 
         let animals = [cat1, dog1];
@@ -83,7 +76,7 @@ describe('Integration tests', () => {
         // SERIALIZE INTEGRATION
         describe('serialize', () => {
 
-            jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+            jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
             it('should serialize a TypeScript object to a JSON object', () => {
                 expect(jsonConvert.serialize<Cat>(cat1)).toEqual(cat1JsonObject);
@@ -110,7 +103,7 @@ describe('Integration tests', () => {
         // DESERIALIZE INTEGRATION
         describe('deserialize', () => {
 
-            jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+            jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
             it('should deserialize a JSON object to a TypeScript object', () => {
                 expect(jsonConvert.deserialize<Cat>(cat1JsonObject, Cat)).toEqual(cat1);

@@ -575,7 +575,7 @@ export class JsonConvert {
         let classInstancePropertyValue: any = instance[classPropertyName];
 
 
-        // Check if the json value exists
+        // Check if the class property value exists
         if (typeof (classInstancePropertyValue) === "undefined") {
 
             if (isOptional) return;
@@ -589,9 +589,13 @@ export class JsonConvert {
         }
 
 
+        // Check if the property is optional
+        // If the json value is null, we don't assign it in that case
+        if (isOptional && classInstancePropertyValue === null) return;
+
+
         // Map the property
         try {
-            // Each class property might have multiple decorators - only use the JSON property name as defined in the first one
             json[jsonPropertyName] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
         } catch (e) {
             throw new Error(
@@ -647,6 +651,11 @@ export class JsonConvert {
                 "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
             );
         }
+
+
+        // Check if the property is optional
+        // If the json value is null, we don't assign it in that case
+        if (isOptional && jsonValue === null) return;
 
 
         // Map the property

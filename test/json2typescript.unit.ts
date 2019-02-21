@@ -30,13 +30,11 @@ describe('Unit tests', () => {
             owner: human1JsonObject,
             talky: true,
             other: "cute",
-            birthdate: null,
             friends: []
         };
         let cat2JsonObject: ICat = {
             catName: "Links",
             district: 50,
-            owner: human2JsonObject,
             talky: true,
             other: "sweet",
             birthdate: "2014-09-01",
@@ -45,7 +43,6 @@ describe('Unit tests', () => {
         let dog1JsonObject: IDog = {
             name: "Barky",
             barking: true,
-            owner: null,
             other: 1.1,
         };
 
@@ -69,7 +66,6 @@ describe('Unit tests', () => {
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
-        cat2.owner = human2;
         cat2.other = "sweet";
         cat2.birthdate = new Date("2014-09-01");
         cat2.friends = null;
@@ -179,11 +175,6 @@ describe('Unit tests', () => {
                 let t_cat = new Cat();
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catName": "Meowy"});
                 expect(t_cat.name).toEqual("Meowy");
-
-                let t_dog = new Dog();
-                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", {"name": "Barky"});
-                expect(t_dog.name).toEqual("Barky");
-
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", {"district": 100});
                 expect(t_cat.district).toEqual(100);
                 (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
@@ -192,6 +183,11 @@ describe('Unit tests', () => {
                         lastName: "Muster"
                     }
                 });
+                expect(t_cat.owner!.lastname).toEqual("Muster");
+
+                let t_dog = new Dog();
+                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", {"name": "Barky"});
+                expect(t_dog.name).toEqual("Barky");
 
                 jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_INSENSITIVE;
 
@@ -202,7 +198,23 @@ describe('Unit tests', () => {
                 expect(() => (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catNames": "Meowy"})).toThrow();
 
                 jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_STRICT;
+
             });
+
+            jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
+
+            it('serializeObject_loopProperty()', () => {
+                let t_cat = {};
+                (<any>jsonConvert).serializeObject_loopProperty(cat2, "owner", t_cat);
+                expect((<any>t_cat)["owner"]).toBe(undefined);
+            });
+            it('deserializeObject_loopProperty()', () => {
+                let t_cat = new Cat();
+                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", { "owner": null });
+                expect(t_cat.owner).toBe(null);
+
+            });
+
         });
 
         // HELPER METHODS
