@@ -6,7 +6,7 @@ import { Any } from "./any";
  *
  * @param target the class
  */
-export function JsonConverter(target: any) {
+export function JsonConverter(target: any): void {
     target[Settings.MAPPER_PROPERTY] = "";
 }
 
@@ -15,7 +15,7 @@ export function JsonConverter(target: any) {
  *
  * @param target the class identifier or the class
  *
- * @returns {any}
+ * @returns
  *
  * @throws Error
  */
@@ -94,11 +94,11 @@ export function JsonObject(target?: string | any): any {
  * @param conversionOption optional param (default: Any), should be either the expected type (String|Boolean|Number|etc) or a custom converter class implementing JsonCustomConvert
  * @param isOptional optional param (default: false), if true, the json property does not have to be present in the object
  *
- * @returns {(target:any, classPropertyName:string)=>void}
+ * @returns
  *
  * @throws Error
  */
-export function JsonProperty(...params: any[]): any {
+export function JsonProperty(...params: any[]): { (target: any, classPropertyName: string): void } {
 
     return function (target: any, classPropertyName: string): void {
         // target is the class

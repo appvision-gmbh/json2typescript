@@ -1,3 +1,14 @@
+# v1.2.0 (2019-02-21)
+
+## Features
+
+* Allow optional properties to be null, closes [#58](https://github.com/dhlab-basel/json2typescript/issues/58)
+
+## Breaking Changes
+
+* If a property is declared optional (by `@JsonProperty(name, Type, true)`), then `null` is now ignored in both serialization and deserialization. 
+Before this version, `json2typescript` would have thrown an error if `ValueChecking.DISABLE_NULL` was used.
+
 # v1.1.1 (2019-02-12)
 
 ## Features

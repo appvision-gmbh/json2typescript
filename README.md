@@ -32,7 +32,12 @@ Make sure you catch the errors in production!
 
 See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
-> Tip: At version 1.1.0 we introduced some soft breaking changes. 
+> Tip: At version 1.2.0 we introduced one more soft breaking change.
+`null` values will now be ignored when you serialize or deserialize optional values.
+This means that you are now able to use `ValueCheckingMode.DISALLOW_NULL` even when your API returns null values in the JSON.
+In that case, you should mark them optional.
+
+> Tip: At version 1.1.0 we introduced some soft breaking change. 
 `undefined` is an invalid value now for serializing or deserializing. 
 If you are working with TypeScript, you might receive some type issues after the update to v1.1.0.
 This is due to the addition of generics; they now help the compiler to detect invalid return types in the serialize and deserialize methods.
