@@ -1,4 +1,7 @@
-[![npm](https://img.shields.io/npm/v/json2typescript.svg)](https://www.npmjs.com/package/json2typescript)
+[![npm](https://img.shields.io/npm/v/json2typescript.svg)](https://www.npmjs.com/package/json2typescript) 
+![](https://img.shields.io/npm/dt/json2typescript.svg?style=flat)
+![](https://img.shields.io/bundlephobia/minzip/json2typescript.svg?style=flat)
+![](https://img.shields.io/npm/l/json2typescript.svg?style=flat)
 
 # json2typescript
 
