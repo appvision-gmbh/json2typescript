@@ -8,6 +8,7 @@ import { Dog } from "./model/typescript/dog";
 import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
+import { OptionalCat } from './model/typescript/optional-cat';
 
 describe('Unit tests', () => {
 
@@ -77,6 +78,10 @@ describe('Unit tests', () => {
         dog1.owner = null;
         dog1.other = 1.1;
 
+        // TYPESCRIPT OPTIONAL INSTANCES
+        let optionalCat1 = new OptionalCat();
+        optionalCat1.name = "MaybeMeowy";
+
         // SETUP CHECKS
         describe('setup checks', () => {
             it('JsonConvert instance', () => {
@@ -87,21 +92,25 @@ describe('Unit tests', () => {
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
                 jsonConvertTest = new JsonConvert(OperationMode.DISABLE, ValueCheckingMode.ALLOW_NULL, true);
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.DISABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(true);
+                expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
                 jsonConvertTest = new JsonConvert(OperationMode.LOGGING, ValueCheckingMode.DISALLOW_NULL, false);
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.LOGGING);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.DISALLOW_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
                 jsonConvertTest = new JsonConvert();
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
             });
 
@@ -162,43 +171,88 @@ describe('Unit tests', () => {
 
             jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
-            it('serializeObject_loopProperty()', () => {
-                let t_cat = {};
-                (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat);
-                expect((<any>t_cat)["catName"]).toBe(cat1.name);
-                (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat);
-                expect((<any>t_cat)["district"]).toBe(100);
-                (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat);
-                expect((<any>t_cat)["owner"]["givenName"]).toBe("Andreas");
-            });
-            it('deserializeObject_loopProperty()', () => {
-                let t_cat = new Cat();
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catName": "Meowy"});
-                expect(t_cat.name).toEqual("Meowy");
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "district", {"district": 100});
-                expect(t_cat.district).toEqual(100);
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "owner", {
-                    "owner": {
-                        givenName: "Andreas",
-                        lastName: "Muster"
-                    }
+            describe('serializeObject_loopProperty()', () => {
+                let t_cat: any;
+                beforeEach( () => {
+                    t_cat = {};
+                } );
+
+                it('should serialize property with different class and JSON names', () => {
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat);
+                    expect((<any>t_cat)["catName"]).toBe(cat1.name);
                 });
-                expect(t_cat.owner!.lastname).toEqual("Muster");
+                it('should serialize property with no declared property name', () => {
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat);
+                    expect((<any>t_cat)["district"]).toBe(100);
+                });
+                it('should serialize a child object property', () => {
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat);
+                    expect((<any>t_cat)["owner"]["givenName"]).toBe("Andreas");
+                });
+                it('should throw an error if required property is missing', () => {
+                    expect( function () {
+                        ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, 'district', t_cat )
+                    } ).toThrowError( 'Fatal error in JsonConvert. ' +
+                        'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
+                        '"district" does not exist or is not defined:\n\n' +
+                        '\tClass property: \n\t\tdistrict\n\n' +
+                        '\tJSON property: \n\t\tdistrictNumber\n\n' );
+                });
+                it('should not throw an error if required property is missing but ignoreRequiredCheck flag set', () => {
+                    jsonConvert.ignoreRequiredCheck = true;
+                    ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, 'district', t_cat );
+                    expect( ( <any>t_cat )[ 'district' ] ).toBeUndefined( 'No value set, but no error thrown' );
+                    jsonConvert.ignoreRequiredCheck = false;
+                });
+            });
+            describe('deserializeObject_loopProperty()', () => {
+                let t_cat: Cat;
+                beforeEach( () => {
+                    t_cat = new Cat();
+                } );
 
-                let t_dog = new Dog();
-                (<any>jsonConvert).deserializeObject_loopProperty(t_dog, "name", {"name": "Barky"});
-                expect(t_dog.name).toEqual("Barky");
+                it( 'should deserialize properties', () => {
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', { 'catName': 'Meowy' } );
+                    expect( t_cat.name ).toEqual( 'Meowy' );
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'district', { 'district': 100 } );
+                    expect( t_cat.district ).toEqual( 100 );
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'owner', {
+                        'owner': {
+                            givenName: 'Andreas',
+                            lastName: 'Muster'
+                        }
+                    } );
+                    expect( t_cat.owner!.lastname ).toEqual( 'Muster' );
 
-                jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_INSENSITIVE;
+                    let t_dog = new Dog();
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_dog, 'name', { 'name': 'Barky' } );
+                    expect( t_dog.name ).toEqual( 'Barky' );
 
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catName": "Meowy"});
-                expect(t_cat.name).toEqual("Meowy");
-                (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catNAME": "Meowy"});
-                expect(t_cat.name).toEqual("Meowy");
-                expect(() => (<any>jsonConvert).deserializeObject_loopProperty(t_cat, "name", {"catNames": "Meowy"})).toThrow();
+                    jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_INSENSITIVE;
 
-                jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_STRICT;
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', { 'catName': 'Meowy' } );
+                    expect( t_cat.name ).toEqual( 'Meowy' );
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', { 'catNAME': 'Meowy' } );
+                    expect( t_cat.name ).toEqual( 'Meowy' );
+                    expect( () => ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', { 'catNames': 'Meowy' } ) ).toThrow();
 
+                    jsonConvert.propertyMatchingRule = PropertyMatchingRule.CASE_STRICT;
+                } );
+                it( 'should throw an error if required property is missing', () => {
+                    expect( function () {
+                        ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', {} );
+                    } ).toThrowError( 'Fatal error in JsonConvert. ' +
+                      'Failed to map the JSON object to the class "Kitty" because the defined JSON property "catName" does not exist:\n\n' +
+                      '\tClass property: \n\t\tname\n\n' +
+                      '\tJSON property: \n\t\tcatName\n\n'
+                    );
+                } );
+                it( 'should not throw an error if required property is missing but ignoreRequiredCheck flag is set', () => {
+                    jsonConvert.ignoreRequiredCheck = true;
+                    ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', {} );
+                    expect( t_cat.name ).toEqual( '', 'Value not set because not present, default value used' );
+                    jsonConvert.ignoreRequiredCheck = false;
+                } );
             });
 
             jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;

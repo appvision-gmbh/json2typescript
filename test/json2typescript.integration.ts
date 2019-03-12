@@ -7,6 +7,8 @@ import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
 import { Animal } from "./model/typescript/animal";
+import { IOptionalCat } from './model/json/i-optional-cat';
+import { OptionalCat } from './model/typescript/optional-cat';
 
 describe('Integration tests', () => {
 
@@ -42,6 +44,9 @@ describe('Integration tests', () => {
             talky: true,
             other: ""
         };
+        let optionalCatJsonObject: IOptionalCat = {
+            catName: "OptionalMeowy"
+        };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
 
@@ -68,6 +73,9 @@ describe('Integration tests', () => {
         cat2.district = 50;
         cat2.birthdate = new Date("2016-01-02");
         cat2.talky = true;
+
+        let optionalCat = new OptionalCat();
+        optionalCat.name = "OptionalMeowy";
 
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
@@ -98,6 +106,28 @@ describe('Integration tests', () => {
                 expect(() => jsonConvert.serializeArray<Cat>(<any> cat1)).toThrow();
             });
 
+            it('should throw an error if serializing a Typescript object with a missing property', () => {
+                expect(function() {jsonConvert.serialize(optionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
+                    '"district" does not exist or is not defined:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.serializeObject(optionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
+                    '"district" does not exist or is not defined:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+            });
+
+            it('should not throw an error if serializing missing property with ignoreRequiredCheck flag set', () => {
+                jsonConvert.ignoreRequiredCheck = true;
+                expect(jsonConvert.serialize(optionalCat)).toEqual(optionalCatJsonObject);
+                expect(jsonConvert.serializeObject(optionalCat)).toEqual(optionalCatJsonObject);
+                jsonConvert.ignoreRequiredCheck = false;
+            });
+
         });
 
         // DESERIALIZE INTEGRATION
@@ -122,6 +152,27 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserializeArray<Cat>(catsJsonArray, Cat)).toEqual(cats);
 
                 expect(() => jsonConvert.deserializeObject<Cat>(catsJsonArray, Cat)).toThrow();
+            });
+
+
+            it('should throw an error if deserializing a JSON object with a missing property', () => {
+                expect(function() {jsonConvert.deserialize(optionalCatJsonObject, OptionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+            });
+
+            it('should not throw an error if deserializing missing property with ignoreRequiredCheck flag set', () => {
+                jsonConvert.ignoreRequiredCheck = true;
+                expect(jsonConvert.deserialize(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
+                expect(jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
+                jsonConvert.ignoreRequiredCheck = false;
             });
 
         });

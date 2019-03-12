@@ -148,6 +148,39 @@ export class JsonConvert {
         if (value in PropertyMatchingRule) this._propertyMatchingRule = value;
     }
 
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties when serializing or deserializing will be ignored, as if they
+     * were marked optional.  Defaults to false.
+     */
+    private _ignoreRequiredCheck = false;
+
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties when serializing or deserializing will be ignored, as if they
+     * were marked optional.  Defaults to false.
+     * @returns {boolean} true if all mapped properties will be considered optional, even if the mapping
+     *                    doesn't explicitly specify this, false if the mapping will determine whether
+     *                    a property is optional or not (default)
+     */
+    get ignoreRequiredCheck(): boolean {
+        return this._ignoreRequiredCheck;
+    }
+
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties when serializing or deserializing will be ignored, as if they
+     * were marked optional.  Defaults to false.
+     * @param value true if all mapped properties will be considered optional, even if the mapping
+     *              doesn't explicitly specify this, false if the mapping will determine whether a
+     *              property is optional or not (default)
+     */
+    set ignoreRequiredCheck( value: boolean) {
+        this._ignoreRequiredCheck = value;
+    }
 
     /////////////////
     // CONSTRUCTOR //
@@ -578,7 +611,7 @@ export class JsonConvert {
         // Check if the class property value exists
         if (typeof (classInstancePropertyValue) === "undefined") {
 
-            if (isOptional) return;
+            if (isOptional || this._ignoreRequiredCheck) return;
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -589,9 +622,9 @@ export class JsonConvert {
         }
 
 
-        // Check if the property is optional
+        // Check if the property is optional, or if we're ignoring the optional property
         // If the json value is null, we don't assign it in that case
-        if (isOptional && classInstancePropertyValue === null) return;
+        if ((isOptional || this._ignoreRequiredCheck) && classInstancePropertyValue === null) return;
 
 
         // Map the property
@@ -642,7 +675,7 @@ export class JsonConvert {
         // Check if the json value exists
         if (typeof (jsonValue) === "undefined") {
 
-            if (isOptional) return;
+            if (isOptional || this._ignoreRequiredCheck) return;
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -655,7 +688,7 @@ export class JsonConvert {
 
         // Check if the property is optional
         // If the json value is null, we don't assign it in that case
-        if (isOptional && jsonValue === null) return;
+        if ((isOptional || this._ignoreRequiredCheck) && jsonValue === null) return;
 
 
         // Map the property
