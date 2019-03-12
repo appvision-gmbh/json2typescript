@@ -127,15 +127,29 @@ describe('Unit tests', () => {
 
                 jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
-                let t_cat = (<any>jsonConvert).deserialize(null, Cat);
-                expect(t_cat).toEqual(null);
-                let t_catJsonObject = (<any>jsonConvert).serialize(null);
-                expect(t_catJsonObject).toEqual(null);
+                let t_cat1 = (<any>jsonConvert).deserialize(null, Cat);
+                expect(t_cat1).toEqual(null);
+                let t_cat2 = (<any>jsonConvert).deserializeObject(null, Cat);
+                expect(t_cat2).toEqual(null);
+                let t_cat3 = (<any>jsonConvert).deserializeArray(null, Cat);
+                expect(t_cat3).toEqual(null);
+
+                let t_catJsonObject1 = (<any>jsonConvert).serialize(null);
+                expect(t_catJsonObject1).toEqual(null);
+                let t_catJsonObject2 = (<any>jsonConvert).serializeObject(null);
+                expect(t_catJsonObject2).toEqual(null);
+                let t_catJsonObject3 = (<any>jsonConvert).serializeArray(null);
+                expect(t_catJsonObject3).toEqual(null);
 
                 jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
                 expect(() => (<any>jsonConvert).deserialize(null, Cat)).toThrow();
+                expect(() => (<any>jsonConvert).deserializeObject(null, Cat)).toThrow();
+                expect(() => (<any>jsonConvert).deserializeArray(null, Cat)).toThrow();
+
                 expect(() => (<any>jsonConvert).serialize(null)).toThrow();
+                expect(() => (<any>jsonConvert).serializeObject(null)).toThrow();
+                expect(() => (<any>jsonConvert).serializeArray(null)).toThrow();
 
             });
             it('deserialize and serialize undefined', () => {
@@ -143,7 +157,12 @@ describe('Unit tests', () => {
                 jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
                 expect(() => (<any>jsonConvert).deserialize(undefined, Cat)).toThrowError();
+                expect(() => (<any>jsonConvert).deserializeObject(undefined, Cat)).toThrowError();
+                expect(() => (<any>jsonConvert).deserializeArray(undefined, Cat)).toThrowError();
+
                 expect(() => (<any>jsonConvert).serialize(undefined)).toThrowError();
+                expect(() => (<any>jsonConvert).serializeObject(undefined)).toThrowError();
+                expect(() => (<any>jsonConvert).serializeArray(undefined)).toThrowError();
 
             });
         });
