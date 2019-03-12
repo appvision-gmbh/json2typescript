@@ -574,9 +574,6 @@ export class JsonConvert {
         }
 
         // Now deserialize and return the array
-        if (this.operationMode === OperationMode.DISABLE) {
-            return jsonArray;
-        }
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JSON array:");
