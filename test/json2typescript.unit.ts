@@ -88,28 +88,32 @@ describe('Unit tests', () => {
 
                 let jsonConvertTest: JsonConvert;
 
-                jsonConvertTest = new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.ALLOW_OBJECT_NULL, false);
+                jsonConvertTest = new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.ALLOW_OBJECT_NULL, false, PropertyMatchingRule.CASE_STRICT);
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.propertyMatchingRule).toEqual(PropertyMatchingRule.CASE_STRICT);
                 expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
-                jsonConvertTest = new JsonConvert(OperationMode.DISABLE, ValueCheckingMode.ALLOW_NULL, true);
+                jsonConvertTest = new JsonConvert(OperationMode.DISABLE, ValueCheckingMode.ALLOW_NULL, true, PropertyMatchingRule.CASE_INSENSITIVE);
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.DISABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(true);
+                expect(jsonConvertTest.propertyMatchingRule).toEqual(PropertyMatchingRule.CASE_INSENSITIVE);
                 expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
                 jsonConvertTest = new JsonConvert(OperationMode.LOGGING, ValueCheckingMode.DISALLOW_NULL, false);
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.LOGGING);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.DISALLOW_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.propertyMatchingRule).toEqual(PropertyMatchingRule.CASE_STRICT);
                 expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
                 jsonConvertTest = new JsonConvert();
                 expect(jsonConvertTest.operationMode).toEqual(OperationMode.ENABLE);
                 expect(jsonConvertTest.valueCheckingMode).toEqual(ValueCheckingMode.ALLOW_OBJECT_NULL);
                 expect(jsonConvertTest.ignorePrimitiveChecks).toEqual(false);
+                expect(jsonConvertTest.propertyMatchingRule).toEqual(PropertyMatchingRule.CASE_STRICT);
                 expect(jsonConvertTest.ignoreRequiredCheck).toEqual(false);
 
             });
