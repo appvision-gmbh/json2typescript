@@ -164,6 +164,23 @@ describe('Unit tests', () => {
                 let t_catJsonObject = (<any>jsonConvert).serialize(t_cat);
                 expect(t_catJsonObject).toEqual(cat1JsonObject);
             });
+
+            describe('OperationMode', () => {
+                it('should just return the object unchanged with OperationMode.DISABLE', () => {
+                    jsonConvert.operationMode = OperationMode.DISABLE;
+                    expect(jsonConvert.serialize(cat1)).toEqual(cat1);
+                    expect(jsonConvert.serializeObject(cat1)).toEqual(cat1);
+                    expect(jsonConvert.serializeArray([cat1])).toEqual([cat1]);
+                    let t_cat = (<any>jsonConvert).deserialize(cat1JsonObject, Cat);
+                    expect(t_cat).toEqual(cat1JsonObject);
+                    let t_cat2 = (<any>jsonConvert).deserializeObject(cat1JsonObject, Cat);
+                    expect(t_cat2).toEqual(cat1JsonObject);
+                    let t_cat3 = (<any>jsonConvert).deserializeArray([cat1JsonObject], Cat);
+                    expect(t_cat3).toEqual([cat1JsonObject]);
+
+                    jsonConvert.operationMode = OperationMode.ENABLE;
+                });
+            });
         });
 
         // PRIVATE METHODS
