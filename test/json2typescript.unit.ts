@@ -185,20 +185,20 @@ describe('Unit tests', () => {
                 } );
 
                 it('should serialize property with different class and JSON names', () => {
-                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "name", t_cat);
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, cat1, "name", t_cat);
                     expect((<any>t_cat)["catName"]).toBe(cat1.name);
                 });
                 it('should serialize property with no declared property name', () => {
-                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "district", t_cat);
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, cat1, "district", t_cat);
                     expect((<any>t_cat)["district"]).toBe(100);
                 });
                 it('should serialize a child object property', () => {
-                    (<any>jsonConvert).serializeObject_loopProperty(cat1, "owner", t_cat);
+                    (<any>jsonConvert).serializeObject_loopProperty(cat1, cat1, "owner", t_cat);
                     expect((<any>t_cat)["owner"]["givenName"]).toBe("Andreas");
                 });
                 it('should throw an error if required property is missing', () => {
                     expect( function () {
-                        ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, 'district', t_cat )
+                        ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, optionalCat1, 'district', t_cat )
                     } ).toThrowError( 'Fatal error in JsonConvert. ' +
                         'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
                         '"district" does not exist or is not defined:\n\n' +
@@ -207,7 +207,7 @@ describe('Unit tests', () => {
                 });
                 it('should not throw an error if required property is missing but ignoreRequiredCheck flag set', () => {
                     jsonConvert.ignoreRequiredCheck = true;
-                    ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, 'district', t_cat );
+                    ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, optionalCat1, 'district', t_cat );
                     expect( ( <any>t_cat )[ 'district' ] ).toBeUndefined( 'No value set, but no error thrown' );
                     jsonConvert.ignoreRequiredCheck = false;
                 });
@@ -266,7 +266,7 @@ describe('Unit tests', () => {
 
             it('serializeObject_loopProperty()', () => {
                 let t_cat = {};
-                (<any>jsonConvert).serializeObject_loopProperty(cat2, "owner", t_cat);
+                (<any>jsonConvert).serializeObject_loopProperty(cat2, cat2, "owner", t_cat);
                 expect((<any>t_cat)["owner"]).toBe(undefined);
             });
             it('deserializeObject_loopProperty()', () => {
