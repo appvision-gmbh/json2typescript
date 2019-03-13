@@ -1,7 +1,7 @@
 import { JsonConvert } from "../src/json2typescript/json-convert";
 import { OperationMode, PropertyMatchingRule, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
 import { Any } from "../src/json2typescript/any";
-import { Settings } from "../src/json2typescript/json-convert-options";
+import { MappingOptions, Settings } from '../src/json2typescript/json-convert-options';
 import { Human } from "./model/typescript/human";
 import { Cat } from "./model/typescript/cat";
 import { Dog } from "./model/typescript/dog";
@@ -9,6 +9,7 @@ import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
 import { OptionalCat } from './model/typescript/optional-cat';
+import { DuplicateCat } from './model/typescript/duplicate-cat';
 
 describe('Unit tests', () => {
 
@@ -78,9 +79,12 @@ describe('Unit tests', () => {
         dog1.owner = null;
         dog1.other = 1.1;
 
-        // TYPESCRIPT OPTIONAL INSTANCES
         let optionalCat1 = new OptionalCat();
         optionalCat1.name = "MaybeMeowy";
+
+        let duplicateCat1 = new DuplicateCat();
+        duplicateCat1.name = "Duplicate";
+        duplicateCat1.district = new Date("2014-10-01");
 
         // SETUP CHECKS
         describe('setup checks', () => {
@@ -317,9 +321,28 @@ describe('Unit tests', () => {
             jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
 
             it('getClassPropertyMappingOptions()', () => {
-                expect((<any>jsonConvert).getClassPropertyMappingOptions(cat1, "name")).not.toBeNull();
-                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog1, "name")).not.toBeNull();
+                /* The actual JSON types used are not strings, even though MappingOption.expectedJsonType is typed as string,
+                 * so obscure this by assigning the expected JSON type to an "any" variable. */
+                let jsonType: any = String;
+                const catNameMapping = new MappingOptions();
+                catNameMapping.classPropertyName = "name";
+                catNameMapping.jsonPropertyName = "catName";
+                catNameMapping.expectedJsonType = jsonType;
+                catNameMapping.isOptional = false;
+                catNameMapping.customConverter = null;
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(cat1, "name")).toEqual(catNameMapping);
+
+                const dogNameMapping = new MappingOptions();
+                dogNameMapping.classPropertyName = "name";
+                dogNameMapping.jsonPropertyName = "name";
+                dogNameMapping.expectedJsonType = jsonType;
+                dogNameMapping.isOptional = false;
+                dogNameMapping.customConverter = null;
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog1, "name")).toEqual(dogNameMapping);
+
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(human1, "name")).toBeNull();
+                // Unmapped property should not return mapping, even though property is the same name as a mapped property on another class
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(duplicateCat1, "district")).toBeNull();
             });
             it('verifyProperty()', () => {
                 expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
