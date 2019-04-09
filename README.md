@@ -487,7 +487,7 @@ The default is `PropertyMatchingRule.CASE_STRICT`.
 
 #### Serializing (TypeScript to JSON)
  
-`(any) serialize(data: any)`
+`(any) serialize(data: T | T[])`
 
 Tries to serialize a TypeScript object or array of objects to JSON.
 
@@ -495,7 +495,7 @@ Tries to serialize a TypeScript object or array of objects to JSON.
 
 #### Deserializing (JSON to TypeScript)
  
-`(any) deserialize(json: any, classReference: { new(): T | T[] })`
+`(T | T[]) deserialize(json: any, classReference: { new(): T | T[] })`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
 
