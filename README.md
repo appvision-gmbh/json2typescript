@@ -495,7 +495,7 @@ Tries to serialize a TypeScript object or array of objects to JSON.
 
 #### Deserializing (JSON to TypeScript)
  
-`(any) deserialize(json: any, classReference: { new(): any })`
+`(any) deserialize(json: any, classReference: { new(): T | T[] })`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
 
@@ -505,10 +505,10 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(any) serializeObject(instance: any)`
-- `(any[]) serializeArray(instanceArray: any[])`
-- `(any) deserializeObject(jsonObject: any, classReference: { new(): any })`
-- `(any[]) deserializeArray(jsonArray: any[], classReference: { new(): any })`
+- `(any) serializeObject(instance: T)`
+- `(any[]) serializeArray(instanceArray: T[])`
+- `(T) deserializeObject(jsonObject: any, classReference: { new(): T })`
+- `(T[]) deserializeArray(jsonArray: any[], classReference: { new(): T })`
 
 
 
