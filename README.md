@@ -240,7 +240,8 @@ Even if you don't have any errors in your IDE, `json2typescript` will not proper
 
 ## Class and property decorators
 
-Decorators should be used whenever you would like to map JSON with TypeScript data.
+Decorators should be used whenever you would like to map JSON with TypeScript data. 
+As of now, you must not use more than one decorator per class or property.
 
 ### Class decorators
 
@@ -256,13 +257,7 @@ in certain cases cause the deserializer to not work as same class names will
 overwrite the property descriptors. It is advised to explicitly ID your 
 objects as above.
 
-> Tip: Make sure you import `JsonObject` from `json2typescript`.  
-
-```typescript
-    @JsonProperty("jsonPropName", String, true)
-    @JsonProperty("jsonPropertyName", String, true)
-    name: string = undefined;
-```
+> Tip: Make sure you import `JsonObject` from `json2typescript`.
 
 #### First parameter: classIdentifier (optional)
 
@@ -283,7 +278,7 @@ export class User {
 ```
 
 Important note: You must assign any (valid) value or `undefined` to your property at 
-initialization, otherwise our mapper does **not** work.
+initialization, otherwise our mapper does **not** work and will simply ignore the property.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 

@@ -1,3 +1,9 @@
+# v1.2.1 (2019-05-02)
+
+## Bug Fixes
+
+* Corrected ReadMe information, closes [#88](https://github.com/dhlab-basel/json2typescript/issues/88)
+
 # v1.2.0 (2019-02-21)
 
 ## Features
