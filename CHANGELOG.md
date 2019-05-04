@@ -1,3 +1,9 @@
+# v1.2.2 (2019-05-04)
+
+## Bug Fixes
+
+* Corrected ReadMe information, closes [#97](https://github.com/dhlab-basel/json2typescript/issues/97)
+
 # v1.2.1 (2019-05-02)
 
 ## Bug Fixes
@@ -13,7 +19,7 @@
 ## Breaking Changes
 
 * If a property is declared optional (by `@JsonProperty(name, Type, true)`), then `null` is now ignored in both serialization and deserialization. 
-Before this version, `json2typescript` would have thrown an error if `ValueChecking.DISABLE_NULL` was used.
+Before this version, `json2typescript` would have thrown an error if `ValueChecking.DISALLOW_NULL` was used.
 
 # v1.1.1 (2019-02-12)
 

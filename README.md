@@ -26,8 +26,8 @@ let user: User = jsonConvert.deserializeObject(jsonObj, User);
 console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... }
 ```
 
-> Tip: All `serialize()` and `deserialize()` methods may throw an exception in case of failure. 
-Make sure you catch the errors in production!
+> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. 
+Make sure you catch errors in production!
 
 ---
 
@@ -220,7 +220,7 @@ export class AppComponent implements OnInit {
         // Map to the country class
         let country: Country;
         try {
-            country = jsonConvert.deserialize(jsonObject, Country);
+            country = jsonConvert.deserializeObject(jsonObject, Country);
             country.cities[0].printInfo(); // prints: Basel was founded in -200 and is really beautiful!
         } catch (e) {
             console.log((<Error>e));
@@ -326,7 +326,7 @@ See the examples at the end of this document for more info about nesting arrays.
 
 ##### Adding a custom converter
 
-More advanced users may need to use custom converters. If you don't want
+More advanced users may need to use custom converters. If you want
 `json2typescript` to use your custom converter, you need to follow these
 steps:
 
@@ -357,6 +357,10 @@ If you set the third parameter to true, there is no exception when it is missing
 The type is still checked as soon the property is present again.
 
 The same applies for the case when you try to serialize a TypeScript object to a JSON object. If the property is not defined in the class and optional, it will not be added to the JSON object.
+
+> Tip: Some API's return null instead of omitting optional values. 
+If you flag a property as optional, `json2typescript` will ignore null values and keep the default value of the property instead. 
+This fact is particularly helpful if your project uses TypeScript `strictNullChecks` or/and disallows `null` values through the `valueCheckingMode` property in `json2typescript`.
 
 #### Important notes
 
@@ -454,7 +458,9 @@ The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 > Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
 
-> Tip: The TypeScript developer team suggests you to avoid null values. If your JSON api doesn't return null values, you should try the last flag disallowing null values.
+> Tip: The TypeScript documentation suggests to avoid null values.
+Compile your TypeScript code with `strictNullChecks=true` and set the `valueCheckingMode` to disallow null values.
+If your API returns `null` in some cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on runtime.
 
 #### Ignore primitive checks
 
