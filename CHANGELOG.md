@@ -1,3 +1,9 @@
+# v1.2.3 (2019-05-11)
+
+## Bug Fixes
+
+* Wrong output files were included in v1.2.x builds, closes [#98](https://github.com/dhlab-basel/json2typescript/issues/98)
+
 # v1.2.2 (2019-05-04)
 
 ## Bug Fixes
