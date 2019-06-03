@@ -578,7 +578,7 @@ export class JsonConvert {
             } else {
                 return {
                     value: jsonArray,
-                    error: ""
+                    error: []
                 };
             }
 
@@ -750,7 +750,18 @@ export class JsonConvert {
 
         // Map the property
         try {
-            instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
+            const propValue = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
+        
+            if (typeof propValue === "object" && propValue["value"] && propValue["error"]) {
+                instance[classPropertyName] = propValue["value"];
+                
+                if (this.isNonEmpty(propValue["error"]))                
+                    errorObject[classPropertyName] = propValue["error"];
+                    
+            } else {
+                instance[classPropertyName] = propValue;
+            }            
+        
         } catch (e) {
 
             if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
@@ -847,7 +858,9 @@ export class JsonConvert {
                 }
 
                 if (serialize) return this.serializeObject(value);
-                else return this.deserializeObject(value, expectedJsonType);
+                else {
+                    return this.deserializeObject(value, expectedJsonType);
+                }
 
             } else if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) { // general object
 
@@ -1087,4 +1100,16 @@ export class JsonConvert {
         return typeof (trueValue);
     }
 
+    private isNonEmpty(obj: any): boolean {
+        
+        if (obj instanceof Array) {
+            return obj.length > 0;
+        } else if (typeof obj === "object") {
+            return Object.keys(obj).length > 0;
+        } else {
+            return obj.length > 0;
+        }
+
+    }
+ 
 }
