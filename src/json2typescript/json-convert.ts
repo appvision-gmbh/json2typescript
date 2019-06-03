@@ -222,14 +222,21 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(instance: T): any {
+    serializeObject<T>(instance: T): {value: any, error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return instance;
+            return {value: instance, error: {}};
         }
 
         // Check if the passed type is allowed
         if (instance === undefined) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: instance,
+                    error: "Parameter is undefined."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -240,16 +247,31 @@ export class JsonConvert {
         } else if (instance === null) {
 
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+                
+                if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                    return {
+                        value: instance,
+                        error: "Property is NULL."
+                    };
+                }
+                
                 throw new Error(
                     "Fatal error in JsonConvert. " +
                     "Passed parameter instance in JsonConvert.serializeObject() is undefined. You have specified to disallow null values." +
                     "\n"
                 );
             } else {
-                return instance;
+                return {value: instance, error: {}};
             }
 
         } else if (typeof (instance) !== "object" || instance instanceof Array) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: instance,
+                    error: "Parameter is not of type object."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -267,10 +289,11 @@ export class JsonConvert {
         }
 
         let jsonObject: any = {};
+        let errorObject: any = {};
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
-            this.serializeObject_loopProperty(instance, propertyKey, jsonObject);
+            this.serializeObject_loopProperty(instance, propertyKey, jsonObject, errorObject);
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -279,7 +302,7 @@ export class JsonConvert {
             console.log("----------");
         }
 
-        return jsonObject;
+        return {value: jsonObject, error: errorObject};
 
     }
 
@@ -642,7 +665,7 @@ export class JsonConvert {
      *
      * @throws throws an Error in case of failure
      */
-    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
+    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any): void {
 
         // Check if a JSON-object mapping is possible for a property
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
@@ -665,6 +688,13 @@ export class JsonConvert {
 
             if (isOptional) return;
 
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                
+                errorObject[classPropertyName] = "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n";
+                return classInstancePropertyValue;
+
+            }
+
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
@@ -681,8 +711,33 @@ export class JsonConvert {
 
         // Map the property
         try {
-            json[jsonPropertyName] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+            const propValue = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+
+            if (typeof propValue === "object" && propValue["value"] && propValue["error"]) {
+                json[jsonPropertyName] = propValue["value"];
+                
+                if (this.isNonEmpty(propValue["error"]))                
+                    errorObject[classPropertyName] = propValue["error"];
+
+            } else {
+                json[jsonPropertyName] = propValue;
+            }
+
         } catch (e) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                errorObject[classPropertyName] = "Fatal error in JsonConvert. " +
+                "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because of a type error.\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
+                "\tClass property value: \n\t\t" + classInstancePropertyValue + "\n\n" +
+                "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
+                "\tRuntime type: \n\t\t" + this.getTrueType(classInstancePropertyValue) + "\n\n" +
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n" +
+                e.message + "\n";
+
+                return classInstancePropertyValue;
+            }
+
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because of a type error.\n\n" +
@@ -757,10 +812,10 @@ export class JsonConvert {
                 
                 if (this.isNonEmpty(propValue["error"]))                
                     errorObject[classPropertyName] = propValue["error"];
-                    
+
             } else {
                 instance[classPropertyName] = propValue;
-            }            
+            }         
         
         } catch (e) {
 
