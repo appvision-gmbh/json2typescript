@@ -12,7 +12,7 @@
 export enum OperationMode {
     DISABLE = 0,
     ENABLE = 1,
-    LOGGING = 2    
+    LOGGING = 2
 };
 
 /**
