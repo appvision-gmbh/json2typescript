@@ -377,7 +377,40 @@ export class JsonConvert {
 
         // Call the appropriate method depending on the type
         if (json instanceof Array) {
-            return this.deserializeArray(json, classReference);
+            return this.deserializeArray(json, classReference).value;                
+        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
+            return this.deserializeObject(json, classReference).value;
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
+                "\n"
+            );
+        }
+    }
+
+    /**
+     * Tries to deserialize given JSON to a TypeScript object or array of objects.
+     *
+     * @param json the JSON as object or array
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    tryDeserialize<T>(json: any, classReference: { new(): T }): {value: any, error: any} {        
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return json;
+        }
+
+        // Call the appropriate method depending on the type
+        if (json instanceof Array) {
+            return this.deserializeArray(json, classReference);                
         } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
             return this.deserializeObject(json, classReference);
         } else {
@@ -387,7 +420,6 @@ export class JsonConvert {
                 "\n"
             );
         }
-
     }
 
     /**
@@ -403,14 +435,21 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): {value: T, error: {}} {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return jsonObject;
+            return { value: jsonObject, error: {} };
         }
 
         // Check if the passed type is allowed
         if (jsonObject === undefined) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: jsonObject,
+                    error: "Property is undefined."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -421,16 +460,35 @@ export class JsonConvert {
         } else if (jsonObject === null) {
 
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+
+                if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                    return {
+                        value: jsonObject,
+                        error: "Property is NULL."
+                    };
+                }
+
                 throw new Error(
                     "Fatal error in JsonConvert. " +
                     "Passed parameter jsonObject in JsonConvert.deserializeObject() is undefined. You have specified to disallow null values." +
                     "\n"
                 );
             } else {
-                return jsonObject;
+                
+                return {
+                    value: jsonObject,
+                    error: {}
+                };
             }
 
         } else if (typeof (jsonObject) !== "object" || jsonObject instanceof Array) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: jsonObject,
+                    error: "Property is not of type object."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -448,10 +506,11 @@ export class JsonConvert {
         }
 
         let instance: T = new classReference();
+        let errorObject = {};
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
-            this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
+            this.deserializeObject_loopProperty(instance, propertyKey, jsonObject, errorObject);
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -460,7 +519,7 @@ export class JsonConvert {
             console.log("----------");
         }
 
-        return instance;
+        return {value: instance, error: errorObject};
 
     }
 
@@ -477,15 +536,22 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
+    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): {value: T[], error: any } {
 
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return jsonArray;
+            return {value: jsonArray, error: []};
         }
 
         // Check if the passed type is allowed
         if (jsonArray === undefined) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: jsonArray,
+                    error: "Property is undefined."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -496,16 +562,34 @@ export class JsonConvert {
         } else if (jsonArray === null) {
 
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
+                
+                if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                    return {
+                        value: jsonArray,
+                        error: "Property is NULL."
+                    };
+                }                
+                
                 throw new Error(
                     "Fatal error in JsonConvert. " +
                     "Passed parameter jsonArray in JsonConvert.deserializeObject() is undefined. You have specified to disallow null values." +
                     "\n"
                 );
             } else {
-                return jsonArray;
+                return {
+                    value: jsonArray,
+                    error: ""
+                };
             }
 
         } else if (typeof (jsonArray) !== "object" || jsonArray instanceof Array === false) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                return {
+                    value: jsonArray,
+                    error: "Property is not of type array."
+                };
+            }
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -516,9 +600,7 @@ export class JsonConvert {
         }
 
         // Now deserialize and return the array
-        if (this.operationMode === OperationMode.DISABLE) {
-            return jsonArray;
-        }
+       
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JSON array:");
@@ -526,10 +608,13 @@ export class JsonConvert {
         }
 
         let array: T[] = [];
+        let errorArray = [];
 
         // Loop through all array elements
         for (const jsonObject of jsonArray) {
-            array.push(this.deserializeObject<T>(jsonObject, classReference));
+            let {value, error} = this.deserializeObject<T>(jsonObject, classReference);
+            array.push(value);
+            errorArray.push(error)
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -538,7 +623,7 @@ export class JsonConvert {
             console.log("----------");
         }
 
-        return array;
+        return {value: array, error: errorArray};
 
     }
 
@@ -620,7 +705,7 @@ export class JsonConvert {
      *
      * @throws throws an Error in case of failure
      */
-    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
+    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any): void {
 
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
@@ -644,6 +729,11 @@ export class JsonConvert {
 
             if (isOptional) return;
 
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                errorObject[classPropertyName] = "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonPropertyName + "\" does not exist:\n\n"
+                return jsonValue;
+            }
+
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonPropertyName + "\" does not exist:\n\n" +
@@ -662,6 +752,19 @@ export class JsonConvert {
         try {
             instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
         } catch (e) {
+
+            if (this.operationMode === OperationMode.CATCH_ALL_ERRORS) {
+                errorObject[classPropertyName] = "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because of a type error.\n\n" +
+                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
+                "\tExpected type: \n\t\t" + this.getExpectedType(expectedJsonType) + "\n\n" +
+                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n" +
+                "\tJSON type: \n\t\t" + this.getJsonType(jsonValue) + "\n\n" +
+                "\tJSON value: \n\t\t" + JSON.stringify(jsonValue) + "\n\n" +
+                e.message + "\n";
+
+                return jsonValue;
+            }
+
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because of a type error.\n\n" +
