@@ -220,17 +220,17 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    trySerialize<T>(data: T | T[]): any | any[] {
+    trySerialize<T>(data: T | T[]): {value: any | any[], error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return data;
+            return {value: data, error: {}};
         }
 
         // Call the appropriate method depending on the type
         if (data instanceof Array) {
-            return this.serializeArray(data, true).value;
+            return this.serializeArray(data, true);
         } else if (typeof data === "object") { // careful: an array is an object in TypeScript!
-            return this.serializeObject(data, true).value;
+            return this.serializeObject(data, true);
         } else {
             throw new Error(
                 "Fatal error in JsonConvert. " +
