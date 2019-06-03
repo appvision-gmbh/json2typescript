@@ -12,8 +12,7 @@
 export enum OperationMode {
     DISABLE = 0,
     ENABLE = 1,
-    LOGGING = 2,
-    CATCH_ALL_ERRORS = 3
+    LOGGING = 2    
 };
 
 /**
