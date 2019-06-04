@@ -254,7 +254,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(instance: T, catchAllErrors = false): {value: any, error: any} {
+    serializeObject<T>(instance: T, catchAllErrors: boolean = false): {value: any, error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return {value: instance, error: {}};
@@ -350,7 +350,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(instanceArray: T[], catchAllErrors = false): {value: any[], error: any} {
+    serializeArray<T>(instanceArray: T[], catchAllErrors: boolean = false): {value: any[], error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return {value: instanceArray, error: []};
@@ -514,7 +514,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }, catchAllErrors = false): {value: T, error: any} {
+    deserializeObject<T>(jsonObject: any, classReference: { new(): T }, catchAllErrors: boolean = false): {value: T, error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return { value: jsonObject, error: {} };
@@ -616,7 +616,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }, catchAllErrors = false): {value: T[], error: any } {
+    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }, catchAllErrors: boolean = false): {value: T[], error: any } {
 
 
         if (this.operationMode === OperationMode.DISABLE) {
@@ -724,7 +724,7 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure and catchAllErrors = false
      */
-    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any, catchAllErrors = false): void {
+    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any, catchAllErrors: boolean = false): void {
 
         // Check if a JSON-object mapping is possible for a property
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
@@ -821,7 +821,7 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure and catchAllErrors = false
      */
-    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any, catchAllErrors = false): void {
+    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any, errorObject: any, catchAllErrors: boolean = false): void {
 
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
