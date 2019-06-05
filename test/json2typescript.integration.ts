@@ -101,9 +101,9 @@ describe('Integration tests', () => {
                 expect(jsonConvert.serialize<Cat>(cat1)).toEqual(cat1JsonObject);
                 expect(jsonConvert.serialize<Cat>(cat2)).toEqual(cat2JsonObject);
                 expect(jsonConvert.serialize<Dog>(dog1)).toEqual(dog1JsonObject);
-                expect(jsonConvert.serializeObject<Cat>(cat1)).toEqual({value: cat1JsonObject, error: {}});
-                expect(jsonConvert.serializeObject<Cat>(cat2)).toEqual({value: cat2JsonObject, error: {}});
-                expect(jsonConvert.serializeObject<Dog>(dog1)).toEqual({value: dog1JsonObject, error: {}});
+                expect(jsonConvert.serializeObject<Cat>(cat1)).toEqual(cat1JsonObject);
+                expect(jsonConvert.serializeObject<Cat>(cat2)).toEqual(cat2JsonObject);
+                expect(jsonConvert.serializeObject<Dog>(dog1)).toEqual(dog1JsonObject);
 
                 expect(() => jsonConvert.serializeArray(<any> cat1)).toThrow();
             });
@@ -111,8 +111,8 @@ describe('Integration tests', () => {
             it('should serialize a TypeScript array to a JSON array', () => {
                 expect(jsonConvert.serialize<Animal>(animals)).toEqual(animalJsonArray);
                 expect(jsonConvert.serialize<Cat>(cats)).toEqual(catsJsonArray);
-                expect(jsonConvert.serializeArray<Animal>(animals)).toEqual({value: animalJsonArray, error: [{}, {}]});
-                expect(jsonConvert.serializeArray<Cat>(cats)).toEqual({value: catsJsonArray, error: [{}, {}]});
+                expect(jsonConvert.serializeArray<Animal>(animals)).toEqual(animalJsonArray);
+                expect(jsonConvert.serializeArray<Cat>(cats)).toEqual(catsJsonArray);
 
                 expect(() => jsonConvert.serializeArray<Cat>(<any> cat1)).toThrow();
             });
@@ -128,9 +128,9 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserialize<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
                 expect(jsonConvert.deserialize<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
                 expect(jsonConvert.deserialize<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
-                expect(jsonConvert.deserializeObject<Cat>(cat1JsonObject, Cat)).toEqual({value: cat1, error: {}});
-                expect(jsonConvert.deserializeObject<Cat>(cat2JsonObject, Cat)).toEqual({value: cat2, error: {}});
-                expect(jsonConvert.deserializeObject<Dog>(dog1JsonObject, Dog)).toEqual({value: dog1, error: {}});
+                expect(jsonConvert.deserializeObject<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
+                expect(jsonConvert.deserializeObject<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
+                expect(jsonConvert.deserializeObject<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
 
                 expect(() => jsonConvert.deserializeArray<Cat>(<any> cat1JsonObject, Cat)).toThrow();
 
@@ -138,7 +138,7 @@ describe('Integration tests', () => {
 
             it('should deserialize a JSON array to a TypeScript array', () => {
                 expect(jsonConvert.deserialize<Cat>(catsJsonArray, Cat)).toEqual(cats);
-                expect(jsonConvert.deserializeArray<Cat>(catsJsonArray, Cat)).toEqual({value: cats, error: [{}, {}]});
+                expect(jsonConvert.deserializeArray<Cat>(catsJsonArray, Cat)).toEqual(cats);
 
                 expect(() => jsonConvert.deserializeObject<Cat>(catsJsonArray, Cat)).toThrow();
             });

@@ -197,9 +197,9 @@ export class JsonConvert {
 
         // Call the appropriate method depending on the type
         if (data instanceof Array) {
-            return this.serializeArray(data).value;
+            return this.serializeArrayUtil(data).value;
         } else if (typeof data === "object") { // careful: an array is an object in TypeScript!
-            return this.serializeObject(data).value;
+            return this.serializeObjectUtil(data).value;
         } else {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -208,6 +208,38 @@ export class JsonConvert {
             );
         }
 
+    }
+
+    /**
+     * Tries to serialize a TypeScript object to a JSON object.
+     *
+     * @param instance TypeScript instance
+     *
+     * @returns the JSON object
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serializeObject<T>(instance: T): any {
+        return this.serializeObjectUtil(instance).value;        
+    }
+
+    /**
+     * Tries to serialize a TypeScript array to a JSON array.
+     *
+     * @param instanceArray array of TypeScript instances
+     *
+     * @returns the JSON array
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serializeArray<T>(instanceArray: T[]): any[] {
+        return this.serializeArrayUtil(instanceArray).value;
     }
 
     /**
@@ -228,9 +260,9 @@ export class JsonConvert {
 
         // Call the appropriate method depending on the type
         if (data instanceof Array) {
-            return this.serializeArray(data, true);
+            return this.serializeArrayUtil(data, true);
         } else if (typeof data === "object") { // careful: an array is an object in TypeScript!
-            return this.serializeObject(data, true);
+            return this.serializeObjectUtil(data, true);
         } else {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -242,6 +274,105 @@ export class JsonConvert {
     }
 
     /**
+     * Tries to deserialize given JSON to a TypeScript object or array of objects.
+     *
+     * @param json the JSON as object or array
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return json;
+        }
+
+        // Call the appropriate method depending on the type
+        if (json instanceof Array) {
+            return this.deserializeArrayUtil(json, classReference).value;                
+        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
+            return this.deserializeObjectUtil(json, classReference).value;
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
+                "\n"
+            );
+        }
+    }
+
+    /**
+     * Tries to deserialize a JSON object to a TypeScript object.
+     *
+     * @param jsonObject the JSON object
+     * @param classReference the class reference
+     *
+     * @returns the deserialized TypeScript instance
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
+        return this.deserializeObjectUtil(jsonObject, classReference).value;
+    }
+
+    /**
+     * Tries to deserialize a JSON array to a TypeScript array.
+     *
+     * @param jsonArray the JSON array
+     * @param classReference the object class
+     *
+     * @returns the deserialized array of TypeScript instances
+     *
+     * @throws an Error in case of failure
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
+        return this.deserializeArrayUtil(jsonArray, classReference).value;
+    }
+
+
+    /**
+     * Tries to deserialize given JSON to a TypeScript object or array of objects.
+     *
+     * @param json the JSON as object or array
+     * @param classReference the class reference
+     *
+     * @returns "possible" deserialized data (TypeScript instance or array of TypeScript instances) and error data
+     *
+     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    tryDeserialize<T>(json: any, classReference: { new(): T }): {value: any, error: any} {        
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return { value: json, error: {} };
+        }
+
+        // Call the appropriate method depending on the type
+        if (json instanceof Array) {
+            return this.deserializeArrayUtil(json, classReference, true);                
+        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
+            return this.deserializeObjectUtil(json, classReference, true);
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
+                "\n"
+            );
+        }
+    }
+
+        /**
      * Tries to serialize a TypeScript object to a JSON object.
      *
      * @param instance TypeScript instance
@@ -254,7 +385,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(instance: T, catchAllErrors: boolean = false): {value: any, error: any} {
+    private serializeObjectUtil<T>(instance: T, catchAllErrors: boolean = false): {value: any, error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return {value: instance, error: {}};
@@ -350,7 +481,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(instanceArray: T[], catchAllErrors: boolean = false): {value: any[], error: any} {
+    private serializeArrayUtil<T>(instanceArray: T[], catchAllErrors: boolean = false): {value: any[], error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return {value: instanceArray, error: []};
@@ -421,7 +552,7 @@ export class JsonConvert {
 
         // Loop through all array elements
         for (const classInstance of <any> instanceArray) {
-            const {value, error} = this.serializeObject(classInstance, catchAllErrors);
+            const {value, error} = this.serializeObjectUtil(classInstance, catchAllErrors);
             jsonArray.push(value);
             errorArray.push(error);
         }
@@ -434,70 +565,6 @@ export class JsonConvert {
 
         return {value: jsonArray, error: errorArray};
 
-    }
-
-    /**
-     * Tries to deserialize given JSON to a TypeScript object or array of objects.
-     *
-     * @param json the JSON as object or array
-     * @param classReference the class reference
-     *
-     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
-     *
-     * @throws an Error in case of failure
-     *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
-     * @see https://www.npmjs.com/package/json2typescript full documentation
-     */
-    deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
-
-        if (this.operationMode === OperationMode.DISABLE) {
-            return json;
-        }
-
-        // Call the appropriate method depending on the type
-        if (json instanceof Array) {
-            return this.deserializeArray(json, classReference).value;                
-        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
-            return this.deserializeObject(json, classReference).value;
-        } else {
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
-                "\n"
-            );
-        }
-    }
-
-    /**
-     * Tries to deserialize given JSON to a TypeScript object or array of objects.
-     *
-     * @param json the JSON as object or array
-     * @param classReference the class reference
-     *
-     * @returns "possible" deserialized data (TypeScript instance or array of TypeScript instances) and error data
-     *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
-     * @see https://www.npmjs.com/package/json2typescript full documentation
-     */
-    tryDeserialize<T>(json: any, classReference: { new(): T }): {value: any, error: any} {        
-
-        if (this.operationMode === OperationMode.DISABLE) {
-            return { value: json, error: {} };
-        }
-
-        // Call the appropriate method depending on the type
-        if (json instanceof Array) {
-            return this.deserializeArray(json, classReference, true);                
-        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
-            return this.deserializeObject(json, classReference, true);
-        } else {
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
-                "\n"
-            );
-        }
     }
 
     /**
@@ -514,7 +581,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }, catchAllErrors: boolean = false): {value: T, error: any} {
+    private deserializeObjectUtil<T>(jsonObject: any, classReference: { new(): T }, catchAllErrors: boolean = false): {value: T, error: any} {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return { value: jsonObject, error: {} };
@@ -616,7 +683,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }, catchAllErrors: boolean = false): {value: T[], error: any } {
+    private deserializeArrayUtil<T>(jsonArray: any[], classReference: { new(): T }, catchAllErrors: boolean = false): {value: T[], error: any } {
 
 
         if (this.operationMode === OperationMode.DISABLE) {
@@ -692,7 +759,7 @@ export class JsonConvert {
 
         // Loop through all array elements
         for (const jsonObject of jsonArray) {
-            let {value, error} = this.deserializeObject<T>(jsonObject, classReference, catchAllErrors);
+            let {value, error} = this.deserializeObjectUtil<T>(jsonObject, classReference, catchAllErrors);
             array.push(value);
             errorArray.push(error)
         }
@@ -974,9 +1041,9 @@ export class JsonConvert {
                     else throw new Error("\tReason: Given value is null.");
                 }
 
-                if (serialize) return this.serializeObject(value, catchAllErrors);
+                if (serialize) return this.serializeObjectUtil(value, catchAllErrors);
                 else {
-                    return this.deserializeObject(value, expectedJsonType, catchAllErrors);
+                    return this.deserializeObjectUtil(value, expectedJsonType, catchAllErrors);
                 }
 
             } else if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) { // general object
