@@ -400,7 +400,7 @@ class DateConverter implements JsonCustomConvert<Date> {
 }
 ```
 
-> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same time between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
+> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same type between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
 
 Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you simply have use the `@JsonProperty` decorator as follows:
 
