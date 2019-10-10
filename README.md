@@ -26,8 +26,8 @@ let user: User = jsonConvert.deserializeObject(jsonObj, User);
 console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... }
 ```
 
-> Tip: All `serialize()` and `deserialize()` methods may throw an exception in case of failure. 
-Make sure you catch the errors in production!
+> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. 
+Make sure you catch errors in production!
 
 ---
 
@@ -220,7 +220,7 @@ export class AppComponent implements OnInit {
         // Map to the country class
         let country: Country;
         try {
-            country = jsonConvert.deserialize(jsonObject, Country);
+            country = jsonConvert.deserializeObject(jsonObject, Country);
             country.cities[0].printInfo(); // prints: Basel was founded in -200 and is really beautiful!
         } catch (e) {
             console.log((<Error>e));
@@ -240,7 +240,8 @@ Even if you don't have any errors in your IDE, `json2typescript` will not proper
 
 ## Class and property decorators
 
-Decorators should be used whenever you would like to map JSON with TypeScript data.
+Decorators should be used whenever you would like to map JSON with TypeScript data. 
+As of now, you must not use more than one decorator per class or property.
 
 ### Class decorators
 
@@ -256,13 +257,7 @@ in certain cases cause the deserializer to not work as same class names will
 overwrite the property descriptors. It is advised to explicitly ID your 
 objects as above.
 
-> Tip: Make sure you import `JsonObject` from `json2typescript`.  
-
-```typescript
-    @JsonProperty("jsonPropName", String, true)
-    @JsonProperty("jsonPropertyName", String, true)
-    name: string = undefined;
-```
+> Tip: Make sure you import `JsonObject` from `json2typescript`.
 
 #### First parameter: classIdentifier (optional)
 
@@ -283,7 +278,7 @@ export class User {
 ```
 
 Important note: You must assign any (valid) value or `undefined` to your property at 
-initialization, otherwise our mapper does **not** work.
+initialization, otherwise our mapper does **not** work and will simply ignore the property.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
@@ -331,7 +326,7 @@ See the examples at the end of this document for more info about nesting arrays.
 
 ##### Adding a custom converter
 
-More advanced users may need to use custom converters. If you don't want
+More advanced users may need to use custom converters. If you want
 `json2typescript` to use your custom converter, you need to follow these
 steps:
 
@@ -362,6 +357,10 @@ If you set the third parameter to true, there is no exception when it is missing
 The type is still checked as soon the property is present again.
 
 The same applies for the case when you try to serialize a TypeScript object to a JSON object. If the property is not defined in the class and optional, it will not be added to the JSON object.
+
+> Tip: Some API's return null instead of omitting optional values. 
+If you flag a property as optional, `json2typescript` will ignore null values and keep the default value of the property instead. 
+This fact is particularly helpful if your project uses TypeScript `strictNullChecks` or/and disallows `null` values through the `valueCheckingMode` property in `json2typescript`.
 
 #### Important notes
 
@@ -401,7 +400,7 @@ class DateConverter implements JsonCustomConvert<Date> {
 }
 ```
 
-> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same time between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
+> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same type between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
 
 Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you simply have use the `@JsonProperty` decorator as follows:
 
@@ -459,7 +458,9 @@ The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 > Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
 
-> Tip: The TypeScript developer team suggests you to avoid null values. If your JSON api doesn't return null values, you should try the last flag disallowing null values.
+> Tip: The TypeScript documentation suggests to avoid null values.
+Compile your TypeScript code with `strictNullChecks=true` and set the `valueCheckingMode` to disallow null values.
+If your API returns `null` in some cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on runtime.
 
 #### Ignore primitive checks
 
@@ -487,7 +488,7 @@ The default is `PropertyMatchingRule.CASE_STRICT`.
 
 #### Serializing (TypeScript to JSON)
  
-`(any) serialize(data: any)`
+`(any) serialize(data: T | T[])`
 
 Tries to serialize a TypeScript object or array of objects to JSON.
 
@@ -495,7 +496,7 @@ Tries to serialize a TypeScript object or array of objects to JSON.
 
 #### Deserializing (JSON to TypeScript)
  
-`(any) deserialize(json: any, classReference: { new(): any })`
+`(T | T[]) deserialize(json: any, classReference: { new(): T | T[] })`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
 
@@ -505,10 +506,10 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(any) serializeObject(instance: any)`
-- `(any[]) serializeArray(instanceArray: any[])`
-- `(any) deserializeObject(jsonObject: any, classReference: { new(): any })`
-- `(any[]) deserializeArray(jsonArray: any[], classReference: { new(): any })`
+- `(any) serializeObject(instance: T)`
+- `(any[]) serializeArray(instanceArray: T[])`
+- `(T) deserializeObject(jsonObject: any, classReference: { new(): T })`
+- `(T[]) deserializeArray(jsonArray: any[], classReference: { new(): T })`
 
 
 
