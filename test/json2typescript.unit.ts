@@ -26,6 +26,7 @@ describe('Unit tests', () => {
         };
         let cat1JsonObject: ICat = {
             catName: "Meowy",
+            secName: "Meew",
             district: 100,
             owner: human1JsonObject,
             talky: true,
@@ -34,6 +35,7 @@ describe('Unit tests', () => {
         };
         let cat2JsonObject: ICat = {
             catName: "Links",
+            secName: "Mooow",
             district: 50,
             talky: true,
             other: "sweet",
@@ -57,6 +59,7 @@ describe('Unit tests', () => {
 
         let cat1 = new Cat();
         cat1.name = "Meowy";
+        cat1.secondName = "Meew";
         cat1.district = 100;
         cat1.owner = human1;
         cat1.talky = true;
@@ -65,6 +68,7 @@ describe('Unit tests', () => {
 
         let cat2 = new Cat();
         cat2.name = "Links";
+        cat2.secondName = "Mooow";
         cat2.district = 50;
         cat2.other = "sweet";
         cat2.birthdate = new Date("2014-09-01");

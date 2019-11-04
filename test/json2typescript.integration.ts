@@ -21,6 +21,7 @@ describe('Integration tests', () => {
         };
         let cat1JsonObject: ICat = {
             catName: "Meowy",
+            secName: "Meew",
             district: 100,
             owner: human1JsonObject,
             birthdate: "2016-01-02",
@@ -30,6 +31,7 @@ describe('Integration tests', () => {
         };
         let dog1JsonObject: IDog = {
             name: "Barky",
+            secName: "Narky",
             barking: true,
             birthdate: "2016-01-02",
             friends: [],
@@ -37,6 +39,7 @@ describe('Integration tests', () => {
         };
         let cat2JsonObject: ICat = {
             catName: "Links",
+            secName: "Mooow",
             district: 50,
             birthdate: "2016-01-02",
             talky: true,
@@ -52,6 +55,7 @@ describe('Integration tests', () => {
 
         let cat1 = new Cat();
         cat1.name = "Meowy";
+        cat1.secondName = "Meew";
         cat1.district = 100;
         cat1.owner = human1;
         cat1.birthdate = new Date("2016-01-02");
@@ -59,12 +63,14 @@ describe('Integration tests', () => {
 
         let dog1 = new Dog();
         dog1.name = "Barky";
+        dog1.secondName = "Narky";
         dog1.isBarking = true;
         dog1.birthdate = new Date("2016-01-02");
         dog1.friends = [];
 
         let cat2 = new Cat();
         cat2.name = "Links";
+        cat2.secondName = "Mooow";
         cat2.district = 50;
         cat2.birthdate = new Date("2016-01-02");
         cat2.talky = true;

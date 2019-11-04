@@ -8,6 +8,9 @@ export class Cat extends Animal {
     @JsonProperty("catName", String)
     name: string = "";
 
+    @JsonProperty("secName", String)
+    secondName: string = "";
+
     @JsonProperty()
     district: number = 0;
 

@@ -5,6 +5,9 @@ import {Animal} from "./animal";
 @JsonObject
 export class Dog extends Animal {
 
+    @JsonProperty("secName", String, true)
+    secondName?: string = undefined;
+
     @JsonProperty("barking", Boolean)
     isBarking: boolean = false;
 
