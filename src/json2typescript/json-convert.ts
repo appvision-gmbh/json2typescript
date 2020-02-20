@@ -695,16 +695,18 @@ export class JsonConvert {
         // Check if mapping is defined
         if (typeof (mappings) === "undefined") return null;
 
-        // Get direct mapping if possible
-        const directMappingName: string = instance[Settings.CLASS_IDENTIFIER] + "." + propertyName;
-        if (typeof (mappings[directMappingName]) !== "undefined") {
-            return mappings[directMappingName];
-        }
-
-        // No mapping was found, try to find some
-        const indirectMappingNames: string[] = Object.keys(mappings).filter(key => key.match("\\." + propertyName + "$")); // use endsWidth in later versions
-        if (indirectMappingNames.length > 0) {
-            return mappings[indirectMappingNames[0]];
+        /* Find mapping by iterating up the prototype chain to find a matching mapping, rather than
+         * just searching by property name. */
+        let prototype = Object.getPrototypeOf(instance);
+        while (prototype != null) {
+            const classIdentifier = prototype[Settings.CLASS_IDENTIFIER];
+            if (!!classIdentifier) {
+                const mappingName: string = classIdentifier + "." + propertyName;
+                if (typeof (mappings[mappingName]) !== "undefined") {
+                    return mappings[mappingName];
+                }
+            }
+            prototype = Object.getPrototypeOf(prototype);
         }
 
         return null;

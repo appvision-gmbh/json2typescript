@@ -7,6 +7,8 @@ import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
 import { Animal } from "./model/typescript/animal";
+import { IAnimal } from "./model/json/i-animal";
+import { DuplicateCat } from "./model/typescript/duplicate-cat";
 
 describe('Integration tests', () => {
 
@@ -42,6 +44,15 @@ describe('Integration tests', () => {
             talky: true,
             other: ""
         };
+        // DuplicateCat class has no mapped properties, so when serialized JSON should match IAnimal interface
+        let duplicateCat1SerializeJsonObject: IAnimal = {
+            name: "Duplicate"
+        };
+        // Add district property, which exists on DuplicateCat but is not mapped - should not be deserialized
+        let duplicateCat2DeserializeJsonObject = {
+            name: "Duplicate2",
+            district: "2016-02-01"
+        };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
 
@@ -69,6 +80,13 @@ describe('Integration tests', () => {
         cat2.birthdate = new Date("2016-01-02");
         cat2.talky = true;
 
+        let duplicateCat1 = new DuplicateCat();
+        duplicateCat1.name = "Duplicate";
+        duplicateCat1.district = new Date("2014-10-01");
+
+        let duplicateCat2 = new DuplicateCat();
+        duplicateCat2.name = "Duplicate2";
+
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
 
@@ -82,9 +100,13 @@ describe('Integration tests', () => {
                 expect(jsonConvert.serialize<Cat>(cat1)).toEqual(cat1JsonObject);
                 expect(jsonConvert.serialize<Cat>(cat2)).toEqual(cat2JsonObject);
                 expect(jsonConvert.serialize<Dog>(dog1)).toEqual(dog1JsonObject);
+                // District property should not be included in serialized JSON
+                expect(jsonConvert.serialize(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
                 expect(jsonConvert.serializeObject<Cat>(cat1)).toEqual(cat1JsonObject);
                 expect(jsonConvert.serializeObject<Cat>(cat2)).toEqual(cat2JsonObject);
                 expect(jsonConvert.serializeObject<Dog>(dog1)).toEqual(dog1JsonObject);
+                // District property should not be included in serialized JSON
+                expect(jsonConvert.serializeObject(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
 
                 expect(() => jsonConvert.serializeArray(<any> cat1)).toThrow();
             });
@@ -109,9 +131,13 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserialize<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
                 expect(jsonConvert.deserialize<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
                 expect(jsonConvert.deserialize<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
+                // Duplicate property in JSON should be not be deserialized
+                expect(jsonConvert.deserialize(duplicateCat2DeserializeJsonObject, DuplicateCat)).toEqual(duplicateCat2);
                 expect(jsonConvert.deserializeObject<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
                 expect(jsonConvert.deserializeObject<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
                 expect(jsonConvert.deserializeObject<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
+                // Duplicate property in JSON should be not be deserialized
+                expect(jsonConvert.deserializeObject(duplicateCat2DeserializeJsonObject, DuplicateCat)).toEqual(duplicateCat2);
 
                 expect(() => jsonConvert.deserializeArray<Cat>(<any> cat1JsonObject, Cat)).toThrow();
 
