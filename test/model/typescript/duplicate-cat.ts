@@ -1,5 +1,6 @@
-import { Animal } from './animal';
-import { JsonObject } from '../../../src/json2typescript/json-convert-decorators';
+import { Animal } from "./animal";
+import { JsonObject, JsonProperty } from "../../../src/json2typescript/json-convert-decorators";
+import { DateConverter } from "./date-converter";
 
 /**
  * Class which has a property with the same name as Cat.  Used to test handling
@@ -12,4 +13,8 @@ export class DuplicateCat extends Animal {
 
   // Leave property with the same name unmapped so there's no direct mapping, but use an incompatible type
   district: Date | undefined = undefined;
+
+  // Map other property with same name, but again use an incompatible type
+  @JsonProperty( "talky", DateConverter )
+  talky: Date | undefined = undefined;
 }

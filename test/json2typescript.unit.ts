@@ -9,6 +9,7 @@ import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
 import { DuplicateCat } from './model/typescript/duplicate-cat';
+import { DateConverter } from "./model/typescript/date-converter";
 
 describe('Unit tests', () => {
 
@@ -81,6 +82,7 @@ describe('Unit tests', () => {
         let duplicateCat1 = new DuplicateCat();
         duplicateCat1.name = "Duplicate";
         duplicateCat1.district = new Date("2014-10-01");
+        duplicateCat1.talky = new Date("2015-02-03");
 
         // SETUP CHECKS
         describe('setup checks', () => {
@@ -246,6 +248,16 @@ describe('Unit tests', () => {
                 dogNameMapping.isOptional = false;
                 dogNameMapping.customConverter = null;
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(dog1, "name")).toEqual(dogNameMapping);
+
+                // Check that mapped property on "sibling" DuplicateCat class with same name as Cat property
+                // but different type is handled correctly
+                const duplicateCatTalkyMapping = new MappingOptions();
+                duplicateCatTalkyMapping.classPropertyName = "talky";
+                duplicateCatTalkyMapping.jsonPropertyName = "talky";
+                duplicateCatTalkyMapping.expectedJsonType = undefined;
+                duplicateCatTalkyMapping.isOptional = false;
+                duplicateCatTalkyMapping.customConverter = new DateConverter();
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(duplicateCat1, "talky")).toEqual(duplicateCatTalkyMapping);
 
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(human1, "name")).toBeNull();
                 // Unmapped property should not return mapping, even though property is the same name as a mapped property on another class

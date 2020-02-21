@@ -1,5 +1,5 @@
 import { JsonConvert } from "../src/json2typescript/json-convert";
-import { OperationMode, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
+import { ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
 import { Cat } from "./model/typescript/cat";
 import { Human } from "./model/typescript/human";
 import { Dog } from "./model/typescript/dog";
@@ -7,8 +7,8 @@ import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
 import { Animal } from "./model/typescript/animal";
-import { IAnimal } from "./model/json/i-animal";
 import { DuplicateCat } from "./model/typescript/duplicate-cat";
+import { IDuplicateCat } from "./model/json/i-duplicate-cat";
 
 describe('Integration tests', () => {
 
@@ -44,14 +44,15 @@ describe('Integration tests', () => {
             talky: true,
             other: ""
         };
-        // DuplicateCat class has no mapped properties, so when serialized JSON should match IAnimal interface
-        let duplicateCat1SerializeJsonObject: IAnimal = {
-            name: "Duplicate"
+        let duplicateCat1SerializeJsonObject: IDuplicateCat = {
+            name: "Duplicate",
+            talky: "2015-02-03"
         };
         // Add district property, which exists on DuplicateCat but is not mapped - should not be deserialized
         let duplicateCat2DeserializeJsonObject = {
             name: "Duplicate2",
-            district: "2016-02-01"
+            district: "2016-02-01",
+            talky: "2016-03-04"
         };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
@@ -83,9 +84,11 @@ describe('Integration tests', () => {
         let duplicateCat1 = new DuplicateCat();
         duplicateCat1.name = "Duplicate";
         duplicateCat1.district = new Date("2014-10-01");
+        duplicateCat1.talky = new Date("2015-02-03");
 
         let duplicateCat2 = new DuplicateCat();
         duplicateCat2.name = "Duplicate2";
+        duplicateCat2.talky = new Date("2016-03-04");
 
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
