@@ -698,7 +698,11 @@ export class JsonConvert {
         /* Find mapping by iterating up the prototype chain to find a matching mapping, rather than
          * just searching by property name. */
         let prototype = Object.getPrototypeOf(instance);
-        while (prototype != null) {
+        /* According to documentation, we'll hit null when we've iterated all the way up to the base
+         * Object, but check for undefined as well in case prototype has been manually set to
+         * undefined.  Note that javascript detects circular prototype references and will cause a
+         * TypeError, so no need to check for self, the prototype chain will eventually terminate. */
+        while (prototype !== null && prototype !== undefined) {
             const classIdentifier = prototype[Settings.CLASS_IDENTIFIER];
             if (!!classIdentifier) {
                 const mappingName: string = classIdentifier + "." + propertyName;

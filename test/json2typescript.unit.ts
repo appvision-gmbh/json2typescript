@@ -1,14 +1,14 @@
 import { JsonConvert } from "../src/json2typescript/json-convert";
 import { OperationMode, PropertyMatchingRule, ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
 import { Any } from "../src/json2typescript/any";
-import { MappingOptions, Settings } from '../src/json2typescript/json-convert-options';
+import { MappingOptions, Settings } from "../src/json2typescript/json-convert-options";
 import { Human } from "./model/typescript/human";
 import { Cat } from "./model/typescript/cat";
 import { Dog } from "./model/typescript/dog";
 import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
-import { DuplicateCat } from './model/typescript/duplicate-cat';
+import { DuplicateCat } from "./model/typescript/duplicate-cat";
 import { DateConverter } from "./model/typescript/date-converter";
 
 describe('Unit tests', () => {
