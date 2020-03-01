@@ -270,7 +270,17 @@ export class JsonConvert {
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
-            this.serializeObject_loopProperty(instance, propertyKey, jsonObject);
+            try {
+                this.serializeObject_loopProperty(instance, propertyKey, jsonObject);
+            }
+            catch (ex) {
+                if (this.operationMode === OperationMode.LOGGING) {
+                    console.log("Failed to serialize property:");
+                    console.log(ex);
+                    console.log("----------");
+                }
+                throw ex;
+            }
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -451,7 +461,17 @@ export class JsonConvert {
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
-            this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
+            try {
+                this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
+            }
+            catch (ex) {
+                if (this.operationMode === OperationMode.LOGGING) {
+                    console.log("Failed to deserialize property:");
+                    console.log(ex);
+                    console.log("----------");
+                }
+                throw ex;
+            }
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
