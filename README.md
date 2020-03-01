@@ -578,14 +578,9 @@ export class User {
 
 # Contributors
 
-This NPM package was originally created by **Andreas Aeschlimann**, scientific researcher of the **Digital Humanities Lab** (DHlab) of **University of Basel** in 2016. 
-
-The Digital Humanities Lab makes use of `json2typescript` in several Angular web applications, for example in the new website of http://www.salsah.org. You may find more information about us on http://dhlab.unibas.ch
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**) and scientific researcher at the **Digital Humanities Lab** (**University of Basel**).
 
 ## Special thanks
 
-Thanks for the input and pull requests by:
-- @gempain for fixing several issues and adding karma tests.
-- @mrwogu for fixing the `noImplicitAny` issue.
-- @bblommers for the support of multiple decorators.
-- @archfz for fixing the constructor.name issue
+You are welcome to report issues and discuss enhancements to make this package even more useful.
+Thanks for the input and all the pull requests from the community! 
