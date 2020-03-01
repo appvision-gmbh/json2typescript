@@ -1,3 +1,19 @@
+# v1.2.5 (2020-03-01)
+
+## Bug Fixes
+
+* Added missing Changelog for current version, closes [#124](https://github.com/AppVision-GmbH/json2typescript/issues/124)
+
+# v1.2.4 (2020-03-01)
+
+## Features
+
+* Added automation tests on the repository with Travis CI 
+
+## Bug Fixes
+
+* Fixed bug in property mapping of complex class inheritances, closes [#121](https://github.com/AppVision-GmbH/json2typescript/pull/121)
+
 # v1.2.3 (2019-05-11)
 
 ## Bug Fixes
