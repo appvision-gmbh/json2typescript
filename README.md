@@ -485,7 +485,7 @@ The default is `PropertyMatchingRule.CASE_STRICT`.
 
 #### Ignore required property checks
 
-`(bool) JsonConvertignoreRequiredCheck`
+`(bool) JsonConvert.ignoreRequiredCheck`
 
 Determines whether the check for required properties should be ignored, making all mapped values optional, whether or not the isOptional property mapping parameter is set.
 If true, any missing properties (undefined) when serializing or deserializing will be ignored, as if they were marked optional.  
