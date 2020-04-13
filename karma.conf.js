@@ -3,7 +3,7 @@ module.exports = function (config) {
         plugins: [
             'karma-jasmine',
             'karma-mocha-reporter',
-            'karma-phantomjs-launcher',
+            'karma-chrome-launcher',
             'karma-typescript'
         ],
         frameworks: ['jasmine', 'karma-typescript'],
@@ -19,7 +19,7 @@ module.exports = function (config) {
             'test/**/*.ts': ['karma-typescript']
         },
         reporters: ['mocha', 'karma-typescript'],
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
         singleRun: true,
         colors: true,
         karmaTypescriptConfig: {
