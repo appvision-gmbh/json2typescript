@@ -1,4 +1,4 @@
-Copyright (c) 2018 Andreas Aeschlimann
+Copyright (c) 2020 Andreas Aeschlimann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

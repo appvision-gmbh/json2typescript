@@ -359,8 +359,9 @@ The type is still checked as soon the property is present again.
 The same applies for the case when you try to serialize a TypeScript object to a JSON object. If the property is not defined in the class and optional, it will not be added to the JSON object.
 
 > Tip: Some API's return null instead of omitting optional values. 
-If you flag a property as optional, `json2typescript` will ignore null values and keep the default value of the property instead. 
+If you flag a property as optional, `json2typescript` will ignore (JSON) null values at deserialization and keep the default value of the property instead. 
 This fact is particularly helpful if your project uses TypeScript `strictNullChecks` or/and disallows `null` values through the `valueCheckingMode` property in `json2typescript`.
+Furthermore, note that the instance property `ignoreRequiredCheck` – if set to true – overrides all `isOptional` values for all properties.
 
 #### Important notes
 
@@ -482,13 +483,23 @@ You may assign the following two values:
 
 The default is `PropertyMatchingRule.CASE_STRICT`.
 
+#### Ignore required property checks
+
+`(bool) JsonConvertignoreRequiredCheck`
+
+Determines whether the check for required properties should be ignored, making all mapped values optional, whether or not the isOptional property mapping parameter is set.
+If true, any missing properties (undefined) when serializing or deserializing will be ignored, as if they were marked optional.  
+Note that properties explicitly set to null will be unaffected by this flag – they will be ignored if optional and included if not.
+
+The default is `false`.
+
 ### Public methods
 
 `json2typescript` allows you to map JSON objects (or arrays) to TypeScript objects (or arrays) and vice versa.
 
 #### Serializing (TypeScript to JSON)
  
-`(any) serialize(data: T | T[])`
+`(any) serialize(data: any | any[])`
 
 Tries to serialize a TypeScript object or array of objects to JSON.
 
@@ -506,8 +517,8 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(any) serializeObject(instance: T)`
-- `(any[]) serializeArray(instanceArray: T[])`
+- `(any) serializeObject(instance: any)`
+- `(any[]) serializeArray(instanceArray: any[])`
 - `(T) deserializeObject(jsonObject: any, classReference: { new(): T })`
 - `(T[]) deserializeArray(jsonArray: any[], classReference: { new(): T })`
 

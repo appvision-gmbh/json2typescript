@@ -1,3 +1,17 @@
+# v1.3.0 (2020-04-13)
+
+## Bug Fixes
+
+* Fixed content of `package-lock.json`, closes #125
+
+## Features
+
+* Implemented `ignoreRequiredCheck` flag and allow serialization without having instances, closes [#126](https://github.com/AppVision-GmbH/json2typescript/pull/126)
+
+## Breaking Changes
+
+* In previous version, the serialization of plain objects failed, because instances of classes were required. As of now, the serialization of plain object may succeed if the structure matches the class structure. Thus, this is considered a soft breaking change.
+
 # v1.2.5 (2020-03-01)
 
 ## Bug Fixes

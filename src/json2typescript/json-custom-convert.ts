@@ -5,7 +5,6 @@
  * - serialize() to map a TypeScript object to a JSON object
  * - deserialize() to map a JSON object to a TypeScript object
  *
- * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @see https://www.npmjs.com/package/json2typescript full documentation on NPM$
  */
 export interface JsonCustomConvert<T> {

@@ -5,7 +5,6 @@ import { Any } from "./any";
 /**
  * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
  *
- * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
  * @see https://www.npmjs.com/package/json2typescript full documentation on NPM
  */
 export class JsonConvert {
@@ -32,7 +31,8 @@ export class JsonConvert {
      * - OperationMode.DISABLE: json2typescript will be disabled, no type checking or mapping is done
      * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
      * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
-     * @returns {number}
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     get operationMode(): number {
         return this._operationMode;
@@ -45,7 +45,8 @@ export class JsonConvert {
      * - OperationMode.DISABLE: json2typescript will be disabled, no type checking or mapping is done
      * - OperationMode.ENABLE: json2typescript is enabled, but only errors are logged
      * - OperationMode.LOGGING: json2typescript is enabled and detailed information is logged
-     * @param value
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     set operationMode(value: number) {
         if (value in OperationMode) this._operationMode = value;
@@ -69,7 +70,7 @@ export class JsonConvert {
      * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
      * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
      *
-     * @returns {number}
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     get valueCheckingMode(): number {
         return this._valueCheckingMode;
@@ -83,7 +84,7 @@ export class JsonConvert {
      * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
      * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
      *
-     * @param value
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     set valueCheckingMode(value: number) {
         if (value in ValueCheckingMode) this._valueCheckingMode = value;
@@ -99,7 +100,7 @@ export class JsonConvert {
      * Determines whether primitive types should be checked.
      * If true, it will be allowed to assign primitive to other primitive types.
      *
-     * @returns {boolean}
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     get ignorePrimitiveChecks(): boolean {
         return this._ignorePrimitiveChecks;
@@ -109,7 +110,7 @@ export class JsonConvert {
      * Determines whether primitive types should be checked.
      * If true, it will be allowed to assign primitive to other primitive types.
      *
-     * @param value
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     set ignorePrimitiveChecks(value: boolean) {
         this._ignorePrimitiveChecks = value;
@@ -130,7 +131,8 @@ export class JsonConvert {
      * You may assign the following values:
      * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
      * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
-     * @returns {number}
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     get propertyMatchingRule(): number {
         return this._propertyMatchingRule;
@@ -142,47 +144,42 @@ export class JsonConvert {
      * You may assign the following values:
      * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
      * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
-     * @param value
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     set propertyMatchingRule(value: number) {
         if (value in PropertyMatchingRule) this._propertyMatchingRule = value;
     }
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making ALL
+     * Determines whether the check for "required" properties should be ignored, making all
      * mapped values optional, whether or not the isOptional property mapping parameter is set.
      * If true, any missing properties when serializing or deserializing will be ignored, as if they
-     * were marked optional.  Defaults to false.
+     * were marked optional.
      */
-    private _ignoreRequiredCheck = false;
+    private _ignoreRequiredCheck: boolean = false;
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making ALL
+     * Determines whether the check for "required" properties should be ignored, making all
      * mapped values optional, whether or not the isOptional property mapping parameter is set.
      * If true, any missing properties (undefined) when serializing or deserializing will be
-     * ignored, as if they were marked optional.  Note that properties explicitly set to null
-     * will be unaffected by this flag - they will be ignored if optional and included if not.
-     * Defaults to false.
-     * @returns {boolean} true if all mapped properties will be considered optional, even if the mapping
-     *                    doesn't explicitly specify this, false if the mapping will determine whether
-     *                    a property is optional or not (default)
+     * ignored, as if they were marked optional.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     get ignoreRequiredCheck(): boolean {
         return this._ignoreRequiredCheck;
     }
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making ALL
+     * Determines whether the check for "required" properties should be ignored, making all
      * mapped values optional, whether or not the isOptional property mapping parameter is set.
      * If true, any missing properties (undefined) when serializing or deserializing will be
-     * ignored, as if they were marked optional.  Note that properties explicitly set to null
-     * will be unaffected by this flag - they will be ignored if optional and included if not.
-     * Defaults to false.
-     * @param value true if all mapped properties will be considered optional, even if the mapping
-     *              doesn't explicitly specify this, false if the mapping will determine whether a
-     *              property is optional or not (default)
+     * ignored, as if they were marked optional.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    set ignoreRequiredCheck( value: boolean) {
+    set ignoreRequiredCheck(value: boolean) {
         this._ignoreRequiredCheck = value;
     }
 
@@ -229,7 +226,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     serialize<T>(data: any | any[], classReference?: { new(): T }): any | any[] {
@@ -245,9 +241,9 @@ export class JsonConvert {
             return this.serializeObject(data, classReference);
         } else {
             throw new Error(
-              "Fatal error in JsonConvert. " +
-              "Passed parameter data in JsonConvert.serialize() is not in valid format (object or array)." +
-              "\n"
+                "Fatal error in JsonConvert. " +
+                "Passed parameter data in JsonConvert.serialize() is not in valid format (object or array)." +
+                "\n"
             );
         }
     }
@@ -268,7 +264,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     serializeObject<T>(data: any, classReference?: { new(): T }): any {
@@ -327,8 +322,7 @@ export class JsonConvert {
         for (const propertyKey of Object.keys(instance as any)) {
             try {
                 this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
-            }
-            catch (ex) {
+            } catch (ex) {
                 if (this.operationMode === OperationMode.LOGGING) {
                     console.log("Failed to serialize property:");
                     console.log(ex);
@@ -364,7 +358,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     serializeArray<T>(dataArray: any[], classReference?: { new(): T }): any[] {
@@ -414,7 +407,7 @@ export class JsonConvert {
         let jsonArray: any[] = [];
 
         // Loop through all array elements
-        for (const dataObject of <any> dataArray) {
+        for (const dataObject of <any>dataArray) {
             jsonArray.push(this.serializeObject(dataObject, classReference));
         }
 
@@ -438,7 +431,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
@@ -472,7 +464,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
@@ -525,8 +516,7 @@ export class JsonConvert {
         for (const propertyKey of Object.keys(instance as any)) {
             try {
                 this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
-            }
-            catch (ex) {
+            } catch (ex) {
                 if (this.operationMode === OperationMode.LOGGING) {
                     console.log("Failed to deserialize property:");
                     console.log(ex);
@@ -556,7 +546,6 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
-     * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
@@ -719,7 +708,8 @@ export class JsonConvert {
         let jsonValue: any = undefined;
         try {
             jsonValue = this.getObjectValue(json, jsonPropertyName);
-        } catch {}
+        } catch {
+        }
 
 
         // Check if the json value exists
@@ -1024,7 +1014,7 @@ export class JsonConvert {
                 return "any";
             } else if (expectedJsonType === String || expectedJsonType === Boolean || expectedJsonType === Number) {
                 return (new expectedJsonType()).constructor.name.toLowerCase();
-            } else if (typeof expectedJsonType === 'function') {
+            } else if (typeof expectedJsonType === "function") {
                 return (new expectedJsonType()).constructor.name;
             } else if (expectedJsonType === undefined) {
                 return "undefined"
