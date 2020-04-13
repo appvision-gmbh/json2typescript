@@ -9,6 +9,9 @@ import { IDog } from "./model/json/i-dog";
 import { Animal } from "./model/typescript/animal";
 import { DuplicateCat } from "./model/typescript/duplicate-cat";
 import { IDuplicateCat } from "./model/json/i-duplicate-cat";
+import { IOptionalCat } from './model/json/i-optional-cat';
+import { OptionalCat } from './model/typescript/optional-cat';
+import { IAnimal } from './model/json/i-animal';
 
 describe('Integration tests', () => {
 
@@ -54,8 +57,30 @@ describe('Integration tests', () => {
             district: "2016-02-01",
             talky: "2016-03-04"
         };
+        let optionalCatJsonObject: IOptionalCat = {
+            catName: "OptionalMeowy"
+        };
         let animalJsonArray = [cat1JsonObject, dog1JsonObject];
         let catsJsonArray = [cat1JsonObject, cat2JsonObject];
+
+        // JSON objects with only Animal base properties
+        let cat1AnimalOnlyJson: IAnimal = {
+            name: "Meowy",
+            owner: human1JsonObject,
+            birthdate: "2016-01-02",
+            friends: []
+        };
+        let cat2AnimalOnlyJson: IAnimal = {
+            name: "Links",
+            birthdate: "2016-01-02"
+        };
+        let dog1AnimalOnlyJson: IAnimal = {
+            name: "Barky",
+            birthdate: "2016-01-02",
+            friends: []
+        };
+        let animalsOnlyJsonArray = [cat1AnimalOnlyJson, dog1AnimalOnlyJson];
+        let catsAnimalOnlyJsonArray = [cat1AnimalOnlyJson, cat2AnimalOnlyJson];
 
         // TYPESCRIPT INSTANCES
         let human1 = new Human();
@@ -90,9 +115,41 @@ describe('Integration tests', () => {
         duplicateCat2.name = "Duplicate2";
         duplicateCat2.talky = new Date("2016-03-04");
 
+        let optionalCat = new OptionalCat();
+        optionalCat.name = "OptionalMeowy";
+
         let animals = [cat1, dog1];
         let cats = [cat1, cat2];
 
+        // JSON objects using Typescript mappings
+        let cat1Typescript: any = {
+            name: "Meowy",
+            district: 100,
+            owner: {
+                firstname: "Andreas",
+                lastname: "Muster"
+            },
+            birthdate: new Date("2016-01-02"),
+            friends: [],
+            talky: false,
+            other: ""
+        };
+        let cat2Typescript: any = {
+            name: "Links",
+            district: 50,
+            birthdate: new Date( "2016-01-02" ),
+            talky: true,
+            other: ""
+        };
+        let dogTypescript: any = {
+            name: "Barky",
+            isBarking: true,
+            birthdate: new Date("2016-01-02"),
+            friends: [],
+            other: 0
+        };
+        let animalsTypescript = [cat1Typescript, dogTypescript];
+        let catsTypescript = [cat1Typescript, cat2Typescript];
 
         // SERIALIZE INTEGRATION
         describe('serialize', () => {
@@ -123,6 +180,51 @@ describe('Integration tests', () => {
                 expect(() => jsonConvert.serializeArray<Cat>(<any> cat1)).toThrow();
             });
 
+            it('should serialize a plain object using Typescript class mappings', () => {
+                expect(jsonConvert.serialize(cat1Typescript, Cat)).toEqual(cat1JsonObject);
+                expect(jsonConvert.serialize(dogTypescript, Dog)).toEqual(dog1JsonObject);
+                expect(jsonConvert.serializeObject(cat1Typescript, Cat)).toEqual(cat1JsonObject);
+                expect(jsonConvert.serializeObject(dogTypescript, Dog)).toEqual(dog1JsonObject);
+
+                expect(() => jsonConvert.serializeObject(catsTypescript, Cat)).toThrow();
+            });
+
+            it('should serialize a plain array using Typescript class mappings', () => {
+                expect(jsonConvert.serialize(catsTypescript, Animal)).toEqual(catsAnimalOnlyJsonArray);
+                expect(jsonConvert.serialize(catsTypescript, Cat)).toEqual(catsJsonArray);
+                expect(jsonConvert.serialize(animalsTypescript, Animal)).toEqual(animalsOnlyJsonArray);
+                expect(jsonConvert.serializeArray(catsTypescript, Animal)).toEqual(catsAnimalOnlyJsonArray);
+                expect(jsonConvert.serializeArray(catsTypescript, Cat)).toEqual(catsJsonArray);
+                expect(jsonConvert.serializeArray(animalsTypescript, Animal)).toEqual(animalsOnlyJsonArray);
+
+                expect(() => jsonConvert.serializeArray(cat1Typescript, Cat)).toThrow();
+                // Should throw an error if attempting to serialize an array containing a Dog using Cat mappings
+                // because required properties are missing
+                expect(() => jsonConvert.serializeArray(animalsTypescript, Cat)).toThrow();
+            });
+
+            it('should throw an error if serializing a Typescript object with a missing property', () => {
+                expect(function() {jsonConvert.serialize(optionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
+                    '"district" does not exist or is not defined:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.serializeObject(optionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
+                    '"district" does not exist or is not defined:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+            });
+
+            it('should not throw an error if serializing missing property with ignoreRequiredCheck flag set', () => {
+                jsonConvert.ignoreRequiredCheck = true;
+                expect(jsonConvert.serialize(optionalCat)).toEqual(optionalCatJsonObject);
+                expect(jsonConvert.serializeObject(optionalCat)).toEqual(optionalCatJsonObject);
+                jsonConvert.ignoreRequiredCheck = false;
+            });
+
         });
 
         // DESERIALIZE INTEGRATION
@@ -151,6 +253,27 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserializeArray<Cat>(catsJsonArray, Cat)).toEqual(cats);
 
                 expect(() => jsonConvert.deserializeObject<Cat>(catsJsonArray, Cat)).toThrow();
+            });
+
+
+            it('should throw an error if deserializing a JSON object with a missing property', () => {
+                expect(function() {jsonConvert.deserialize(optionalCatJsonObject, OptionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat);})
+                  .toThrowError('Fatal error in JsonConvert. ' +
+                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
+                    '\tClass property: \n\t\tdistrict\n\n' +
+                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+            });
+
+            it('should not throw an error if deserializing missing property with ignoreRequiredCheck flag set', () => {
+                jsonConvert.ignoreRequiredCheck = true;
+                expect(jsonConvert.deserialize(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
+                expect(jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
+                jsonConvert.ignoreRequiredCheck = false;
             });
 
         });

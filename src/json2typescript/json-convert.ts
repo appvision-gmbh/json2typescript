@@ -148,6 +148,43 @@ export class JsonConvert {
         if (value in PropertyMatchingRule) this._propertyMatchingRule = value;
     }
 
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties when serializing or deserializing will be ignored, as if they
+     * were marked optional.  Defaults to false.
+     */
+    private _ignoreRequiredCheck = false;
+
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties (undefined) when serializing or deserializing will be
+     * ignored, as if they were marked optional.  Note that properties explicitly set to null
+     * will be unaffected by this flag - they will be ignored if optional and included if not.
+     * Defaults to false.
+     * @returns {boolean} true if all mapped properties will be considered optional, even if the mapping
+     *                    doesn't explicitly specify this, false if the mapping will determine whether
+     *                    a property is optional or not (default)
+     */
+    get ignoreRequiredCheck(): boolean {
+        return this._ignoreRequiredCheck;
+    }
+
+    /**
+     * Determines whether the check for "required" properties should be ignored, making ALL
+     * mapped values optional, whether or not the isOptional property mapping parameter is set.
+     * If true, any missing properties (undefined) when serializing or deserializing will be
+     * ignored, as if they were marked optional.  Note that properties explicitly set to null
+     * will be unaffected by this flag - they will be ignored if optional and included if not.
+     * Defaults to false.
+     * @param value true if all mapped properties will be considered optional, even if the mapping
+     *              doesn't explicitly specify this, false if the mapping will determine whether a
+     *              property is optional or not (default)
+     */
+    set ignoreRequiredCheck( value: boolean) {
+        this._ignoreRequiredCheck = value;
+    }
 
     /////////////////
     // CONSTRUCTOR //
@@ -178,9 +215,15 @@ export class JsonConvert {
 
 
     /**
-     * Tries to serialize a TypeScript object or array of objects to JSON.
+     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
+     * the specified class reference.  Note that if a class reference is provided, it will be used as
+     * the source of property mapping for serialization, even if the object or one of its elements is
+     * an instance of a different class with its own mappings.  Also, ONLY the properties from the
+     * class reference will be serialized - any additional properties on the object(s) will be silently
+     * ignored.
      *
      * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
      *
      * @returns the JSON object
      *
@@ -189,7 +232,7 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T>(data: T | T[]): any | any[] {
+    serialize<T>(data: any | any[], classReference?: { new(): T }): any | any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -197,23 +240,29 @@ export class JsonConvert {
 
         // Call the appropriate method depending on the type
         if (data instanceof Array) {
-            return this.serializeArray(data);
+            return this.serializeArray(data, classReference);
         } else if (typeof data === "object") { // careful: an array is an object in TypeScript!
-            return this.serializeObject(data);
+            return this.serializeObject(data, classReference);
         } else {
             throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Passed parameter data in JsonConvert.serialize() is not in valid format (object or array)." +
-                "\n"
+              "Fatal error in JsonConvert. " +
+              "Passed parameter data in JsonConvert.serialize() is not in valid format (object or array)." +
+              "\n"
             );
         }
-
     }
 
     /**
-     * Tries to serialize a TypeScript object to a JSON object.
+     * Tries to serialize a TypeScript object to a JSON object using either the mappings on the
+     * provided class reference, if present, or on the provided object.  Note that if a class
+     * reference is provided, it will be used as the source of property mapping for serialization,
+     * even if the object is itself an instance of a different class with its own mappings.
+     * Also, ONLY the properties from the class reference will be serialized - any additional
+     * properties on the object will be silently ignored.
      *
-     * @param instance TypeScript instance
+     * @param data object containing the values to be mapped to a JSON object, must be an
+     *             instance of a class with JSON mappings if no class reference is provided
+     * @param classReference optional class reference which provides the property mappings to use
      *
      * @returns the JSON object
      *
@@ -222,14 +271,14 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(instance: T): any {
+    serializeObject<T>(data: any, classReference?: { new(): T }): any {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return instance;
+            return data;
         }
 
         // Check if the passed type is allowed
-        if (instance === undefined) {
+        if (data === undefined) {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -237,7 +286,7 @@ export class JsonConvert {
                 "\n"
             );
 
-        } else if (instance === null) {
+        } else if (data === null) {
 
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
@@ -246,10 +295,10 @@ export class JsonConvert {
                     "\n"
                 );
             } else {
-                return instance;
+                return data;
             }
 
-        } else if (typeof (instance) !== "object" || instance instanceof Array) {
+        } else if (typeof (data) !== "object" || data instanceof Array) {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -263,15 +312,21 @@ export class JsonConvert {
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JavaScript instance:");
-            console.log(instance);
+            console.log(data);
         }
 
         let jsonObject: any = {};
+        let instance: T;
+        if (!!classReference) {
+            instance = new classReference();
+        } else {
+            instance = <T>data;
+        }
 
-        // Loop through all initialized class properties
+        // Loop through all initialized class properties on the mapping instance
         for (const propertyKey of Object.keys(instance)) {
             try {
-                this.serializeObject_loopProperty(instance, propertyKey, jsonObject);
+                this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
             }
             catch (ex) {
                 if (this.operationMode === OperationMode.LOGGING) {
@@ -294,9 +349,16 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to serialize a TypeScript array to a JSON array.
+     * Tries to serialize a TypeScript array to a JSON array using either the mappings on the
+     * provided class reference, if present, or on the provided object.  Note that if a class
+     * reference is provided, ALL objects in the array will be serialized using the mappings
+     * from that class reference, even if they're actually instances of a different class.
+     * Also, ONLY the properties from the class reference will be serialized - any additional
+     * properties on the objects will be silently ignored.
      *
-     * @param instanceArray array of TypeScript instances
+     * @param dataArray array of objects containing the values to be mapped to a JSON object, which
+     *                  must be instances of classes with JSON mappings if no class reference is provided
+     * @param classReference optional class reference which provides the property mappings to use
      *
      * @returns the JSON array
      *
@@ -305,14 +367,14 @@ export class JsonConvert {
      * @author Andreas Aeschlimann, DHlab, University of Basel, Switzerland
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(instanceArray: T[]): any[] {
+    serializeArray<T>(dataArray: any[], classReference?: { new(): T }): any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return instanceArray;
+            return dataArray;
         }
 
         // Check if the passed type is allowed
-        if (instanceArray === undefined) {
+        if (dataArray === undefined) {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -320,7 +382,7 @@ export class JsonConvert {
                 "\n"
             );
 
-        } else if (instanceArray === null) {
+        } else if (dataArray === null) {
 
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
@@ -329,10 +391,10 @@ export class JsonConvert {
                     "\n"
                 );
             } else {
-                return instanceArray;
+                return dataArray;
             }
 
-        } else if (typeof (instanceArray) !== "object" || instanceArray instanceof Array === false) {
+        } else if (typeof (dataArray) !== "object" || dataArray instanceof Array === false) {
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -346,14 +408,14 @@ export class JsonConvert {
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JavaScript array:");
-            console.log(instanceArray);
+            console.log(dataArray);
         }
 
         let jsonArray: any[] = [];
 
         // Loop through all array elements
-        for (const classInstance of <any> instanceArray) {
-            jsonArray.push(this.serializeObject(classInstance));
+        for (const dataObject of <any> dataArray) {
+            jsonArray.push(this.serializeObject(dataObject, classReference));
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -569,15 +631,16 @@ export class JsonConvert {
 
 
     /**
-     * Tries to find the JSON mapping for a given class property and finally assign the value.
+     * Tries to find the JSON mapping for a given class property from the given instance used for mapping,
+     * and finally assign the value from the given dataObject
      *
-     * @param instance the instance of the class
+     * @param dataObject the object containing the value to be assigned
+     * @param instance the instance of the class used for mapping
      * @param classPropertyName the property name
      * @param json the JSON object
-     *
      * @throws throws an Error in case of failure
      */
-    private serializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
+    private serializeObject_loopProperty(dataObject: any, instance: any, classPropertyName: string, json: any): void {
 
         // Check if a JSON-object mapping is possible for a property
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
@@ -592,13 +655,13 @@ export class JsonConvert {
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
 
-        let classInstancePropertyValue: any = instance[classPropertyName];
+        let classInstancePropertyValue: any = dataObject[classPropertyName];
 
 
         // Check if the class property value exists
         if (typeof (classInstancePropertyValue) === "undefined") {
 
-            if (isOptional) return;
+            if (isOptional || this._ignoreRequiredCheck) return;
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -662,7 +725,7 @@ export class JsonConvert {
         // Check if the json value exists
         if (typeof (jsonValue) === "undefined") {
 
-            if (isOptional) return;
+            if (isOptional || this._ignoreRequiredCheck) return;
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -769,7 +832,7 @@ export class JsonConvert {
                     else throw new Error("\tReason: Given value is null.");
                 }
 
-                if (serialize) return this.serializeObject(value);
+                if (serialize) return this.serializeObject(value, expectedJsonType);
                 else return this.deserializeObject(value, expectedJsonType);
 
             } else if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) { // general object
