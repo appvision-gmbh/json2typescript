@@ -324,7 +324,7 @@ export class JsonConvert {
         }
 
         // Loop through all initialized class properties on the mapping instance
-        for (const propertyKey of Object.keys(instance)) {
+        for (const propertyKey of Object.keys(instance as any)) {
             try {
                 this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
             }
@@ -522,7 +522,7 @@ export class JsonConvert {
         let instance: T = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance)) {
+        for (const propertyKey of Object.keys(instance as any)) {
             try {
                 this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
             }
@@ -978,7 +978,7 @@ export class JsonConvert {
             const keyMapping: any = Object.keys(data).reduce((keys: string[], key: string) => {
                 keys[<any>key.toLowerCase()] = key;
                 return keys;
-            }, {});
+            }, {} as any);
 
             // Define the new key
             key = keyMapping[key.toLowerCase()];
