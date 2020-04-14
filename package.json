@@ -22,15 +22,23 @@
   "homepage": "http://dhlab.unibas.ch",
   "scripts": {
     "test": "karma start karma.conf.js",
-    "build": "npm run test && tsc",
+    "build": "npm run test && tsc && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
     "dist": "npm run build && npm pack"
   },
   "typescript": {
     "definition": "src/index.d.ts"
   },
+  "typesVersions": {
+    "<3.8": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  },
   "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "^3.5.10",
+    "downlevel-dts": "^0.4.0",
     "jasmine": "3.5.0",
     "karma": "^5.0.1",
     "karma-chrome-launcher": "^3.1.0",
