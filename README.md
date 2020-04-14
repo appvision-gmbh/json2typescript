@@ -259,11 +259,9 @@ objects as above.
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 
-#### First parameter: classIdentifier (optional)
+#### First parameter: classIdentifier
 
-The first parameter of `@JsonObject` is meant to be a unique class identifier, usually just the class name.
-In many applications, developers deploy minified code which also minifies class names. 
-Adding a class identifier is highly recommended because it will prevent collision of class names.
+The first parameter of `@JsonObject` must be a unique class identifier, usually just the class name.
 
 ### Property decorators
 

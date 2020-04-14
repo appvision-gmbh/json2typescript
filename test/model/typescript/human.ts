@@ -1,6 +1,6 @@
 import {JsonObject, JsonProperty} from "../../../src/json2typescript/json-convert-decorators";
 
-@JsonObject()
+@JsonObject("Human")
 export class Human {
 
     @JsonProperty("givenName", String)

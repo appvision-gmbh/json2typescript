@@ -19,7 +19,7 @@ export function JsonConverter(target: any): void {
  *
  * @throws Error
  */
-export function JsonObject(target?: string | any): any {
+export function JsonObject(target: string | any): any {
     // target is the constructor or the custom class name
 
     let classIdentifier = "";
@@ -57,21 +57,16 @@ export function JsonObject(target?: string | any): any {
             return decorator;
 
         // Decorator was @JsonObject
-        case "function":
-            decorator(target);
-            return;
-
         // Decorator was @JsonObject()
-        case "undefined":
-            return decorator;
-
         // Decorator was @JsonObject(123)
+        case "function":
+        case "undefined":
         default:
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
                 "It is mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
-                "Use either @JsonObject or @JsonObject(classId) where classId is a string.\n\n"
+                "Use @JsonObject(classId) where classId is a string.\n\n"
             );
 
     }
