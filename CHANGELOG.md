@@ -1,3 +1,9 @@
+# v1.4.1 (2020-04-14)
+
+## Bug Fixes
+
+* Fixed compile due to bad `package.json` when using older TypeScript versions, closes [#132](https://github.com/AppVision-GmbH/json2typescript/issues/132)
+
 # v1.4.0 (2020-04-14)
 
 ## Bug Fixes
