@@ -33,20 +33,11 @@ Make sure you catch errors in production!
 
 # Changelog
 
-See the changelog in the seperate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
+See the changelog in the separate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
-> Tip: At version 1.2.0 we introduced one more soft breaking change.
-`null` values will now be ignored when you serialize or deserialize optional values.
-This means that you are now able to use `ValueCheckingMode.DISALLOW_NULL` even when your API returns null values in the JSON.
-In that case, you should mark them optional.
-
-> Tip: At version 1.1.0 we introduced some soft breaking change. 
-`undefined` is an invalid value now for serializing or deserializing. 
-If you are working with TypeScript, you might receive some type issues after the update to v1.1.0.
-This is due to the addition of generics; they now help the compiler to detect invalid return types in the serialize and deserialize methods.
-
-> Tip: Starting from version 1.0.6, we recommend to use unique class identifiers in the `@JsonObject` decorator. 
-Read below how to use the decorators properly.
+> Tip: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. 
+Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance.
+In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
 
@@ -54,7 +45,7 @@ Read below how to use the decorators properly.
 
 ## Requirements
 
-We developed **json2typescript** for Angular and Ionic 2+. In this document, we only cover this use case. 
+We developed **json2typescript** for Angular 2+ and Ionic 2+. In this document, we only cover this use case. 
 However, you may use our package for pure TypeScript or even JavaScript applications.
 
 ## Setup a Test Application
@@ -252,10 +243,8 @@ The class decorators are used infront of the class declaration and do support on
 export class User {}
 ```
 
-> Warning: Minification removes the actual names of certain classes. This can
-in certain cases cause the deserializer to not work as same class names will
-overwrite the property descriptors. It is advised to explicitly ID your 
-objects as above.
+> Warning: The class decorator uses the parameter to identify the class.
+Please use a unique identifier for each class in your project, for example simply the name of the class.
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 

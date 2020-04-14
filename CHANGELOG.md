@@ -1,8 +1,20 @@
+# v1.4.0 (2020-04-14)
+
+## Bug Fixes
+
+* Fixed compile issues when using older TypeScript versions, closes [#131](https://github.com/AppVision-GmbH/json2typescript/issues/131)
+
+## Breaking Changes
+
+* The older versions did not enforce developers the use of the `@JsonObject(classId)` decorator. 
+If you do not use the class decorator or have no parameter given, please update according to the docs.
+This is now mandatory, closes [#129](https://github.com/AppVision-GmbH/json2typescript/issues/129) and [#130](https://github.com/AppVision-GmbH/json2typescript/issues/130)
+
 # v1.3.0 (2020-04-13)
 
 ## Bug Fixes
 
-* Fixed content of `package-lock.json`, closes #125
+* Fixed content of `package-lock.json`, closes [#125](https://github.com/AppVision-GmbH/json2typescript/issues/125)
 
 ## Features
 
@@ -10,7 +22,9 @@
 
 ## Breaking Changes
 
-* In previous version, the serialization of plain objects failed, because instances of classes were required. As of now, the serialization of plain object may succeed if the structure matches the class structure. Thus, this is considered a soft breaking change.
+* In previous version, the serialization of plain objects failed, because instances of classes were required. 
+As of now, the serialization of plain object may succeed if the structure matches the class structure. 
+Thus, this is considered a soft breaking change.
 
 # v1.2.5 (2020-03-01)
 
