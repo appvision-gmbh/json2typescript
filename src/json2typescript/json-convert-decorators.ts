@@ -19,7 +19,7 @@ export function JsonConverter(target: any): void {
  *
  * @throws Error
  */
-export function JsonObject(target: string | any): any {
+export function JsonObject(target: string | any): (target: any) => void {
     // target is the constructor or the custom class name
 
     let classIdentifier = "";
