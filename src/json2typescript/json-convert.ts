@@ -228,7 +228,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T>(data: any | any[], classReference?: { new(): T }): any | any[] {
+    serialize<T extends object>(data: T | T[], classReference?: { new(): T }): object | object[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -250,7 +250,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript object to a JSON object using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, it will be used as the source of property mapping for serialization,
      * even if the object is itself an instance of a different class with its own mappings.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -266,7 +266,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(data: any, classReference?: { new(): T }): any {
+    serializeObject<T extends object>(data: T, classReference?: { new(): T }): object {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -315,11 +315,11 @@ export class JsonConvert {
         if (!!classReference) {
             instance = new classReference();
         } else {
-            instance = <T>data;
+            instance = data;
         }
 
         // Loop through all initialized class properties on the mapping instance
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -360,7 +360,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(dataArray: any[], classReference?: { new(): T }): any[] {
+    serializeArray<T extends object>(dataArray: object[], classReference?: { new(): T }): object[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
@@ -433,7 +433,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
+    deserialize<T extends object>(json: any, classReference: { new(): T }): T | T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return json;
@@ -466,7 +466,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T }): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject;
@@ -513,7 +513,7 @@ export class JsonConvert {
         let instance: T = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -548,7 +548,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T }): T[] {
 
 
         if (this.operationMode === OperationMode.DISABLE) {
