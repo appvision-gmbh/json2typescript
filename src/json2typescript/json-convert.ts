@@ -213,7 +213,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference.  Note that if a class reference is provided, it will be used as
+     * the specified class reference. Note that if a class reference is provided, it will be used as
      * the source of property mapping for serialization, even if the object or one of its elements is
      * an instance of a different class with its own mappings.  Also, ONLY the properties from the
      * class reference will be serialized - any additional properties on the object(s) will be silently
@@ -228,7 +228,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T extends object>(data: T | T[], classReference?: { new(): T }): object | object[] {
+    serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U }): object | object[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -266,7 +266,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T extends object>(data: T, classReference?: { new(): T }): object {
+    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): object {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -311,7 +311,7 @@ export class JsonConvert {
         }
 
         let jsonObject: any = {};
-        let instance: T;
+        let instance: T | U;
         if (!!classReference) {
             instance = new classReference();
         } else {
@@ -338,13 +338,13 @@ export class JsonConvert {
             console.log("----------");
         }
 
-        return jsonObject;
+        return JSON.parse(JSON.stringify(jsonObject));
 
     }
 
     /**
      * Tries to serialize a TypeScript array to a JSON array using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, ALL objects in the array will be serialized using the mappings
      * from that class reference, even if they're actually instances of a different class.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -360,7 +360,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T extends object>(dataArray: object[], classReference?: { new(): T }): object[] {
+    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): object[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
@@ -404,10 +404,10 @@ export class JsonConvert {
             console.log(dataArray);
         }
 
-        let jsonArray: any[] = [];
+        let jsonArray: object[] = [];
 
         // Loop through all array elements
-        for (const dataObject of <any>dataArray) {
+        for (const dataObject of dataArray) {
             jsonArray.push(this.serializeObject(dataObject, classReference));
         }
 
@@ -773,7 +773,7 @@ export class JsonConvert {
         let prototype = Object.getPrototypeOf(instance);
         /* According to documentation, we'll hit null when we've iterated all the way up to the base
          * Object, but check for undefined as well in case prototype has been manually set to
-         * undefined.  Note that javascript detects circular prototype references and will cause a
+         * undefined. Note that javascript detects circular prototype references and will cause a
          * TypeError, so no need to check for self, the prototype chain will eventually terminate. */
         while (prototype !== null && prototype !== undefined) {
             const classIdentifier = prototype[Settings.CLASS_IDENTIFIER];
