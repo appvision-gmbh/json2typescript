@@ -22,7 +22,7 @@
   "homepage": "http://dhlab.unibas.ch",
   "scripts": {
     "test": "karma start karma.conf.js",
-    "build": "npm run test && tsc && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
+    "build": "npm i && npm run test && tsc && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
     "dist": "npm run build && npm pack"
   },
   "typescript": {
