@@ -186,7 +186,7 @@ describe('Integration tests', () => {
                 expect(jsonConvert.serializeObject(cat1Typescript, Cat)).toEqual(cat1JsonObject);
                 expect(jsonConvert.serializeObject(dogTypescript, Dog)).toEqual(dog1JsonObject);
 
-                expect(() => jsonConvert.serializeObject(catsTypescript as any, Cat)).toThrow();
+                expect(() => jsonConvert.serializeObject(catsTypescript, Cat)).toThrow();
             });
 
             it('should serialize a plain array using Typescript class mappings', () => {
