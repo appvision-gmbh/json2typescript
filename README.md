@@ -104,20 +104,20 @@ export class City {
     // This maps the value of the JSON key "name" to the class property "name".
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("name", String)
-    name: string = undefined;
+    name: string = "";
     
     // This maps the JSON key "founded" to the private class property "_founded".
     // Note the use of public getter and setter.
     // If the JSON value is not of type number (or missing), there will be an exception.
     @JsonProperty("founded", Number)
-    private _founded: number = undefined;
+    private _founded: number = 0;
     get founded() { return this._founded; }
     set founded(value: number) { this._founded = value; }
     
     // This maps the JSON key "beautiful" to the class property "beautiful".
     // If the JSON value is not of type boolean (or missing), there will be an exception.
     @JsonProperty("beautiful", Boolean)
-    beautiful: boolean = undefined;
+    beautiful: boolean = false;
     
     // This maps the JSON key "data" to the class property "data".
     // We are not sure about the type, so we omit the second parameter.
@@ -129,7 +129,7 @@ export class City {
     // This is an example of a string array. Note our syntax "[String]".
     // In the further examples at the end of this document, you can see how to nest complex arrays.
     @JsonProperty("keywords", [String])
-    keywords: string[] = undefined; // or Array<string>
+    keywords: string[] = []; // or Array<string>
     
     printInfo() {
         if (this.beautiful)
@@ -153,13 +153,13 @@ export class Country {
     // This maps the value of the JSON key "countryName" to the class property "name".
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("countryName", String)
-    name: string = undefined;
+    name: string = "";
     
     // This maps the value of the JSON key "cities" to the class property "cities".
     // If the JSON value is not of type array object (or missing), there will be an exception.
     // There will be an exception too if the objects in the array do not match the class "City".
     @JsonProperty("cities", [City])
-    cities: City[] = undefined;
+    cities: City[] = [];
     
 }
 ```
@@ -260,12 +260,12 @@ Property decorators are a vital part for type checking. It is important that the
 @JsonObject("User")
 export class User {
     @JsonProperty("jsonPropertyName", String, false)
-    name: string = undefined;
+    name: string = "";
 }
 ```
 
-Important note: You must assign any (valid) value or `undefined` to your property at 
-initialization, otherwise our mapper does **not** work and will simply ignore the property.
+Important note: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property.
+Assigning no value is not the same as assigning `undefined` in context of `json2typescript`.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
@@ -330,7 +330,7 @@ and pass it as second param in `@JsonProperty` as below:
 @JsonObject("User")
 export class User {
     @JsonProperty("birthdate", DateConverter)
-    birthdate: Date = undefined;
+    birthdate: Date = new Date();
 }
 ```
 
@@ -397,7 +397,7 @@ Assume that in your JSON you have a date in a standardized format, such as `2017
 @JsonObject("User")
 export class User {
     @JsonProperty("date", DateConverter)
-    date: Date = undefined;
+    date: Date = new Date();
 }
 ```
 
@@ -475,7 +475,7 @@ The default is `PropertyMatchingRule.CASE_STRICT`.
 `(bool) JsonConvert.ignoreRequiredCheck`
 
 Determines whether the check for required properties should be ignored, making all mapped values optional, whether or not the isOptional property mapping parameter is set.
-If true, any missing properties (undefined) when serializing or deserializing will be ignored, as if they were marked optional.  
+If true, any missing properties (undefined or null) when serializing or deserializing will be ignored, as if they were marked optional.  
 Note that properties explicitly set to null will be unaffected by this flag – they will be ignored if optional and included if not.
 
 The default is `false`.
