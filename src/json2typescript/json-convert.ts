@@ -883,14 +883,16 @@ export class JsonConvert {
             if (expectedJsonType.length === 0) {
                 return value;
             }
+            // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
+            const jsonType: any[] = expectedJsonType.slice(0);
 
             // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedJsonType.length < value.length;
+            let autofillType: boolean = jsonType.length < value.length;
             for (let i = 0; i < value.length; i++) {
 
-                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
+                if (autofillType && i >= jsonType.length) jsonType[i] = jsonType[i - 1];
 
-                array[i] = this.verifyProperty(expectedJsonType[i], value[i], serialize);
+                array[i] = this.verifyProperty(jsonType[i], value[i], serialize);
 
             }
 
