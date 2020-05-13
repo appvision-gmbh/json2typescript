@@ -38,7 +38,8 @@ describe('Integration tests', () => {
             barking: true,
             birthdate: "2016-01-02",
             friends: [],
-            other: 0
+            other: 0,
+            toys: ["pizza", "bone", "ball"]
         };
         let cat2JsonObject: ICat = {
             catName: "Links",
@@ -99,6 +100,7 @@ describe('Integration tests', () => {
         dog1.isBarking = true;
         dog1.birthdate = new Date("2016-01-02");
         dog1.friends = [];
+        dog1.toys = ["pizza", "bone", "ball"];
 
         let cat2 = new Cat();
         cat2.name = "Links";
@@ -146,7 +148,8 @@ describe('Integration tests', () => {
             isBarking: true,
             birthdate: new Date("2016-01-02"),
             friends: [],
-            other: 0
+            other: 0,
+            toys: ["pizza", "bone", "ball"]
         };
         let animalsTypescript = [cat1Typescript, dogTypescript];
         let catsTypescript = [cat1Typescript, cat2Typescript];
@@ -225,6 +228,16 @@ describe('Integration tests', () => {
                 jsonConvert.ignoreRequiredCheck = false;
             });
 
+            it('should not mutate the expected JSON type mapping for array properties', () => {
+                const dog2 = new Dog();
+                dog2.toys = ["stick", "ball", "bone"];
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "initial expectedJsonType before serializing");
+                jsonConvert.serialize(dog2);
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "expectedJsonType after serializing");
+            });
+
         });
 
         // DESERIALIZE INTEGRATION
@@ -274,6 +287,15 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserialize(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
                 expect(jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
                 jsonConvert.ignoreRequiredCheck = false;
+            });
+
+            it('should not mutate the expected JSON type mapping for array properties', () => {
+                const dog2 = new Dog();
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "initial expectedJsonType before deserializing");
+                jsonConvert.deserialize(dog1JsonObject, Dog);
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "expectedJsonType after deserializing");
             });
 
         });
