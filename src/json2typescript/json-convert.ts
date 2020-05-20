@@ -869,75 +869,68 @@ export class JsonConvert {
 
         }
 
-        // Check if attempt and expected was n-d
-        if (expectedJsonType instanceof Array && value instanceof Array) {
-
-            let array: any[] = [];
-
-            // No data given, so return empty value
-            if (value.length === 0) {
-                return array;
-            }
-
-            // We obviously don't care about the type, so return the value as is
-            if (expectedJsonType.length === 0) {
-                return value;
-            }
-            // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
-            const jsonType: any[] = expectedJsonType.slice(0);
-
-            // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = jsonType.length < value.length;
-            for (let i = 0; i < value.length; i++) {
-
-                if (autofillType && i >= jsonType.length) jsonType[i] = jsonType[i - 1];
-
-                array[i] = this.verifyProperty(jsonType[i], value[i], serialize);
-
-            }
-
-            return array;
-
-        }
-
-        // Check if attempt was 1-d and expected was n-d
-        if (expectedJsonType instanceof Array && value instanceof Object) {
-
-            let array: any[] = [];
-
-            // No data given, so return empty value
-            if (value.length === 0) {
-                return array;
-            }
-
-            // We obviously don't care about the type, so return the json value as is
-            if (expectedJsonType.length === 0) {
-                return value;
-            }
-
-            // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedJsonType.length < Object.keys(value).length;
-            let i = 0;
-            for (let key in value) {
-
-                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
-
-                array[key as any] = this.verifyProperty(expectedJsonType[i], value[key]);
-
-                i++;
-            }
-
-            return array;
-
-        }
-
-        // Check if attempt was 1-d and expected was n-d
+        // Check if expected was n-d
         if (expectedJsonType instanceof Array) {
             if (value === null) {
                 if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
                 else throw new Error("\tReason: Given value is null.");
             }
-            throw new Error("\tReason: Expected type is array, but given value is non-array.");
+
+            // Check that value is not primitive
+            if (value instanceof Object) {
+                let array: any[] = [];
+
+                // No data given, so return empty value
+                if (value.length === 0) {
+                    return array;
+                }
+
+                // We obviously don't care about the type, so return the value as is
+                if (expectedJsonType.length === 0) {
+                    return value;
+                }
+                // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
+                const jsonType: any[] = expectedJsonType.slice(0);
+
+                // Check if attempt was n-d
+                if (value instanceof Array) {
+
+                    // Loop through the data. Both type and value are at least of length 1
+                    let autofillType: boolean = jsonType.length < value.length;
+                    for (let i = 0; i < value.length; i++) {
+
+                        if (autofillType && i >= jsonType.length) {
+                            jsonType[i] = jsonType[i - 1];
+                        }
+
+                        array[i] = this.verifyProperty(jsonType[i], value[i], serialize);
+
+                    }
+
+                    return array;
+
+                // Otherwise attempt was 1-d
+                } else {
+
+                    // Loop through the data. Both type and value are at least of length 1
+                    let autofillType: boolean = jsonType.length < Object.keys(value).length;
+                    let i = 0;
+                    for (let key in value) {
+
+                        if (autofillType && i >= jsonType.length) {
+                            jsonType[i] = jsonType[i - 1];
+                        }
+
+                        array[key as any] = this.verifyProperty(jsonType[i], value[key]);
+
+                        i++;
+                    }
+
+                    return array;
+                }
+            } else {
+                throw new Error("\tReason: Expected type is array, but given value is primitive.");
+            }
         }
 
         // Check if attempt was n-d and expected as 1-d
