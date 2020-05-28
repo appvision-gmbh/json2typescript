@@ -17,9 +17,9 @@
     "object",
     "instance"
   ],
-  "author": "dhlab@unibas.ch",
+  "author": "AppVision GmbH",
   "license": "MIT",
-  "homepage": "http://dhlab.unibas.ch",
+  "homepage": "https://appvision.ch",
   "scripts": {
     "test": "karma start karma.conf.js",
     "build": "npm i && npm run test && tsc && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
@@ -52,6 +52,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dhlab-basel/json2typescript"
+    "url": "https://github.com/appvision-gmbh/json2typescript"
   }
 }
