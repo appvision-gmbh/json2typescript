@@ -486,11 +486,15 @@ The default is `false`.
 
 #### Serializing (TypeScript to JSON)
  
-`(any) serialize(data: any | any[])`
+`(any | any[]) serialize(data: any | any[], classReference?: { new(): T })`
 
-Tries to serialize a TypeScript object or array of objects to JSON.
+Tries to serialize a TypeScript object or array of objects to JSON.  
 
 > Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the serialize method.
+
+You may optionally provide a class constructor to use the `@JsonProperty` mappings defined for that class to serialize the data object(s), instead of mappings defined on the data class.  Note that if the data is an array, the mappings from the constructor class are used for *all* elements in the array.  If no constructor is provided, the mappings from the data object class are used to serialize the data object(s).
+
+> Tip: This feature is helpful if you need to serialize an object that was not created using a class constructor, or if you want to serialize a subclass with only the properties of the superclass.
 
 #### Deserializing (JSON to TypeScript)
  
@@ -504,8 +508,8 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(any) serializeObject(instance: any)`
-- `(any[]) serializeArray(instanceArray: any[])`
+- `(any) serializeObject(instance: any, classReference?: { new(): T })`
+- `(any[]) serializeArray(instanceArray: any[], classReference?: { new(): T })`
 - `(T) deserializeObject(jsonObject: any, classReference: { new(): T })`
 - `(T[]) deserializeArray(jsonArray: any[], classReference: { new(): T })`
 
