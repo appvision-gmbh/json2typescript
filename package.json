@@ -22,7 +22,7 @@
   "homepage": "https://appvision.ch",
   "scripts": {
     "test": "karma start karma.conf.js",
-    "build": "npm i && npm run test && tsc && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
+    "build": "npm i && npm run test && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && npx downlevel-dts . ts3.4 && cp -r ts3.4/* . && rm -r ts3.4",
     "dist": "npm run build && npm pack"
   },
   "typescript": {
@@ -39,16 +39,12 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^5.0.2",
     "phantomjs-prebuilt": "^2.1.16",
-    "typescript": "3.8.3"
+    "typescript": "3.9.5"
   },
-  "main": "index.js",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
   "files": [
-    "src/json2typescript/*.d.ts",
-    "src/json2typescript/*.map",
-    "src/json2typescript/*.js",
-    "index.d.ts",
-    "index.js.map",
-    "index.js"
+    "lib/"
   ],
   "repository": {
     "type": "git",
