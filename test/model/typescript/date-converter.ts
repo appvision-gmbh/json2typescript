@@ -5,10 +5,10 @@ import { JsonCustomConvert } from "../../../src/json2typescript/json-custom-conv
 export class DateConverter implements JsonCustomConvert<Date | null> {
     serialize(date: Date | null): any {
         if (date instanceof Date) {
-            let year = date.getFullYear();
-            let month = date.getMonth() + 1;
-            let day = date.getUTCDate();
-            return year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
+            // Convert to standard ISO format, which is in UTC
+            const isoString = date.toISOString();
+            // Split on the "T" separator and return just the date portion
+            return isoString.split("T")[0];
         } else {
             return null;
         }

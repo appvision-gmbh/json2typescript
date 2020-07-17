@@ -28,7 +28,7 @@ describe('Integration tests', () => {
             catName: "Meowy",
             district: 100,
             owner: human1JsonObject,
-            birthdate: "2016-01-02",
+            birthdate: "2016-01-01",
             friends: [],
             talky: false,
             other: ""
@@ -36,14 +36,15 @@ describe('Integration tests', () => {
         let dog1JsonObject: IDog = {
             name: "Barky",
             barking: true,
-            birthdate: "2016-01-02",
+            birthdate: "2017-02-12",
             friends: [],
-            other: 0
+            other: 0,
+            toys: ["pizza", "bone", "ball"]
         };
         let cat2JsonObject: ICat = {
             catName: "Links",
             district: 50,
-            birthdate: "2016-01-02",
+            birthdate: "2016-05-19",
             talky: true,
             other: ""
         };
@@ -67,16 +68,16 @@ describe('Integration tests', () => {
         let cat1AnimalOnlyJson: IAnimal = {
             name: "Meowy",
             owner: human1JsonObject,
-            birthdate: "2016-01-02",
+            birthdate: "2016-01-01",
             friends: []
         };
         let cat2AnimalOnlyJson: IAnimal = {
             name: "Links",
-            birthdate: "2016-01-02"
+            birthdate: "2016-05-19"
         };
         let dog1AnimalOnlyJson: IAnimal = {
             name: "Barky",
-            birthdate: "2016-01-02",
+            birthdate: "2017-02-12",
             friends: []
         };
         let animalsOnlyJsonArray = [cat1AnimalOnlyJson, dog1AnimalOnlyJson];
@@ -91,19 +92,20 @@ describe('Integration tests', () => {
         cat1.name = "Meowy";
         cat1.district = 100;
         cat1.owner = human1;
-        cat1.birthdate = new Date("2016-01-02");
+        cat1.birthdate = new Date("2016-01-01");
         cat1.friends = [];
 
         let dog1 = new Dog();
         dog1.name = "Barky";
         dog1.isBarking = true;
-        dog1.birthdate = new Date("2016-01-02");
+        dog1.birthdate = new Date("2017-02-12");
         dog1.friends = [];
+        dog1.toys = ["pizza", "bone", "ball"];
 
         let cat2 = new Cat();
         cat2.name = "Links";
         cat2.district = 50;
-        cat2.birthdate = new Date("2016-01-02");
+        cat2.birthdate = new Date("2016-05-19");
         cat2.talky = true;
 
         let duplicateCat1 = new DuplicateCat();
@@ -129,7 +131,7 @@ describe('Integration tests', () => {
                 firstname: "Andreas",
                 lastname: "Muster"
             },
-            birthdate: new Date("2016-01-02"),
+            birthdate: new Date("2016-01-01"),
             friends: [],
             talky: false,
             other: ""
@@ -137,16 +139,17 @@ describe('Integration tests', () => {
         let cat2Typescript: any = {
             name: "Links",
             district: 50,
-            birthdate: new Date( "2016-01-02" ),
+            birthdate: new Date( "2016-05-19" ),
             talky: true,
             other: ""
         };
         let dogTypescript: any = {
             name: "Barky",
             isBarking: true,
-            birthdate: new Date("2016-01-02"),
+            birthdate: new Date("2017-02-12"),
             friends: [],
-            other: 0
+            other: 0,
+            toys: ["pizza", "bone", "ball"]
         };
         let animalsTypescript = [cat1Typescript, dogTypescript];
         let catsTypescript = [cat1Typescript, cat2Typescript];
@@ -225,6 +228,16 @@ describe('Integration tests', () => {
                 jsonConvert.ignoreRequiredCheck = false;
             });
 
+            it('should not mutate the expected JSON type mapping for array properties', () => {
+                const dog2 = new Dog();
+                dog2.toys = ["stick", "ball", "bone"];
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "initial expectedJsonType before serializing");
+                jsonConvert.serialize(dog2);
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "expectedJsonType after serializing");
+            });
+
         });
 
         // DESERIALIZE INTEGRATION
@@ -274,6 +287,15 @@ describe('Integration tests', () => {
                 expect(jsonConvert.deserialize(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
                 expect(jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat)).toEqual(optionalCat);
                 jsonConvert.ignoreRequiredCheck = false;
+            });
+
+            it('should not mutate the expected JSON type mapping for array properties', () => {
+                const dog2 = new Dog();
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "initial expectedJsonType before deserializing");
+                jsonConvert.deserialize(dog1JsonObject, Dog);
+                expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
+                  .toEqual([String], "expectedJsonType after deserializing");
             });
 
         });
