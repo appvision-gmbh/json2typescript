@@ -1,3 +1,13 @@
+# v1.5.0 (2020-07-17)
+
+## Bug Fixes
+
+* Fix handling of array property type mapping, fixed with PR [#142](https://github.com/appvision-gmbh/json2typescript/pull/142)
+
+## Features
+
+* Add esm module format in order to fix CommonJS issue with Angular 10, closes [#147](https://github.com/appvision-gmbh/json2typescript/issues/147)
+
 # v1.4.1 (2020-04-14)
 
 ## Bug Fixes
