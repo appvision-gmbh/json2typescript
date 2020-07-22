@@ -222,7 +222,7 @@ Play around with the JSON to provocate exceptions when deserializing the object.
 
 ## Important notes
 
-Avoid circular depencencies on the classes that use `json2typescript`. 
+Avoid circular dependencies on the classes that use `json2typescript`. 
 Even if you don't have any errors in your IDE, `json2typescript` will not properly work in this case.
 
 ---
