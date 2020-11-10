@@ -15,5 +15,6 @@ export class MappingOptions {
     jsonPropertyName: string = "";
     expectedJsonType?: string = undefined;
     isOptional: boolean = false;
+    exportNull: boolean = false;
     customConverter: any = null;
 }

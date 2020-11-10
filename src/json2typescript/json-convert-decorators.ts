@@ -101,6 +101,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
         let jsonPropertyName: string = classPropertyName;
         let conversionOption: any = Any;
         let isOptional: boolean = false;
+        let exportNull: boolean = false;
 
         switch (params.length) {
             case 1:
@@ -150,6 +151,33 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
                 conversionOption = params[1];
                 isOptional = params[2];
                 break;
+          case 4:
+            if (params[0] === undefined) throw new Error(
+              "Fatal error in JsonConvert. " +
+              "It is not allowed to explicitly pass \"undefined\" as first parameter in the @JsonProperty decorator.\n\n" +
+              "\tClass property: \n" +
+              "\t\t" + classPropertyName + "\n\n" +
+              "Leave the decorator parameters empty if you do not wish to pass the first parameter.\n\n"
+            );
+            if (params[1] === undefined) throw new Error(
+              "Fatal error in JsonConvert. " +
+              "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+              "\tClass property: \n" +
+              "\t\t" + classPropertyName + "\n\n" +
+              "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"
+            );
+            if (params[2] === undefined) throw new Error(
+              "Fatal error in JsonConvert. " +
+              "It is not allowed to explicitly pass \"undefined\" as second parameter in the @JsonProperty decorator.\n\n" +
+              "\tClass property: \n" +
+              "\t\t" + classPropertyName + "\n\n" +
+              "Use \"Any\" to allow any type. You can import this class from \"json2typescript\".\n\n"
+            );
+            jsonPropertyName = params[0];
+            conversionOption = params[1];
+            isOptional = params[2];
+            exportNull = params[3];
+            break;
             default:
                 break;
         }
@@ -163,6 +191,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
         jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
         jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
+        jsonPropertyMappingOptions.exportNull = exportNull ? exportNull : false;
 
         // Check if conversionOption is a type or a custom converter.
         if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(conversionOption[Settings.MAPPER_PROPERTY]) !== "undefined") {
@@ -182,7 +211,5 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
                 "\t\t" + classPropertyName + "\n\n"
             );
         }
-
     }
-
 }

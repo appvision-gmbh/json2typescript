@@ -643,6 +643,7 @@ export class JsonConvert {
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
+        let exportNull: boolean = mappingOptions.exportNull;
 
         let classInstancePropertyValue: any = dataObject[classPropertyName];
 
@@ -660,6 +661,12 @@ export class JsonConvert {
             );
         }
 
+
+        // If the json value is null, result must be null
+        if (exportNull && classInstancePropertyValue === null) {
+          json[jsonPropertyName] = classInstancePropertyValue;
+          return;
+        }
 
         // Check if the property is optional
         // If the json value is null, we don't assign it in that case
@@ -704,6 +711,7 @@ export class JsonConvert {
         let expectedJsonType: any = mappingOptions.expectedJsonType;
         let isOptional: boolean = mappingOptions.isOptional;
         let customConverter: any = mappingOptions.customConverter;
+        let exportNull: boolean = mappingOptions.exportNull;
 
         let jsonValue: any = undefined;
         try {
@@ -725,13 +733,19 @@ export class JsonConvert {
             );
         }
 
+        // Check if the property is optional
+        // If the json value is null, result must be null
+        if (exportNull && jsonValue === null) {
+          instance[classPropertyName] = jsonValue;
+          return;
+        }
 
         // Check if the property is optional
         // If the json value is null, we don't assign it in that case
         if (isOptional && jsonValue === null) return;
 
 
-        // Map the property
+      // Map the property
         try {
             instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
         } catch (e) {
