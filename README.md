@@ -578,11 +578,21 @@ export class User {
 
 ---
 
+# Tools
+
+## Class decorator generator
+
+Since version 1.4, `json2typescript` requires the `@JsonObject("ClassName")` decorator in front of the TypeScript class definition. GitHub user `tlmurphy` created a Python script that automatically generates the decorator with the original class name as parameter.
+
+More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
+
+---
+
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**) and scientific researcher at the **Digital Humanities Lab** (**University of Basel**).
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**).
 
 ## Special thanks
 
 You are welcome to report issues and discuss enhancements to make this package even more useful.
-Thanks for the input and all the pull requests from the community! 
+Thanks for the input and all the pull requests from the community!
