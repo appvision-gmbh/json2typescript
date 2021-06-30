@@ -278,16 +278,6 @@ describe('Integration tests', () => {
                 jsonConvert.useDiscriminator = false;
             });
 
-            it('should not add discriminator property to json if enabled but class is baseclass', () => {
-                jsonConvert.useDiscriminator = true;
-                jsonConvert.classes = {"Dog": Dog};
-                animalHolder.animal = new Animal();
-                expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual(undefined);
-                animalHolder.animal = null;
-                jsonConvert.classes = {};
-                jsonConvert.useDiscriminator = false;
-            });
-
         });
 
         // DESERIALIZE INTEGRATION
