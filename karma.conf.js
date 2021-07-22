@@ -1,5 +1,6 @@
 module.exports = function (config) {
     config.set({
+        //logLevel: config.LOG_DEBUG,
         plugins: [
             'karma-jasmine',
             'karma-mocha-reporter',
@@ -29,11 +30,15 @@ module.exports = function (config) {
             reports: {
                 'text': '',
                 'html': 'coverage'
+            },
+            compilerOptions: {
+                target: 'es5',
+                lib: ['es6', 'dom']
             }
         },
         browserConsoleLogOptions: {
             terminal: true,
-            level: ""
+            level: ''
         }
     })
 };
