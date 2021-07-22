@@ -537,7 +537,7 @@ Unregisters a list of classes from the discriminator feature.
 
 `void unregisterAllClasses()`
 
-Unregisters all classes from discriminator feature.
+Unregisters all classes from the discriminator feature.
 
 > Note: You only need to register and unregister classes if you use the discriminator feature. Otherwise, these methods are without any effect.
 
