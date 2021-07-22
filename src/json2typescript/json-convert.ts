@@ -338,7 +338,7 @@ export class JsonConvert {
             console.log("----------");
         }
 
-        return JSON.parse(JSON.stringify(jsonObject));
+        return jsonObject;
 
     }
 
