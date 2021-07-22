@@ -228,7 +228,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U }): object | object[] {
+    serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U }): any | any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -266,7 +266,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): object {
+    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -360,7 +360,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): object[] {
+    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
