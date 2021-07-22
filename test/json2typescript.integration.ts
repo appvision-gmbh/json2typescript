@@ -1,6 +1,5 @@
 import { JsonConvert } from "../src/json2typescript/json-convert";
 import { ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
-import { Asdf } from "./model/typescript/asdf";
 import { Cat } from "./model/typescript/cat";
 import { Human } from "./model/typescript/human";
 import { Dog } from "./model/typescript/dog";
@@ -173,9 +172,6 @@ describe('Integration tests', () => {
 
         // SERIALIZE INTEGRATION
         describe('serialize', () => {
-            console.log("REGISTERING....");
-            jsonConvert.registerClasses(Asdf, Animal);
-            console.log("REGISTERED!");
             jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
             it('should serialize a TypeScript object to a JSON object', () => {
