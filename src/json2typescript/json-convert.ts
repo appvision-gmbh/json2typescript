@@ -213,7 +213,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference.  Note that if a class reference is provided, it will be used as
+     * the specified class reference. Note that if a class reference is provided, it will be used as
      * the source of property mapping for serialization, even if the object or one of its elements is
      * an instance of a different class with its own mappings.  Also, ONLY the properties from the
      * class reference will be serialized - any additional properties on the object(s) will be silently
@@ -228,7 +228,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T>(data: any | any[], classReference?: { new(): T }): any | any[] {
+    serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U }): any | any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -250,7 +250,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript object to a JSON object using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, it will be used as the source of property mapping for serialization,
      * even if the object is itself an instance of a different class with its own mappings.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -266,7 +266,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(data: any, classReference?: { new(): T }): any {
+    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -311,15 +311,15 @@ export class JsonConvert {
         }
 
         let jsonObject: any = {};
-        let instance: T;
+        let instance: T | U;
         if (!!classReference) {
             instance = new classReference();
         } else {
-            instance = <T>data;
+            instance = data;
         }
 
         // Loop through all initialized class properties on the mapping instance
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -344,7 +344,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript array to a JSON array using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, ALL objects in the array will be serialized using the mappings
      * from that class reference, even if they're actually instances of a different class.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -360,7 +360,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(dataArray: any[], classReference?: { new(): T }): any[] {
+    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
@@ -404,10 +404,10 @@ export class JsonConvert {
             console.log(dataArray);
         }
 
-        let jsonArray: any[] = [];
+        let jsonArray: object[] = [];
 
         // Loop through all array elements
-        for (const dataObject of <any>dataArray) {
+        for (const dataObject of dataArray) {
             jsonArray.push(this.serializeObject(dataObject, classReference));
         }
 
@@ -433,7 +433,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
+    deserialize<T extends object>(json: any, classReference: { new(): T }): T | T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return json;
@@ -466,7 +466,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T }): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject;
@@ -513,7 +513,7 @@ export class JsonConvert {
         let instance: T = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -548,7 +548,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T }): T[] {
 
 
         if (this.operationMode === OperationMode.DISABLE) {
@@ -792,7 +792,7 @@ export class JsonConvert {
         let prototype = Object.getPrototypeOf(instance);
         /* According to documentation, we'll hit null when we've iterated all the way up to the base
          * Object, but check for undefined as well in case prototype has been manually set to
-         * undefined.  Note that javascript detects circular prototype references and will cause a
+         * undefined. Note that javascript detects circular prototype references and will cause a
          * TypeError, so no need to check for self, the prototype chain will eventually terminate. */
         while (prototype !== null && prototype !== undefined) {
             const classIdentifier = prototype[Settings.CLASS_IDENTIFIER];
@@ -888,73 +888,68 @@ export class JsonConvert {
 
         }
 
-        // Check if attempt and expected was n-d
-        if (expectedJsonType instanceof Array && value instanceof Array) {
-
-            let array: any[] = [];
-
-            // No data given, so return empty value
-            if (value.length === 0) {
-                return array;
-            }
-
-            // We obviously don't care about the type, so return the value as is
-            if (expectedJsonType.length === 0) {
-                return value;
-            }
-
-            // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedJsonType.length < value.length;
-            for (let i = 0; i < value.length; i++) {
-
-                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
-
-                array[i] = this.verifyProperty(expectedJsonType[i], value[i], serialize);
-
-            }
-
-            return array;
-
-        }
-
-        // Check if attempt was 1-d and expected was n-d
-        if (expectedJsonType instanceof Array && value instanceof Object) {
-
-            let array: any[] = [];
-
-            // No data given, so return empty value
-            if (value.length === 0) {
-                return array;
-            }
-
-            // We obviously don't care about the type, so return the json value as is
-            if (expectedJsonType.length === 0) {
-                return value;
-            }
-
-            // Loop through the data. Both type and value are at least of length 1
-            let autofillType: boolean = expectedJsonType.length < Object.keys(value).length;
-            let i = 0;
-            for (let key in value) {
-
-                if (autofillType && i >= expectedJsonType.length) expectedJsonType[i] = expectedJsonType[i - 1];
-
-                array[key as any] = this.verifyProperty(expectedJsonType[i], value[key]);
-
-                i++;
-            }
-
-            return array;
-
-        }
-
-        // Check if attempt was 1-d and expected was n-d
+        // Check if expected was n-d
         if (expectedJsonType instanceof Array) {
             if (value === null) {
                 if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
                 else throw new Error("\tReason: Given value is null.");
             }
-            throw new Error("\tReason: Expected type is array, but given value is non-array.");
+
+            // Check that value is not primitive
+            if (value instanceof Object) {
+                let array: any[] = [];
+
+                // No data given, so return empty value
+                if (value.length === 0) {
+                    return array;
+                }
+
+                // We obviously don't care about the type, so return the value as is
+                if (expectedJsonType.length === 0) {
+                    return value;
+                }
+                // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
+                const jsonType: any[] = expectedJsonType.slice(0);
+
+                // Check if attempt was n-d
+                if (value instanceof Array) {
+
+                    // Loop through the data. Both type and value are at least of length 1
+                    let autofillType: boolean = jsonType.length < value.length;
+                    for (let i = 0; i < value.length; i++) {
+
+                        if (autofillType && i >= jsonType.length) {
+                            jsonType[i] = jsonType[i - 1];
+                        }
+
+                        array[i] = this.verifyProperty(jsonType[i], value[i], serialize);
+
+                    }
+
+                    return array;
+
+                // Otherwise attempt was 1-d
+                } else {
+
+                    // Loop through the data. Both type and value are at least of length 1
+                    let autofillType: boolean = jsonType.length < Object.keys(value).length;
+                    let i = 0;
+                    for (let key in value) {
+
+                        if (autofillType && i >= jsonType.length) {
+                            jsonType[i] = jsonType[i - 1];
+                        }
+
+                        array[key as any] = this.verifyProperty(jsonType[i], value[key]);
+
+                        i++;
+                    }
+
+                    return array;
+                }
+            } else {
+                throw new Error("\tReason: Expected type is array, but given value is primitive.");
+            }
         }
 
         // Check if attempt was n-d and expected as 1-d

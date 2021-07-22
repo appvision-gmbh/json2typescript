@@ -45,8 +45,7 @@ describe('Unit tests', () => {
             district: 50,
             talky: true,
             other: "sweet",
-            birthdate: "2014-09-01",
-            friends: null
+            birthdate: "2014-09-01"
         };
         let dog1JsonObject: IDog = {
             name: "Barky",
@@ -322,10 +321,150 @@ describe('Unit tests', () => {
                 // Unmapped property should not return mapping, even though property is the same name as a mapped property on another class
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(duplicateCat1, "district")).toBeNull();
             });
-            it('verifyProperty()', () => {
-                expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
-                expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false)).toEqual(["Andreas", [true, 2.2]]);
-                expect(() => (<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toThrow();
+            describe("verifyProperty()", () => {
+                let jsonConvert: JsonConvert;
+                beforeEach(() => {
+                    jsonConvert = new JsonConvert();
+                    jsonConvert.ignorePrimitiveChecks = false;
+                    jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+                });
+                describe("expectedJsonType unmapped", () => {
+                    it("should return the value if expected type is Any, Object, or null", () => {
+                        expect((<any>jsonConvert).verifyProperty(Any, cat1, true)).toBe(cat1);
+                        expect((<any>jsonConvert).verifyProperty(Object, cat1, false)).toBe(cat1);
+                        expect((<any>jsonConvert).verifyProperty(null, cat1, true)).toBe(cat1);
+                    });
+                    it("should NOT throw an error even if null not allowed", () => {
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
+                        expect((<any>jsonConvert).verifyProperty(Any, null, true)).toBeNull("expected Any");
+                        expect((<any>jsonConvert).verifyProperty(Object, null, false)).toBeNull("expected Object");
+                        expect((<any>jsonConvert).verifyProperty(null, null, true)).toBeNull("expected null");
+                    });
+                });
+                describe("expectedJsonType mapped class", () => {
+                    it("should correctly serialize/deserialize a mapped object property", () => {
+                        expect((<any>jsonConvert).verifyProperty(Cat, cat2, true)).toEqual(cat2JsonObject);
+                        expect((<any>jsonConvert).verifyProperty(Cat, cat1JsonObject, false)).toEqual(cat1);
+                    });
+                    it("should return null if allowed", () => {
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_OBJECT_NULL;
+                        expect((<any>jsonConvert).verifyProperty(Cat, null, true))
+                            .toBeNull("serializing null returns null");
+                        expect((<any>jsonConvert).verifyProperty(Cat, null, false))
+                            .toBeNull("deserializing null returns null");
+                    });
+                    it("should throw an error if null not allowed", () => {
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
+                        const errorMessage = "\tReason: Given value is null.";
+                        expect(() => (<any>jsonConvert).verifyProperty(Cat, null, true))
+                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty(Cat, null, false))
+                            .toThrowError(errorMessage);
+                    });
+                    it("should throw an error if value is an array", () => {
+                        expect(() => (<any>jsonConvert).verifyProperty(Cat, [cat1, cat2], true))
+                            .toThrowError("\tReason: Given value is array, but expected a non-array type.");
+                    });
+                });
+                describe("expectedJsonType primitive", () => {
+                    it("should correctly serialize and deserialize expected primitive values", () => {
+                        expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
+                        expect((<any>jsonConvert).verifyProperty(Number, 2.2, false)).toBe(2.2);
+                        expect((<any>jsonConvert).verifyProperty(Boolean, true, true)).toBe(true);
+                    });
+                    it("should error if expected JSON type doesn't match value type", () => {
+                        const errorMessage = "\tReason: Given object does not match the expected primitive type.";
+                        expect(() => (<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty(String, true, true)).toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty(Boolean, 54, true)).toThrowError(errorMessage);
+                    });
+                    it("should return value if expected JSON type doesn't match value type but flag set", () => {
+                        jsonConvert.ignorePrimitiveChecks = true;
+                        expect((<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toBe("Andreas");
+                        expect((<any>jsonConvert).verifyProperty(String, true, true)).toBe(true);
+                        expect((<any>jsonConvert).verifyProperty(Boolean, 54, true)).toBe(54);
+                    });
+                    it("should return null if nulls allowed", () => {
+                        expect((<any>jsonConvert).verifyProperty(String, null, false)).toBeNull("expected string should be null");
+                        expect((<any>jsonConvert).verifyProperty(Number, null, false)).toBeNull("expected number should be null");
+                        expect((<any>jsonConvert).verifyProperty(Boolean, null, true)).toBeNull("expected boolean should be null");
+                    });
+                    it("should throw an error if only object nulls allowed", () => {
+                        const errorMessage = "\tReason: Given value is null.";
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_OBJECT_NULL;
+                        expect(() => (<any>jsonConvert).verifyProperty(String, null, false))
+                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty(Number, null, false))
+                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty(Boolean, null, true))
+                            .toThrowError(errorMessage);
+                    });
+                    it("should throw an error if value is an array", () => {
+                        expect(() => (<any>jsonConvert).verifyProperty(String, ["Andreas", "Joseph"], true))
+                            .toThrowError("\tReason: Given value is array, but expected a non-array type.");
+                    });
+                });
+                describe("expectedJsonType array", () => {
+                    it("should return value as-is if expected type is empty", () => {
+                        const pseudoArray = {
+                            "0": "Andreas",
+                            "1": {"0": true, "1": 2.2}
+                        };
+                        expect((<any>jsonConvert).verifyProperty([], pseudoArray, true)).toBe(pseudoArray);
+                        expect((<any>jsonConvert).verifyProperty([], cat1, false)).toBe(cat1);
+                    });
+                    it("should return empty array if value is empty", () => {
+                        expect((<any>jsonConvert).verifyProperty([String], [], true)).toEqual([]);
+                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], [], false)).toEqual([]);
+                        expect((<any>jsonConvert).verifyProperty([Cat], [], false)).toEqual([]);
+                    });
+                    it("should correctly handle array of object types", () => {
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
+                        expect((<any>jsonConvert).verifyProperty([Cat], [cat1, cat2], true))
+                            .toEqual([cat1JsonObject, cat2JsonObject]);
+                        expect((<any>jsonConvert).verifyProperty([Cat], [cat1JsonObject, cat2JsonObject], false))
+                            .toEqual([cat1, cat2]);
+                    });
+                    it("should correctly handle expected nested array types", () => {
+                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false))
+                            .toEqual(["Andreas", [true, 2.2]]);
+                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], {
+                            "0": "Andreas",
+                            "1": {"0": true, "1": 2.2}
+                        }, true)).toEqual(["Andreas", [true, 2.2]]);
+                    });
+                    it("should expand expected array type as needed without affecting original mapping", () => {
+                        const expectedJsonType = [String];
+                        expect((<any>jsonConvert).verifyProperty(expectedJsonType, ["Andreas", "Joseph", "Albert"], true))
+                            .toEqual(["Andreas", "Joseph", "Albert"]);
+                        expect(expectedJsonType).toEqual([String]);
+
+                        expect((<any>jsonConvert).verifyProperty(expectedJsonType, {"0": "Andreas", "1": "Joseph", "2": "Albert"}))
+                            .toEqual(["Andreas", "Joseph", "Albert"]);
+                        expect(expectedJsonType).toEqual([String]);
+                    });
+                    it("should throw an error if expected array and value is primitive", () => {
+                        const errorMessage = "\tReason: Expected type is array, but given value is primitive."
+                        expect(() => (<any>jsonConvert).verifyProperty([String], "Andreas"))
+                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty([], "Andreas"))
+                            .toThrowError(errorMessage);
+                    });
+                    it("should return null if nulls allowed", () => {
+                        expect((<any>jsonConvert).verifyProperty([String], null, true))
+                            .toBeNull("expected string array should be null");
+                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], null, true))
+                            .toBeNull("expected nested array should be null");
+                    });
+                    it("should throw an error if nulls disallowed", () => {
+                        const errorMessage = "\tReason: Given value is null.";
+                        jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
+                        expect(() => (<any>jsonConvert).verifyProperty([String], null, true))
+                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).verifyProperty([String, [Boolean, Number]], null, true))
+                            .toThrowError(errorMessage);
+                    });
+                });
             });
             it('getObjectValue()', () => {
                 expect((<any>jsonConvert).getObjectValue({ "name": "Andreas" }, "name")).toBe("Andreas");
