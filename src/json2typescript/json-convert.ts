@@ -652,7 +652,7 @@ export class JsonConvert {
 
             if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
                 isOptional === PropertyConvertingMode.SERIALIZE_OPTIONAL ||
-                this._ignoreRequiredCheck) {
+                this.ignoreRequiredCheck) {
                 return;
             }
 
@@ -730,7 +730,7 @@ export class JsonConvert {
 
             if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
                 isOptional === PropertyConvertingMode.DESERIALIZE_OPTIONAL ||
-                this._ignoreRequiredCheck) return;
+                this.ignoreRequiredCheck) return;
 
             throw new Error(
                 "Fatal error in JsonConvert. " +
