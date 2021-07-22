@@ -222,12 +222,33 @@ Play around with the JSON to provocate exceptions when deserializing the object.
 
 ## Important notes
 
-Avoid circular depencencies on the classes that use `json2typescript`. 
+Avoid circular dependencies on the classes that use `json2typescript`. 
 Even if you don't have any errors in your IDE, `json2typescript` will not properly work in this case.
 
 ---
 
 # Detailed reference
+
+## Property declarations
+
+For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. They can be initialized using any (valid) value or `undefined`.
+
+```typescript
+@JsonObject("User")
+export class User {
+    @JsonProperty("name", String, false)  // ✔ Decorator
+    name: string = "";  ✔ Initialization
+    
+    @JsonProperty("alias", string, false)  // ❌ Must use String instead.
+    alias: string = ""; //  ✔ Initialization
+    
+    @JsonProperty("expertise", String, false) ✔ Decorator
+    expertise: string;  //  ❌ Must be initialised, otherwise is ignored.
+}
+```
+
+> **Warning**: Non initialized properties won't trigger any exception, as **they are invisible to the mapper**.
+
 
 ## Class and property decorators
 
@@ -264,8 +285,7 @@ export class User {
 }
 ```
 
-Important note: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property.
-Assigning no value is not the same as assigning `undefined` in context of `json2typescript`.
+> **Important note**: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property. Assigning no value is not the same as assigning `undefined` in context of `json2typescript`.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
@@ -578,11 +598,21 @@ export class User {
 
 ---
 
+# Tools
+
+## Class decorator generator
+
+Since version 1.4, `json2typescript` requires the `@JsonObject("ClassName")` decorator in front of the TypeScript class definition. GitHub user `tlmurphy` created a Python script that automatically generates the decorator with the original class name as parameter.
+
+More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
+
+---
+
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**) and scientific researcher at the **Digital Humanities Lab** (**University of Basel**).
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**).
 
 ## Special thanks
 
 You are welcome to report issues and discuss enhancements to make this package even more useful.
-Thanks for the input and all the pull requests from the community! 
+Thanks for the input and all the pull requests from the community!
