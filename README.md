@@ -18,7 +18,7 @@ With **json2typescript**, only a simple function call is necessary, as demonstra
 // Assume that you have a class named User defined at some point
 // Assume that you get a JSON string from a webservice
 let jsonStr: string = ...;
-let jsonObj: object = JSON.parse(jsonStr);
+let jsonObj: any = JSON.parse(jsonStr);
 
 // Now you can map the json object to the TypeScript object automatically
 let jsonConvert: JsonConvert = new JsonConvert();
@@ -179,7 +179,7 @@ import {Country} from "./country";
 export class AppComponent implements OnInit {
     ngOnInit() {
         // Define a JSON object (could come from a HTTP service, parsed with JSON.parse() if necessary)
-        const jsonObject: object = { 
+        const jsonObject: any = { 
             "countryName": "Switzerland", 
             "cities": [
                 { 
@@ -582,7 +582,7 @@ As we have an array of array of strings, you can define the expected type like t
 @JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], [String, String]])
-    keywords: any = undefined;
+    keywords: (string[])[] = [];
 }
 ```
 
@@ -607,7 +607,7 @@ You can define the expected type in your class like this:
 @JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], Number])
-    keywords: any = undefined;
+    keywords: (string[] | number)[] = [];
 }
 ```
 
@@ -637,12 +637,14 @@ jsonConvert.discriminatorPropertyName = "$type"; // this is the property name
 jsonConvert.registerClasses(User); // register all classes
 
 // Assume the following JSON object coming from your server
-const jsonObject: object = {
+const jsonObject: any = {
     "name": "Walter",
     "$type": "app.example.User" // the value of $type matches the @JsonObject decorator above
 }
 
 // This is how you would traditionally map an object
+// But we have enabled the discriminator functionality and registered the User class
+// In that case, the second parameter (User) here is ignored
 const user1: User = jsonConvert.deserialize(jsonObject, User);
 
 // But now you may automatically map it thanks to the $type property
