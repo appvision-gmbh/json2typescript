@@ -650,14 +650,16 @@ const user2: User = jsonConvert.deserialize<User>(jsonObject);
 
 ```
 
-> Note: This feature is particularly useful when doing dynamic mapping. Otherwise, you just may provide the type yourself (as done above with `user1`).
+> Note: This feature is particularly useful when doing dynamic mapping. Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
 
-For example, in some cases you will expect to receive a child class instance, but you do not know in advance which one. 
+A real-world example for the discriminator feature is the mapping of child classes.
 
 Assume that you might have two classes `AdminUser` and `NormalUser` that inherit from `User`. 
 The web client sometimes cannot know the type in advance. 
-If you use the discriminator property, the server can define the type and `json2typescript` will properly instantiate the desired class.
-This means, your property can be safely declared as union type of `AdminUser | NormalUser` instead of `User`.
+If you use the discriminator feature, the server can define the type in the JSON and `json2typescript` will properly instantiate the desired class.
+This means, your property can be safely declared in TypeScript as union type of `AdminUser | NormalUser` instead of `User`.
+
+> Warning: If you enable the discriminator feature and try to deserialize a JSON object to a registered class instance, the second parameter of the `deserialize` methods is always ignored.
 
 
 
