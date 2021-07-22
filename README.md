@@ -252,6 +252,8 @@ Please use a unique identifier for each class in your project, for example simpl
 
 The first parameter of `@JsonObject` must be a unique class identifier, usually just the class name.
 
+> Note: This class identifier may be used for automatic instantiation when enabling the discriminator feature.
+
 ### Property decorators
 
 Property decorators are a vital part for type checking. It is important that the type in the decorator matches the TypeScript type.
@@ -480,6 +482,25 @@ Note that properties explicitly set to null will be unaffected by this flag – 
 
 The default is `false`.
 
+#### Use discriminator
+
+`(bool) JsonConvert.useDiscriminator`
+
+Determines if discriminators should be used.
+If this option is set to true, all registered classes will be serialized with an additional discriminator property (default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value. 
+When deserializing an object containing the discriminator property, json2typescript will attempt to automatically instantiate the correct type (by comparing the value of the discriminator property with the registered classes).
+
+The default is `false`.
+
+#### Discriminator property name
+
+`(string) JsonConvert.discriminatorPropertyName`
+
+Defines the name of the discriminator property.
+
+The default is `"$type"`.
+
+
 ### Public methods
 
 `json2typescript` allows you to map JSON objects (or arrays) to TypeScript objects (or arrays) and vice versa.
@@ -503,6 +524,22 @@ You may optionally provide a class constructor to use the `@JsonProperty` mappin
 Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 > Tip: The param `json` must not be a string, but an `object` or an `array`.  Use `JSON.parse()` before applying the deserialize method in case you have a json string.
+
+#### Registering and unregistering classes
+
+`void registerClasses(...classReferences: { new(): any }[])`
+
+Registers a list of classes to be used in the discriminator feature.
+
+`void ungisterClasses(...classReferences: { new(): any }[])`
+
+Unregisters a list of classes from the discriminator feature.
+
+`void unregisterAllClasses()`
+
+Unregisters all classes from discriminator feature.
+
+> Note: You only need to register and unregister classes if you use the discriminator feature. Otherwise, these methods are without any effect.
 
 #### Other methods
 
@@ -575,6 +612,54 @@ export class User {
 ```
 
 > Tip: In our syntax, `[[String, String], Number]` is equivalent to `[[String], Number]`.
+
+## Automatic instantiation using the discriminator feature
+
+If your server adds a discriminator property to every JSON object, `json2typescript` is able to automatically instantiate objects.
+
+First, set up the discriminator feature for a class, for example
+
+```typescript
+@JsonObject("app.example.User")
+export class User {
+    @JsonProperty("name", String)
+    name: string = "";
+}
+```
+
+Now, set up a `JsonConvert` to enable the discriminator feature and activate it for the classes you like:
+
+```typescript
+// Set up json convert
+let jsonConvert: JsonConvert = new JsonConvert();
+jsonConvert.useDiscriminator = true; // enable the discriminator
+jsonConvert.discriminatorPropertyName = "$type"; // this is the property name
+jsonConvert.registerClasses(User); // register all classes
+
+// Assume the following JSON object coming from your server
+const jsonObject: object = {
+    "name": "Walter",
+    "$type": "app.example.User" // the value of $type matches the @JsonObject decorator above
+}
+
+// This is how you would traditionally map an object
+const user1: User = jsonConvert.deserialize(jsonObject, User);
+
+// But now you may automatically map it thanks to the $type property
+const user2: User = jsonConvert.deserialize<User>(jsonObject);
+
+```
+
+> Note: This feature is particularly useful when doing dynamic mapping. Otherwise, you just may provide the type yourself (as done above with `user1`).
+
+For example, in some cases you will expect to receive a child class instance, but you do not know in advance which one. 
+
+Assume that you might have two classes `AdminUser` and `NormalUser` that inherit from `User`. 
+The web client sometimes cannot know the type in advance. 
+If you use the discriminator property, the server can define the type and `json2typescript` will properly instantiate the desired class.
+This means, your property can be safely declared as union type of `AdminUser | NormalUser` instead of `User`.
+
+
 
 ---
 
