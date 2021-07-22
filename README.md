@@ -486,17 +486,31 @@ The default is `false`.
 
 #### Serializing (TypeScript to JSON)
  
-`(any) serialize(data: any | any[])`
+`(any|any[]) serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U })`
 
-Tries to serialize a TypeScript object or array of objects to JSON.
+Tries to serialize a TypeScript object or array of objects to JSON. 
+
+The first parameter must be a TypeScript object or array, the second parameter is the optional class reference.
+
+If you provide only one parameter, the class for serialization is inferred automatically.
+For example, if you call `jsonConvert.serialize(user)` where `user` is an instance of the class `User`, `json2typescript` will automatically use this class for serialization.
+
+By providing two parameters, it will override the class for serialization.
+For example, this allows you to call `jsonConvert.serialize(userObject, User)` where `userObject` is just a plain TypeScript `any` object.
+
+The returned value will be `any` object or an array of `any` objects.
 
 > Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the serialize method.
 
 #### Deserializing (JSON to TypeScript)
  
-`(T | T[]) deserialize(json: any, classReference: { new(): T | T[] })`
+`(T | T[]) deserialize<T extends object>(json: any, classReference: { new(): T })`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
+
+The first parameter must be a Typescript object or array, the second parameter is the class reference.
+
+The returned value will be an instance or an array of instances of the given class reference.
 
 > Tip: The param `json` must not be a string, but an `object` or an `array`.  Use `JSON.parse()` before applying the deserialize method in case you have a json string.
 
@@ -504,10 +518,10 @@ Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
 In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
-- `(any) serializeObject(instance: any)`
-- `(any[]) serializeArray(instanceArray: any[])`
-- `(T) deserializeObject(jsonObject: any, classReference: { new(): T })`
-- `(T[]) deserializeArray(jsonArray: any[], classReference: { new(): T })`
+- `(any) serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U })`
+- `(any[]) serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U })`
+- `(T) deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T })`
+- `(T[]) deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T })`
 
 
 
