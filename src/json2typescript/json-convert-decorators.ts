@@ -101,7 +101,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
 
         let jsonPropertyName: string = classPropertyName;
         let conversionOption: any = Any;
-        let isOptional: PropertyConvertingMode = PropertyConvertingMode.NEVER_OPTIONAL;
+        let convertingMode: PropertyConvertingMode = PropertyConvertingMode.MAP_NULLABLE;
 
         switch (params.length) {
             case 1:
@@ -150,14 +150,13 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
                 jsonPropertyName = params[0];
                 conversionOption = params[1];
                 if (params[2] === true) {
-                    isOptional = PropertyConvertingMode.ALWAYS_OPTIONAL;
-                } else if (params[2] === PropertyConvertingMode.NEVER_OPTIONAL ||
-                    params[2] === PropertyConvertingMode.ALWAYS_OPTIONAL ||
-                    params[2] === PropertyConvertingMode.SERIALIZE_OPTIONAL ||
-                    params[2] === PropertyConvertingMode.DESERIALIZE_OPTIONAL) {
-                    isOptional = params[2];
+                    convertingMode = PropertyConvertingMode.IGNORE_NULLABLE;
+                } else if (params[2] === PropertyConvertingMode.IGNORE_NULLABLE ||
+                    params[2] === PropertyConvertingMode.PASS_NULLABLE ||
+                    params[2] === PropertyConvertingMode.MAP_NULLABLE) {
+                    convertingMode = params[2];
                 } else {
-                    isOptional = PropertyConvertingMode.NEVER_OPTIONAL;
+                    convertingMode = PropertyConvertingMode.MAP_NULLABLE;
                 }
                 break;
             default:
@@ -172,7 +171,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
         let jsonPropertyMappingOptions = new MappingOptions();
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
         jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
-        jsonPropertyMappingOptions.isOptional = isOptional;
+        jsonPropertyMappingOptions.convertingMode = convertingMode;
 
         // Check if conversionOption is a type or a custom converter.
         if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(conversionOption[Settings.MAPPER_PROPERTY]) !== "undefined") {

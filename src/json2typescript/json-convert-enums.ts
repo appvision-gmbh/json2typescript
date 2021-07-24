@@ -29,7 +29,7 @@ export enum PropertyMatchingRule {
 };
 
 /**
- * Enum for the value checking mode of a JsonConvert instance.
+ * Enum for the value checking mode of a JsonConvert instance for the serialization and deserialization.
  *
  * The values should be used as follows:
  * - ALLOW_NULL: all given values in the JSON are allowed to be null
@@ -48,17 +48,20 @@ export enum ValueCheckingMode {
 /**
  * Enum for the property converting mode of a property (de)serialized with JsonConvert.
  *
+ * The converting mode defines what happens for nullable types.
+ * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+ *
+ * The setting overrides the behavior of the ValueCheckingMode for a specific property.
+ *
  * The values should be used as follows:
- * - NEVER_OPTIONAL: the property is never optional
- * - ALWAYS_OPTIONAL: the property is always optional
- * - SERIALIZE_OPTIONAL: the property is optional in serialization only
- * - DESERIALIZE_OPTIONAL: the property is optional in deserialization only
+ * - MAP_NULLABLE: a nullable property is passed to the mapper, type is normally checked
+ * - IGNORE_NULLABLE: the property is never passed if missing, undefined or null
+ * - PASS_NULLABLE: the property is passed and the given type for the mapping is ignored
  *
  * @see https://www.npmjs.com/package/json2typescript full documentation
  */
 export enum PropertyConvertingMode {
-    NEVER_OPTIONAL = 0,
-    ALWAYS_OPTIONAL = 1,
-    SERIALIZE_OPTIONAL = 2,
-    DESERIALIZE_OPTIONAL = 3
+    MAP_NULLABLE = 0,
+    IGNORE_NULLABLE = 1,
+    PASS_NULLABLE = 2,
 };

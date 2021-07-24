@@ -16,6 +16,6 @@ export class MappingOptions {
     classPropertyName: string = "";
     jsonPropertyName: string = "";
     expectedJsonType?: string = undefined;
-    isOptional: PropertyConvertingMode = PropertyConvertingMode.NEVER_OPTIONAL;
+    convertingMode: PropertyConvertingMode = PropertyConvertingMode.MAP_NULLABLE;
     customConverter: any = null;
 }
