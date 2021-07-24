@@ -1,17 +1,17 @@
 import { JsonConvert } from "../src/json2typescript/json-convert";
 import { ValueCheckingMode } from "../src/json2typescript/json-convert-enums";
-import { Cat } from "./model/typescript/cat";
-import { Human } from "./model/typescript/human";
-import { Dog } from "./model/typescript/dog";
-import { IHuman } from "./model/json/i-human";
+import { IAnimal } from "./model/json/i-animal";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
-import { Animal } from "./model/typescript/animal";
-import { DuplicateCat } from "./model/typescript/duplicate-cat";
 import { IDuplicateCat } from "./model/json/i-duplicate-cat";
-import { IOptionalCat } from './model/json/i-optional-cat';
-import { OptionalCat } from './model/typescript/optional-cat';
-import { IAnimal } from './model/json/i-animal';
+import { IHuman } from "./model/json/i-human";
+import { IOptionalCat } from "./model/json/i-optional-cat";
+import { Animal } from "./model/typescript/animal";
+import { Cat } from "./model/typescript/cat";
+import { Dog } from "./model/typescript/dog";
+import { DuplicateCat } from "./model/typescript/duplicate-cat";
+import { Human } from "./model/typescript/human";
+import { OptionalCat } from "./model/typescript/optional-cat";
 
 describe('Integration tests', () => {
 
@@ -207,18 +207,8 @@ describe('Integration tests', () => {
             });
 
             it('should throw an error if serializing a Typescript object with a missing property', () => {
-                expect(function() {jsonConvert.serialize(optionalCat);})
-                  .toThrowError('Fatal error in JsonConvert. ' +
-                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
-                    '"district" does not exist or is not defined:\n\n' +
-                    '\tClass property: \n\t\tdistrict\n\n' +
-                    '\tJSON property: \n\t\tdistrictNumber\n\n');
-                expect(function() {jsonConvert.serializeObject(optionalCat);})
-                  .toThrowError('Fatal error in JsonConvert. ' +
-                    'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
-                    '"district" does not exist or is not defined:\n\n' +
-                    '\tClass property: \n\t\tdistrict\n\n' +
-                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.serialize(optionalCat);}).toThrowError();
+                expect(function() {jsonConvert.serializeObject(optionalCat);}).toThrowError();
             });
 
             it('should not throw an error if serializing missing property with ignoreRequiredCheck flag set', () => {
@@ -270,16 +260,8 @@ describe('Integration tests', () => {
 
 
             it('should throw an error if deserializing a JSON object with a missing property', () => {
-                expect(function() {jsonConvert.deserialize(optionalCatJsonObject, OptionalCat);})
-                  .toThrowError('Fatal error in JsonConvert. ' +
-                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
-                    '\tClass property: \n\t\tdistrict\n\n' +
-                    '\tJSON property: \n\t\tdistrictNumber\n\n');
-                expect(function() {jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat);})
-                  .toThrowError('Fatal error in JsonConvert. ' +
-                    'Failed to map the JSON object to the class "OptionalKitty" because the defined JSON property "districtNumber" does not exist:\n\n' +
-                    '\tClass property: \n\t\tdistrict\n\n' +
-                    '\tJSON property: \n\t\tdistrictNumber\n\n');
+                expect(function() {jsonConvert.deserialize(optionalCatJsonObject, OptionalCat);}).toThrowError();
+                expect(function() {jsonConvert.deserializeObject(optionalCatJsonObject, OptionalCat);}).toThrowError();
             });
 
             it('should not throw an error if deserializing missing property with ignoreRequiredCheck flag set', () => {

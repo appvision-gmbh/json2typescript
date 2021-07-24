@@ -1,21 +1,21 @@
+import { Any } from "../src/json2typescript/any";
 import { JsonConvert } from "../src/json2typescript/json-convert";
 import {
     OperationMode,
     PropertyConvertingMode,
     PropertyMatchingRule,
-    ValueCheckingMode
+    ValueCheckingMode,
 } from "../src/json2typescript/json-convert-enums";
-import { Any } from "../src/json2typescript/any";
 import { MappingOptions, Settings } from "../src/json2typescript/json-convert-options";
-import { Human } from "./model/typescript/human";
-import { Cat } from "./model/typescript/cat";
-import { Dog } from "./model/typescript/dog";
-import { IHuman } from "./model/json/i-human";
 import { ICat } from "./model/json/i-cat";
 import { IDog } from "./model/json/i-dog";
-import { DuplicateCat } from "./model/typescript/duplicate-cat";
+import { IHuman } from "./model/json/i-human";
+import { Cat } from "./model/typescript/cat";
 import { DateConverter } from "./model/typescript/date-converter";
-import { OptionalCat } from './model/typescript/optional-cat';
+import { Dog } from "./model/typescript/dog";
+import { DuplicateCat } from "./model/typescript/duplicate-cat";
+import { Human } from "./model/typescript/human";
+import { OptionalCat } from "./model/typescript/optional-cat";
 
 describe('Unit tests', () => {
 
@@ -51,6 +51,7 @@ describe('Unit tests', () => {
             name: "Barky",
             barking: true,
             other: 1.1,
+            toys: []
         };
 
         // TYPESCRIPT INSTANCES
@@ -203,11 +204,7 @@ describe('Unit tests', () => {
                 it('should throw an error if required property is missing', () => {
                     expect( function () {
                         ( <any>jsonConvert ).serializeObject_loopProperty( optionalCat1, optionalCat1, 'district', t_cat )
-                    } ).toThrowError( 'Fatal error in JsonConvert. ' +
-                        'Failed to map the JavaScript instance of class "OptionalKitty" to JSON because the defined class property ' +
-                        '"district" does not exist or is not defined:\n\n' +
-                        '\tClass property: \n\t\tdistrict\n\n' +
-                        '\tJSON property: \n\t\tdistrictNumber\n\n' );
+                    } ).toThrowError();
                 });
                 it('should not throw an error if required property is missing but ignoreRequiredCheck flag set', () => {
                     jsonConvert.ignoreRequiredCheck = true;
@@ -252,11 +249,7 @@ describe('Unit tests', () => {
                 it( 'should throw an error if required property is missing', () => {
                     expect( function () {
                         ( <any>jsonConvert ).deserializeObject_loopProperty( t_cat, 'name', {} );
-                    } ).toThrowError( 'Fatal error in JsonConvert. ' +
-                      'Failed to map the JSON object to the class "Kitty" because the defined JSON property "catName" does not exist:\n\n' +
-                      '\tClass property: \n\t\tname\n\n' +
-                      '\tJSON property: \n\t\tcatName\n\n'
-                    );
+                    }).toThrowError();
                 } );
                 it( 'should not throw an error if required property is missing but ignoreRequiredCheck flag is set', () => {
                     jsonConvert.ignoreRequiredCheck = true;
@@ -295,7 +288,7 @@ describe('Unit tests', () => {
                 catNameMapping.classPropertyName = "name";
                 catNameMapping.jsonPropertyName = "catName";
                 catNameMapping.expectedJsonType = jsonType;
-                catNameMapping.isOptional = PropertyConvertingMode.NEVER_OPTIONAL;
+                catNameMapping.convertingMode = PropertyConvertingMode.MAP_NULLABLE;
                 catNameMapping.customConverter = null;
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(cat1, "name")).toEqual(catNameMapping);
 
@@ -303,7 +296,7 @@ describe('Unit tests', () => {
                 dogNameMapping.classPropertyName = "name";
                 dogNameMapping.jsonPropertyName = "name";
                 dogNameMapping.expectedJsonType = jsonType;
-                dogNameMapping.isOptional = PropertyConvertingMode.NEVER_OPTIONAL;
+                dogNameMapping.convertingMode = PropertyConvertingMode.MAP_NULLABLE;
                 dogNameMapping.customConverter = null;
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(dog1, "name")).toEqual(dogNameMapping);
 
@@ -313,7 +306,7 @@ describe('Unit tests', () => {
                 duplicateCatTalkyMapping.classPropertyName = "talky";
                 duplicateCatTalkyMapping.jsonPropertyName = "talky";
                 duplicateCatTalkyMapping.expectedJsonType = undefined;
-                duplicateCatTalkyMapping.isOptional = PropertyConvertingMode.NEVER_OPTIONAL;
+                duplicateCatTalkyMapping.convertingMode = PropertyConvertingMode.MAP_NULLABLE;
                 duplicateCatTalkyMapping.customConverter = new DateConverter();
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(duplicateCat1, "talky")).toEqual(duplicateCatTalkyMapping);
 
@@ -321,7 +314,8 @@ describe('Unit tests', () => {
                 // Unmapped property should not return mapping, even though property is the same name as a mapped property on another class
                 expect((<any>jsonConvert).getClassPropertyMappingOptions(duplicateCat1, "district")).toBeNull();
             });
-            describe("verifyProperty()", () => {
+
+            describe("convertProperty()", () => {
                 let jsonConvert: JsonConvert;
                 beforeEach(() => {
                     jsonConvert = new JsonConvert();
@@ -330,78 +324,73 @@ describe('Unit tests', () => {
                 });
                 describe("expectedJsonType unmapped", () => {
                     it("should return the value if expected type is Any, Object, or null", () => {
-                        expect((<any>jsonConvert).verifyProperty(Any, cat1, true)).toBe(cat1);
-                        expect((<any>jsonConvert).verifyProperty(Object, cat1, false)).toBe(cat1);
-                        expect((<any>jsonConvert).verifyProperty(null, cat1, true)).toBe(cat1);
+                        expect((<any>jsonConvert).convertProperty(Any, cat1, true)).toBe(cat1);
+                        expect((<any>jsonConvert).convertProperty(Object, cat1, false)).toBe(cat1);
+                        expect((<any>jsonConvert).convertProperty(null, cat1, true)).toBe(cat1);
                     });
                     it("should NOT throw an error even if null not allowed", () => {
                         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
-                        expect((<any>jsonConvert).verifyProperty(Any, null, true)).toBeNull("expected Any");
-                        expect((<any>jsonConvert).verifyProperty(Object, null, false)).toBeNull("expected Object");
-                        expect((<any>jsonConvert).verifyProperty(null, null, true)).toBeNull("expected null");
+                        expect((<any>jsonConvert).convertProperty(Any, null, true)).toBeNull("expected Any");
+                        expect((<any>jsonConvert).convertProperty(Object, null, false)).toBeNull("expected Object");
+                        expect((<any>jsonConvert).convertProperty(null, null, true)).toBeNull("expected null");
                     });
                 });
                 describe("expectedJsonType mapped class", () => {
                     it("should correctly serialize/deserialize a mapped object property", () => {
-                        expect((<any>jsonConvert).verifyProperty(Cat, cat2, true)).toEqual(cat2JsonObject);
-                        expect((<any>jsonConvert).verifyProperty(Cat, cat1JsonObject, false)).toEqual(cat1);
+                        expect((<any>jsonConvert).convertProperty(Cat, cat2, PropertyConvertingMode.MAP_NULLABLE, true)).toEqual(cat2JsonObject);
+                        expect((<any>jsonConvert).convertProperty(Cat, cat1JsonObject, PropertyConvertingMode.MAP_NULLABLE, false)).toEqual(cat1);
                     });
                     it("should return null if allowed", () => {
                         jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_OBJECT_NULL;
-                        expect((<any>jsonConvert).verifyProperty(Cat, null, true))
-                            .toBeNull("serializing null returns null");
-                        expect((<any>jsonConvert).verifyProperty(Cat, null, false))
-                            .toBeNull("deserializing null returns null");
+                        expect((<any>jsonConvert).convertProperty(Cat, null, PropertyConvertingMode.MAP_NULLABLE, true)).toEqual(null);
+                        expect((<any>jsonConvert).convertProperty(Cat, null, PropertyConvertingMode.MAP_NULLABLE,false)).toEqual(null);
                     });
                     it("should throw an error if null not allowed", () => {
                         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
-                        const errorMessage = "\tReason: Given value is null.";
-                        expect(() => (<any>jsonConvert).verifyProperty(Cat, null, true))
-                            .toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty(Cat, null, false))
-                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).convertProperty(Cat, null, PropertyConvertingMode.MAP_NULLABLE, true))
+                            .toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty(Cat, null, PropertyConvertingMode.MAP_NULLABLE, false))
+                            .toThrowError();
                     });
                     it("should throw an error if value is an array", () => {
-                        expect(() => (<any>jsonConvert).verifyProperty(Cat, [cat1, cat2], true))
-                            .toThrowError("\tReason: Given value is array, but expected a non-array type.");
+                        expect(() => (<any>jsonConvert).convertProperty(Cat, [cat1, cat2], true))
+                            .toThrowError();
                     });
                 });
                 describe("expectedJsonType primitive", () => {
                     it("should correctly serialize and deserialize expected primitive values", () => {
-                        expect((<any>jsonConvert).verifyProperty(String, "Andreas", false)).toBe("Andreas");
-                        expect((<any>jsonConvert).verifyProperty(Number, 2.2, false)).toBe(2.2);
-                        expect((<any>jsonConvert).verifyProperty(Boolean, true, true)).toBe(true);
+                        expect((<any>jsonConvert).convertProperty(String, "Andreas", PropertyConvertingMode.MAP_NULLABLE, false)).toBe("Andreas");
+                        expect((<any>jsonConvert).convertProperty(Number, 2.2, PropertyConvertingMode.MAP_NULLABLE, false)).toBe(2.2);
+                        expect((<any>jsonConvert).convertProperty(Boolean, true, PropertyConvertingMode.MAP_NULLABLE, true)).toBe(true);
                     });
                     it("should error if expected JSON type doesn't match value type", () => {
-                        const errorMessage = "\tReason: Given object does not match the expected primitive type.";
-                        expect(() => (<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty(String, true, true)).toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty(Boolean, 54, true)).toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).convertProperty(Number, "Andreas", PropertyConvertingMode.MAP_NULLABLE, false)).toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty(String, true, PropertyConvertingMode.MAP_NULLABLE, true)).toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty(Boolean, 54, PropertyConvertingMode.MAP_NULLABLE, true)).toThrowError();
                     });
                     it("should return value if expected JSON type doesn't match value type but flag set", () => {
                         jsonConvert.ignorePrimitiveChecks = true;
-                        expect((<any>jsonConvert).verifyProperty(Number, "Andreas", false)).toBe("Andreas");
-                        expect((<any>jsonConvert).verifyProperty(String, true, true)).toBe(true);
-                        expect((<any>jsonConvert).verifyProperty(Boolean, 54, true)).toBe(54);
+                        expect((<any>jsonConvert).convertProperty(Number, "Andreas", PropertyConvertingMode.MAP_NULLABLE, false)).toBe("Andreas");
+                        expect((<any>jsonConvert).convertProperty(String, true, PropertyConvertingMode.MAP_NULLABLE, true)).toBe(true);
+                        expect((<any>jsonConvert).convertProperty(Boolean, 54, PropertyConvertingMode.MAP_NULLABLE, true)).toBe(54);
                     });
                     it("should return null if nulls allowed", () => {
-                        expect((<any>jsonConvert).verifyProperty(String, null, false)).toBeNull("expected string should be null");
-                        expect((<any>jsonConvert).verifyProperty(Number, null, false)).toBeNull("expected number should be null");
-                        expect((<any>jsonConvert).verifyProperty(Boolean, null, true)).toBeNull("expected boolean should be null");
+                        expect((<any>jsonConvert).convertProperty(String, null, PropertyConvertingMode.MAP_NULLABLE, false)).toBeNull("expected string should be null");
+                        expect((<any>jsonConvert).convertProperty(Number, null, PropertyConvertingMode.MAP_NULLABLE, false)).toBeNull("expected number should be null");
+                        expect((<any>jsonConvert).convertProperty(Boolean, null, PropertyConvertingMode.MAP_NULLABLE, true)).toBeNull("expected boolean should be null");
                     });
                     it("should throw an error if only object nulls allowed", () => {
-                        const errorMessage = "\tReason: Given value is null.";
                         jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_OBJECT_NULL;
-                        expect(() => (<any>jsonConvert).verifyProperty(String, null, false))
-                            .toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty(Number, null, false))
-                            .toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty(Boolean, null, true))
-                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).convertProperty(String, null, PropertyConvertingMode.MAP_NULLABLE, false))
+                            .toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty(Number, null, PropertyConvertingMode.MAP_NULLABLE, false))
+                            .toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty(Boolean, null, PropertyConvertingMode.MAP_NULLABLE, true))
+                            .toThrowError();
                     });
                     it("should throw an error if value is an array", () => {
-                        expect(() => (<any>jsonConvert).verifyProperty(String, ["Andreas", "Joseph"], true))
-                            .toThrowError("\tReason: Given value is array, but expected a non-array type.");
+                        expect(() => (<any>jsonConvert).convertProperty(String, ["Andreas", "Joseph"], PropertyConvertingMode.MAP_NULLABLE, true))
+                            .toThrowError();
                     });
                 });
                 describe("expectedJsonType array", () => {
@@ -410,62 +399,57 @@ describe('Unit tests', () => {
                             "0": "Andreas",
                             "1": {"0": true, "1": 2.2}
                         };
-                        expect((<any>jsonConvert).verifyProperty([], pseudoArray, true)).toBe(pseudoArray);
-                        expect((<any>jsonConvert).verifyProperty([], cat1, false)).toBe(cat1);
+                        expect((<any>jsonConvert).convertProperty([], pseudoArray, PropertyConvertingMode.MAP_NULLABLE, true)).toBe(pseudoArray);
+                        expect((<any>jsonConvert).convertProperty([], cat1, PropertyConvertingMode.MAP_NULLABLE, false)).toBe(cat1);
                     });
                     it("should return empty array if value is empty", () => {
-                        expect((<any>jsonConvert).verifyProperty([String], [], true)).toEqual([]);
-                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], [], false)).toEqual([]);
-                        expect((<any>jsonConvert).verifyProperty([Cat], [], false)).toEqual([]);
+                        expect((<any>jsonConvert).convertProperty([String], [], PropertyConvertingMode.MAP_NULLABLE, true)).toEqual([]);
+                        expect((<any>jsonConvert).convertProperty([String, [Boolean, Number]], [], PropertyConvertingMode.PASS_NULLABLE, false)).toEqual([]);
+                        expect((<any>jsonConvert).convertProperty([Cat], [], PropertyConvertingMode.MAP_NULLABLE, false)).toEqual([]);
                     });
                     it("should correctly handle array of object types", () => {
                         jsonConvert.valueCheckingMode = ValueCheckingMode.ALLOW_NULL;
-                        expect((<any>jsonConvert).verifyProperty([Cat], [cat1, cat2], true))
-                            .toEqual([cat1JsonObject, cat2JsonObject]);
-                        expect((<any>jsonConvert).verifyProperty([Cat], [cat1JsonObject, cat2JsonObject], false))
-                            .toEqual([cat1, cat2]);
+                        expect((<any>jsonConvert).convertProperty([Cat], [cat1, cat2], PropertyConvertingMode.PASS_NULLABLE, true)).toEqual([cat1JsonObject, cat2JsonObject]);
+                        expect((<any>jsonConvert).convertProperty([Cat], [cat1JsonObject, cat2JsonObject], PropertyConvertingMode.PASS_NULLABLE, false)).toEqual([cat1, cat2]);
                     });
                     it("should correctly handle expected nested array types", () => {
-                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false))
+                        expect((<any>jsonConvert).convertProperty([String, [Boolean, Number]], ["Andreas", [true, 2.2]], false))
                             .toEqual(["Andreas", [true, 2.2]]);
-                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], {
+                        expect((<any>jsonConvert).convertProperty([String, [Boolean, Number]], {
                             "0": "Andreas",
                             "1": {"0": true, "1": 2.2}
                         }, true)).toEqual(["Andreas", [true, 2.2]]);
                     });
                     it("should expand expected array type as needed without affecting original mapping", () => {
                         const expectedJsonType = [String];
-                        expect((<any>jsonConvert).verifyProperty(expectedJsonType, ["Andreas", "Joseph", "Albert"], true))
+                        expect((<any>jsonConvert).convertProperty(expectedJsonType, ["Andreas", "Joseph", "Albert"], PropertyConvertingMode.MAP_NULLABLE, true))
                             .toEqual(["Andreas", "Joseph", "Albert"]);
                         expect(expectedJsonType).toEqual([String]);
 
-                        expect((<any>jsonConvert).verifyProperty(expectedJsonType, {"0": "Andreas", "1": "Joseph", "2": "Albert"}))
+                        expect((<any>jsonConvert).convertProperty(expectedJsonType, {"0": "Andreas", "1": "Joseph", "2": "Albert"}, PropertyConvertingMode.MAP_NULLABLE))
                             .toEqual(["Andreas", "Joseph", "Albert"]);
                         expect(expectedJsonType).toEqual([String]);
                     });
                     it("should throw an error if expected array and value is primitive", () => {
-                        const errorMessage = "\tReason: Expected type is array, but given value is primitive."
-                        expect(() => (<any>jsonConvert).verifyProperty([String], "Andreas"))
-                            .toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty([], "Andreas"))
-                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).convertProperty([String], "Andreas", PropertyConvertingMode.MAP_NULLABLE))
+                            .toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty([], "Andreas", PropertyConvertingMode.MAP_NULLABLE))
+                            .toThrowError();
                     });
                     it("should return null if nulls allowed", () => {
-                        expect((<any>jsonConvert).verifyProperty([String], null, true))
-                            .toBeNull("expected string array should be null");
-                        expect((<any>jsonConvert).verifyProperty([String, [Boolean, Number]], null, true))
-                            .toBeNull("expected nested array should be null");
+                        expect((<any>jsonConvert).convertProperty([String], null, PropertyConvertingMode.MAP_NULLABLE, true)).toEqual(null);
+                        expect((<any>jsonConvert).convertProperty([String, [Boolean, Number]], null, PropertyConvertingMode.MAP_NULLABLE, true)).toEqual(null);
                     });
                     it("should throw an error if nulls disallowed", () => {
-                        const errorMessage = "\tReason: Given value is null.";
                         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
-                        expect(() => (<any>jsonConvert).verifyProperty([String], null, true))
-                            .toThrowError(errorMessage);
-                        expect(() => (<any>jsonConvert).verifyProperty([String, [Boolean, Number]], null, true))
-                            .toThrowError(errorMessage);
+                        expect(() => (<any>jsonConvert).convertProperty([String], null, PropertyConvertingMode.MAP_NULLABLE, true))
+                            .toThrowError();
+                        expect(() => (<any>jsonConvert).convertProperty([String, [Boolean, Number]], null, PropertyConvertingMode.MAP_NULLABLE, true))
+                            .toThrowError();
                     });
                 });
             });
+
             it('getObjectValue()', () => {
                 expect((<any>jsonConvert).getObjectValue({ "name": "Andreas" }, "name")).toBe("Andreas");
                 expect(() => (<any>jsonConvert).getObjectValue({ "nAmE": "Andreas" }, "NaMe")).toThrow();

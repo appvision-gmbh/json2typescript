@@ -12,5 +12,6 @@ export class Dog extends Animal {
     other: number = 0;
 
     @JsonProperty("toys", [String], true)
-    toys?: string[] = undefined;
+    toys: string[] = [];
+
 }

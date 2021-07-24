@@ -65,6 +65,8 @@ describe("JsonConvert basic type tests", () => {
 
     // </editor-fold>
 
+    // <editor-fold desc="TESTS">
+
     describe("undefined checks", () => {
 
         describe("serialize", () => {
@@ -612,5 +614,7 @@ describe("JsonConvert basic type tests", () => {
         });
 
     });
+
+    // </editor-fold>
 
 });
