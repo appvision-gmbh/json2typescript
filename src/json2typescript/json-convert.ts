@@ -200,27 +200,37 @@ export class JsonConvert {
 
     /**
      * Determines how nullable property types should be serialized and deserialized.
-     *
-     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
      * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
      *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
      * The values should be used as follows:
-     * - MAP_NULLABLE: a nullable property is passed to the mapper, type is normally checked
-     * - IGNORE_NULLABLE: the property is never passed if missing, undefined or null
-     * - PASS_NULLABLE: the property is passed and the given type for the mapping is ignored
+     * Determines how nullable property types should be serialized and deserialized.
+     * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+     *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
+     * The values should be used as follows:
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
      */
     private _propertyConvertingMode: PropertyConvertingMode | undefined = undefined;
 
     /**
      * Determines how nullable property types should be serialized and deserialized.
-     *
-     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
      * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
      *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
      * The values should be used as follows:
-     * - MAP_NULLABLE: a nullable property is passed to the mapper, type is normally checked
-     * - IGNORE_NULLABLE: the property is never passed if missing, undefined or null
-     * - PASS_NULLABLE: the property is passed and the given type for the mapping is ignored
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -230,14 +240,16 @@ export class JsonConvert {
 
     /**
      * Determines how nullable property types should be serialized and deserialized.
-     *
-     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
      * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
      *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
      * The values should be used as follows:
-     * - MAP_NULLABLE: a nullable property is passed to the mapper, type is normally checked
-     * - IGNORE_NULLABLE: the property is never passed if missing, undefined or null
-     * - PASS_NULLABLE: the property is passed and the given type for the mapping is ignored
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */

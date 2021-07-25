@@ -88,7 +88,8 @@ export function JsonObject(target: string | any): (target: any) => void {
  *
  * @param jsonPropertyName optional param (default: classPropertyName) the property name in the expected JSON object
  * @param conversionOption optional param (default: Any), should be either the expected type (String|Boolean|Number|etc) or a custom converter class implementing JsonCustomConvert
- * @param isOptional optional param (default: PropertyConvertingMode.NEVER_OPTIONAL), parameter to determine whether the property has to be present in the object
+ * @param convertingMode optional param (default: PropertyConvertingMode.MAP_NULLABLE), determines how nullable
+ * property types should be serialized and deserialized
  *
  * @returns
  *
