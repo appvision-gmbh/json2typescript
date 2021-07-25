@@ -959,7 +959,12 @@ export class JsonConvert {
                         jsonType[i] = jsonType[i - 1];
                     }
 
-                    array[i] = this.convertProperty(jsonType[i], value[i], convertingMode, serialize);
+                    array[i] = this.convertProperty(
+                        jsonType[i],
+                        value[i],
+                        this.propertyConvertingMode || PropertyConvertingMode.MAP_NULLABLE,
+                        serialize
+                    );
 
                 }
 
@@ -976,7 +981,12 @@ export class JsonConvert {
                         jsonType[i] = jsonType[i - 1];
                     }
 
-                    array[key as any] = this.convertProperty(jsonType[i], value[key], convertingMode, serialize);
+                    array[key as any] = this.convertProperty(
+                        jsonType[i],
+                        value[key],
+                        this.propertyConvertingMode || PropertyConvertingMode.MAP_NULLABLE,
+                        serialize
+                    );
 
                     i++;
                 }
