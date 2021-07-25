@@ -743,42 +743,6 @@ export class JsonConvert {
             }
         }
 
-
-
-
-        /*
-        // Check if the class property value exists
-        if (typeof (classInstancePropertyValue) === "undefined") {
-
-            if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
-                isOptional === PropertyConvertingMode.SERIALIZE_OPTIONAL ||
-                this.ignoreRequiredCheck) {
-                return;
-            }
-
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
-                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
-            );
-        }
-
-
-        // Check if the json value is null.
-        // If the property is optional, then drop the property.
-        // If the property is not optional, assign null value to json.
-        if (classInstancePropertyValue === null) {
-            if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
-                isOptional === PropertyConvertingMode.SERIALIZE_OPTIONAL) {
-                return;
-            } else {
-                json[jsonPropertyName] = null;
-                return;
-            }
-        }*/
-
-
         // Map the property
         try {
             json[jsonPropertyName] = customConverter !== null ?
@@ -836,32 +800,6 @@ export class JsonConvert {
                 return;
             }
         }
-
-        /*
-        // Check if the json value exists
-        if (typeof (jsonValue) === "undefined") {
-
-            if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
-                isOptional === PropertyConvertingMode.DESERIALIZE_OPTIONAL ||
-                this.ignoreRequiredCheck) return;
-
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonPropertyName + "\" does not exist:\n\n" +
-                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
-            );
-        }
-
-
-        // Check if the json value is null.
-        // If the property is optional, do not assign it because we want to use the default value of the class.
-        // Otherwise, proceed with the verification. We will only assign null if it is allowed.
-        if (jsonValue === null) {
-            if (isOptional === PropertyConvertingMode.ALWAYS_OPTIONAL ||
-                isOptional === PropertyConvertingMode.DESERIALIZE_OPTIONAL) return;
-        }*/
-
 
         // Map the property
         try {
