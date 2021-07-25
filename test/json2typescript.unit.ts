@@ -131,6 +131,43 @@ describe("JsonConvert unit tests", () => {
         });
     });
 
+    // DISCRIMINATOR FEATURE
+    describe('discriminator checks', () => {
+       it('registering classes', () => {
+
+            let jsonConvertTest: JsonConvert;
+
+            jsonConvertTest = new JsonConvert();
+            jsonConvertTest.registerClasses(Cat, Dog);
+            expect((<any>jsonConvertTest).classes.has((<any>cat1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+            expect((<any>jsonConvertTest).classes.has((<any>dog1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+            expect((<any>jsonConvertTest).classes.has((<any>human1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+
+        });
+        it('unregistering classes', () => {
+
+            let jsonConvertTest: JsonConvert;
+
+            jsonConvertTest = new JsonConvert();
+            jsonConvertTest.registerClasses(Cat, Dog);
+            jsonConvertTest.unregisterClasses(Cat);
+            expect((<any>jsonConvertTest).classes.has((<any>cat1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+            expect((<any>jsonConvertTest).classes.has((<any>dog1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+            expect((<any>jsonConvertTest).classes.has((<any>human1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+
+        });
+        it('unregistering all classes', () => {
+
+            let jsonConvertTest: JsonConvert;
+
+            jsonConvertTest = new JsonConvert();
+            jsonConvertTest.registerClasses(Cat, Dog);
+            jsonConvertTest.unregisterAllClasses();
+            expect((<any>jsonConvertTest).classes.size).toEqual(0);
+
+        });
+    });
+
     // NULL/UNDEFINED CHECKS
     describe("null/undefined checks", () => {
         it("serialize and deserialize null", () => {
