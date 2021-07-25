@@ -127,7 +127,7 @@ describe("JsonConvert unit tests", () => {
         it("JsonObject decorator", () => {
             expect((<any>human1)[Settings.CLASS_IDENTIFIER]).toEqual("Human");
             expect((<any>cat1)[Settings.CLASS_IDENTIFIER]).toEqual("Kitty");
-            expect((<any>dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Dog");
+            expect((<any>dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Doggy");
         });
     });
 

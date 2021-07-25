@@ -8,7 +8,7 @@ export class AnimalHolder {
     name: string = "";
 
     @JsonProperty("animal", Animal)
-    animal: Animal = null;
+    animal: Animal | null = null;
 
     constructor() {}
 

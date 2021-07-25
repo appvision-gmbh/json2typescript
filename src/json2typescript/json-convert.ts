@@ -887,7 +887,7 @@ export class JsonConvert {
 
             const classConstructorName = dataObject?.constructor?.name;
 
-            if (this._useDiscriminator) {
+            if (this._useDiscriminator && json instanceof Object) {
                 this.classes.forEach((classDataObject: {new(): any}, key: string) => {
                     if (classDataObject.name === classConstructorName) {
                         json[this._discriminatorPropertyName] = key;
@@ -927,7 +927,7 @@ export class JsonConvert {
 
         // Get expected and real values
         const jsonPropertyName: string = mappingOptions.jsonPropertyName;
-        const expectedJsonType: any = mappingOptions.expectedJsonType;
+        let expectedJsonType: any = mappingOptions.expectedJsonType;
         const convertingMode: PropertyConvertingMode = this.propertyConvertingMode ?? mappingOptions.convertingMode;
         const customConverter: any = mappingOptions.customConverter;
 
@@ -950,7 +950,7 @@ export class JsonConvert {
 
         // Map the property
         try {
-            const classConstructorName = jsonValue[this.discriminatorPropertyName];
+            const classConstructorName = jsonValue instanceof Object ? jsonValue[this.discriminatorPropertyName] : null;
 
             if (this._useDiscriminator && this.classes.has(classConstructorName)) {
                 expectedJsonType = this.classes.get(classConstructorName);

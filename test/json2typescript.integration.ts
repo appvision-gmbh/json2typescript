@@ -51,6 +51,18 @@ describe("JsonConvert integration tests", () => {
         name: "Duplicate",
         talky: "2015-02-03",
     };
+    let animalHolderWithDogJsonObject = {
+        name: "Laura",
+        animal: {
+            $type: "Doggy",
+            name: "Barky",
+            barking: true,
+            birthdate: "2017-02-12",
+            friends: [],
+            other: 0,
+            toys: ["pizza", "bone", "ball"]
+        }
+    };
     // Add district property, which exists on DuplicateCat but is not mapped - should not be deserialized
     let duplicateCat2DeserializeJsonObject = {
         name: "Duplicate2",
@@ -121,6 +133,9 @@ describe("JsonConvert integration tests", () => {
 
     let animals = [cat1, dog1];
     let cats = [cat1, cat2];
+
+    let animalHolder = new AnimalHolder();
+    animalHolder.name = "Lisa";
 
     // JSON objects using Typescript mappings
     let cat1Typescript: any = {
