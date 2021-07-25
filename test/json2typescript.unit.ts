@@ -123,7 +123,44 @@ describe('Unit tests', () => {
             it('JsonObject decorator', () => {
                 expect((<any>human1)[Settings.CLASS_IDENTIFIER]).toEqual("Human");
                 expect((<any>cat1)[Settings.CLASS_IDENTIFIER]).toEqual("Kitty");
-                expect((<any>dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Dog");
+                expect((<any>dog1)[Settings.CLASS_IDENTIFIER]).toEqual("Doggy");
+            });
+        });
+
+        // DISCRIMINATOR FEATURE
+        describe('discriminator checks', () => {
+            it('registering classes', () => {
+
+                let jsonConvertTest: JsonConvert;
+
+                jsonConvertTest = new JsonConvert();
+                jsonConvertTest.registerClasses(Cat, Dog);
+                expect((<any>jsonConvertTest).classes.has((<any>cat1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+                expect((<any>jsonConvertTest).classes.has((<any>dog1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+                expect((<any>jsonConvertTest).classes.has((<any>human1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+
+            });
+            it('unregistering classes', () => {
+
+                let jsonConvertTest: JsonConvert;
+
+                jsonConvertTest = new JsonConvert();
+                jsonConvertTest.registerClasses(Cat, Dog);
+                jsonConvertTest.unregisterClasses(Cat);
+                expect((<any>jsonConvertTest).classes.has((<any>cat1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+                expect((<any>jsonConvertTest).classes.has((<any>dog1)[Settings.CLASS_IDENTIFIER])).toBeTrue();
+                expect((<any>jsonConvertTest).classes.has((<any>human1)[Settings.CLASS_IDENTIFIER])).toBeFalse();
+
+            });
+            it('unregistering all classes', () => {
+
+                let jsonConvertTest: JsonConvert;
+
+                jsonConvertTest = new JsonConvert();
+                jsonConvertTest.registerClasses(Cat, Dog);
+                jsonConvertTest.unregisterAllClasses();
+                expect((<any>jsonConvertTest).classes.size).toEqual(0);
+
             });
         });
 
