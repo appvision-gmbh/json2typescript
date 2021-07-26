@@ -35,7 +35,12 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 See the changelog in the separate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
-> Tip: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
+> Warning: If you are reading this document on GitHub, it might be ahead of the published NPM version.
+> Please refer to the [ReadMe on NPM](https://www.npmjs.com/package/json2typescript) if in doubt.
+
+> Warning: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. 
+> Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. 
+> In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
 
@@ -231,30 +236,6 @@ IDE, `json2typescript` will not properly work in this case.
 
 # Detailed reference
 
-## Property declarations
-
-For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. They can be
-initialized using any (valid) value or `undefined`.
-
-```typescript
-@JsonObject("User")
-export class User {
-    @JsonProperty("name", String, false)  // ✔ Decorator
-    name: string = "";
-✔
-    Initialization
-
-    @JsonProperty("alias", string, false)  // ❌ Must use String instead.
-    alias: string = ""; //  ✔ Initialization
-
-@JsonProperty("expertise", String, false) ✔
-    Decorator
-    expertise: string;  //  ❌ Must be initialised, otherwise is ignored.
-}
-```
-
-> **Warning**: Non initialized properties won't trigger any exception, as **they are invisible to the mapper**.
-
 ## Class and property decorators
 
 Decorators should be used whenever you would like to map JSON with TypeScript data. As of now, you must not use more
@@ -284,15 +265,30 @@ The first parameter of `@JsonObject` must be a unique class identifier, usually 
 Property decorators are a vital part for type checking. It is important that the type in the decorator matches the
 TypeScript type.
 
+For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. 
+They can be initialized using any (valid) value or `undefined`.
+See the example below for better understanding:
+
 ```typescript
 @JsonObject("User")
 export class User {
-    @JsonProperty("jsonPropertyName", String, false)
+    
+    // A correct example
+    @JsonProperty("name", String, false)
     name: string = "";
+    
+    // An incorrect example
+    @JsonProperty("alias", string, false) // Wrong type: Must use String instead.
+    alias: string = "";
+  
+    // An incorrect example
+    @JsonProperty("expertise", String, false)
+    expertise: string; // No initialization: Property will be ignored without visible exception
+    
 }
 ```
 
-> **Important note**: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property. Assigning no value is not the same as assigning `undefined` in context of `json2typescript`.
+> **Important note**: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property. Assigning no value is not the same as assigning `undefined` in context of `json2typescript`. Non-initialized properties will not trigger any exception, as **they are invisible to the mapper**.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
@@ -567,7 +563,7 @@ The values should be used as follows:
 
 The default is `PropertyMatchingRule.MAP_NULLABLE`.
 
-> This property is usually only temporarily set and should be used with caution.
+> Note: This property is usually only temporarily set and should be used with caution.
 > It replaces the deprecated property `ignoreRequiredCheck`.
 
 #### Use discriminator
@@ -579,6 +575,8 @@ If this option is set to true, all registered classes will be serialized with an
 When deserializing an object containing the discriminator property, json2typescript will attempt to automatically instantiate the correct type (by comparing the value of the discriminator property with the registered classes).
 
 The default is `false`.
+
+> Note: At the end of this document you may find an example on how to use the discriminator feature.
 
 #### Discriminator property name
 
@@ -658,15 +656,17 @@ instead:
 - `(T) deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T })`
 - `(T[]) deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T })`
 
+
+
 ---
 
-# Further examples
+# Advanced strategies
 
-In case you don't have enough complex examples yet, you may find some more in this section.
+In this section you will find additional examples.
 
 ## Nesting arrays
 
-It is heavily discouraged to use nested arrays and use different types in a JSON api. If you need them anyway, here is
+It is heavily discouraged to use nested arrays and use different types in a JSON API. If you need them anyway, here is
 how you have to define the types:
 
 ### 1) Nested arrays with same type
@@ -764,10 +764,10 @@ const user1: User = jsonConvert.deserialize(jsonObject, User);
 
 // But now you may automatically map it thanks to the $type property
 const user2: User = jsonConvert.deserialize<User>(jsonObject);
-
 ```
 
-> Note: This feature is particularly useful when doing dynamic mapping. Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
+> Note: This feature is particularly useful when doing dynamic mapping. 
+> Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
 
 A real-world example for the discriminator feature is the mapping of child classes.
 
@@ -796,8 +796,7 @@ More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
 
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**
-AppVision GmbH**).
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, founder of and software architect at **AppVision GmbH**.
 
 ## Special thanks
 

@@ -691,7 +691,7 @@ export class JsonConvert {
             return jsonObject as T;
         }
 
-        jsonObject = this.mapUndefinedToNull && jsonObject === undefined ? null : jsonObject;
+        jsonObject = this.mapUndefinedToNull && jsonObject === undefined ? null as any : jsonObject;
 
         // Check if the passed type is allowed
         if (jsonObject === undefined) {
@@ -776,7 +776,7 @@ export class JsonConvert {
             return jsonArray as T[];
         }
 
-        jsonArray = this.mapUndefinedToNull && jsonArray === undefined ? null as any[] : jsonArray;
+        jsonArray = this.mapUndefinedToNull && jsonArray === undefined ? null as any : jsonArray;
 
         // Check if the passed type is allowed
         if (jsonArray === undefined) {
