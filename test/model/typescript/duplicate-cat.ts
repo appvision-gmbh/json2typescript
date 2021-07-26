@@ -17,4 +17,5 @@ export class DuplicateCat extends Animal {
   // Map other property with same name, but again use an incompatible type
   @JsonProperty( "talky", DateConverter )
   talky: Date | undefined = undefined;
+
 }

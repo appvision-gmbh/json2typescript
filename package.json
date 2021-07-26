@@ -30,16 +30,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/jasmine": "^3.5.10",
-    "downlevel-dts": "^0.4.0",
-    "jasmine": "3.5.0",
-    "karma": "^5.0.1",
+    "@types/jasmine": "^3.8.1",
+    "downlevel-dts": "^0.7.0",
+    "jasmine": "3.8.0",
+    "karma": "^6.3.4",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-jasmine": "3.1.1",
+    "karma-jasmine": "4.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-typescript": "^5.0.2",
+    "karma-typescript": "^5.5.1",
     "phantomjs-prebuilt": "^2.1.16",
-    "typescript": "3.9.5"
+    "typescript": "4.3.5"
   },
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",

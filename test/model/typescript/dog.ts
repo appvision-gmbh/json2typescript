@@ -2,7 +2,7 @@ import {JsonObject, JsonProperty} from "../../../src/json2typescript/json-conver
 
 import {Animal} from "./animal";
 
-@JsonObject("Dog")
+@JsonObject("Doggy")
 export class Dog extends Animal {
 
     @JsonProperty("barking", Boolean)
@@ -12,5 +12,6 @@ export class Dog extends Animal {
     other: number = 0;
 
     @JsonProperty("toys", [String], true)
-    toys?: string[] = undefined;
+    toys: string[] = [];
+
 }

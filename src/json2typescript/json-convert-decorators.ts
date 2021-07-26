@@ -1,5 +1,6 @@
 import { MappingOptions, Settings } from "./json-convert-options";
 import { Any } from "./any";
+import { PropertyConvertingMode } from "./json-convert-enums";
 
 /**
  * Decorator of a class that is a custom converter.
@@ -87,7 +88,8 @@ export function JsonObject(target: string | any): (target: any) => void {
  *
  * @param jsonPropertyName optional param (default: classPropertyName) the property name in the expected JSON object
  * @param conversionOption optional param (default: Any), should be either the expected type (String|Boolean|Number|etc) or a custom converter class implementing JsonCustomConvert
- * @param isOptional optional param (default: false), if true, the json property does not have to be present in the object
+ * @param convertingMode optional param (default: PropertyConvertingMode.MAP_NULLABLE), determines how nullable
+ * property types should be serialized and deserialized
  *
  * @returns
  *
@@ -100,7 +102,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
 
         let jsonPropertyName: string = classPropertyName;
         let conversionOption: any = Any;
-        let isOptional: boolean = false;
+        let convertingMode: PropertyConvertingMode = PropertyConvertingMode.MAP_NULLABLE;
 
         switch (params.length) {
             case 1:
@@ -148,7 +150,15 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
                 );
                 jsonPropertyName = params[0];
                 conversionOption = params[1];
-                isOptional = params[2];
+                if (params[2] === true) {
+                    convertingMode = PropertyConvertingMode.IGNORE_NULLABLE;
+                } else if (params[2] === PropertyConvertingMode.IGNORE_NULLABLE ||
+                    params[2] === PropertyConvertingMode.PASS_NULLABLE ||
+                    params[2] === PropertyConvertingMode.MAP_NULLABLE) {
+                    convertingMode = params[2];
+                } else {
+                    convertingMode = PropertyConvertingMode.MAP_NULLABLE;
+                }
                 break;
             default:
                 break;
@@ -162,7 +172,7 @@ export function JsonProperty(...params: any[]): { (target: any, classPropertyNam
         let jsonPropertyMappingOptions = new MappingOptions();
         jsonPropertyMappingOptions.classPropertyName = classPropertyName;
         jsonPropertyMappingOptions.jsonPropertyName = jsonPropertyName;
-        jsonPropertyMappingOptions.isOptional = isOptional ? isOptional : false;
+        jsonPropertyMappingOptions.convertingMode = convertingMode;
 
         // Check if conversionOption is a type or a custom converter.
         if (typeof(conversionOption) !== "undefined" && conversionOption !== null && typeof(conversionOption[Settings.MAPPER_PROPERTY]) !== "undefined") {

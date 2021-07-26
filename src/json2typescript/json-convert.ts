@@ -1,6 +1,6 @@
-import { OperationMode, PropertyMatchingRule, ValueCheckingMode } from "./json-convert-enums";
-import { MappingOptions, Settings } from "./json-convert-options";
 import { Any } from "./any";
+import { OperationMode, PropertyConvertingMode, PropertyMatchingRule, ValueCheckingMode } from "./json-convert-enums";
+import { MappingOptions, Settings } from "./json-convert-options";
 
 /**
  * Offers a simple API for mapping JSON objects to TypeScript/JavaScript classes and vice versa.
@@ -54,21 +54,23 @@ export class JsonConvert {
 
     /**
      * Determines which types are allowed to be null.
+     * This setting may be overridden by property settings (see PropertyConvertingMode).
      *
      * You may assign three different values:
-     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
-     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
-     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     * - ValueCheckingMode.ALLOW_NULL: all given values are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated
      */
     private _valueCheckingMode: number = ValueCheckingMode.ALLOW_OBJECT_NULL;
 
     /**
      * Determines which types are allowed to be null.
+     * This setting may be overridden by property settings (see PropertyConvertingMode).
      *
      * You may assign three different values:
-     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
-     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
-     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     * - ValueCheckingMode.ALLOW_NULL: all given values are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -78,16 +80,58 @@ export class JsonConvert {
 
     /**
      * Determines which types are allowed to be null.
+     * This setting may be overridden by property settings (see PropertyConvertingMode).
      *
      * You may assign three different values:
-     * - ValueCheckingMode.ALLOW_NULL: all given values in the JSON are allowed to be null
-     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects in the JSON are allowed to be null, primitive types are not allowed to be null
-     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated in the JSON
+     * - ValueCheckingMode.ALLOW_NULL: all given values are allowed to be null
+     * - ValueCheckingMode.ALLOW_OBJECT_NULL: objects are allowed to be null, primitive types are not allowed to be null
+     * - ValueCheckingMode.DISALLOW_NULL: no null values are tolerated
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     set valueCheckingMode(value: number) {
         if (value in ValueCheckingMode) this._valueCheckingMode = value;
+    }
+
+    /**
+     * Determines whether a missing or undefined property value should be considered as null or not.
+     *
+     * If true, a missing JSON value will be added and set as null before deserialization.
+     * For serialization, undefined values will be set to null before serialization.
+     *
+     * The ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during
+     * serialization or deserialization.
+     */
+    private _mapUndefinedToNull: boolean = false;
+
+    /**
+     * Determines whether a missing or undefined property value should be considered as null or not.
+     *
+     * If true, a missing JSON value will be added and set as null before deserialization.
+     * For serialization, undefined values will be set to null before serialization.
+     *
+     * ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during
+     * serialization or deserialization.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    get mapUndefinedToNull(): boolean {
+        return this._mapUndefinedToNull;
+    }
+
+    /**
+     * Determines whether a missing or undefined property value should be considered as null or not.
+     *
+     * If true, a missing JSON value will be added and set as null before deserialization.
+     * For serialization, undefined values will be set to null before serialization.
+     *
+     * The ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during
+     * serialization or deserialization.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    set mapUndefinedToNull(value: boolean) {
+        this._mapUndefinedToNull = value;
     }
 
     /**
@@ -121,7 +165,8 @@ export class JsonConvert {
      *
      * You may assign the following values:
      * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they
+     * are not case sensitive
      */
     private _propertyMatchingRule: number = PropertyMatchingRule.CASE_STRICT;
 
@@ -130,7 +175,8 @@ export class JsonConvert {
      *
      * You may assign the following values:
      * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they
+     * are not case sensitive
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -143,7 +189,8 @@ export class JsonConvert {
      *
      * You may assign the following values:
      * - PropertyMatchingRule.CASE_STRICT: JSON properties need to match exactly the names in the decorators
-     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they are not case sensitive
+     * - PropertyMatchingRule.CASE_INSENSITIVE: JSON properties need to match names in the decorators, but names they
+     * are not case sensitive
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -152,36 +199,161 @@ export class JsonConvert {
     }
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making all
-     * mapped values optional, whether or not the isOptional property mapping parameter is set.
-     * If true, any missing properties when serializing or deserializing will be ignored, as if they
-     * were marked optional.
+     * Determines how nullable property types should be serialized and deserialized.
+     * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+     *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
+     * The values should be used as follows:
+     * Determines how nullable property types should be serialized and deserialized.
+     * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+     *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
+     * The values should be used as follows:
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
      */
-    private _ignoreRequiredCheck: boolean = false;
+    private _propertyConvertingMode: PropertyConvertingMode | undefined = undefined;
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making all
-     * mapped values optional, whether or not the isOptional property mapping parameter is set.
-     * If true, any missing properties (undefined) when serializing or deserializing will be
-     * ignored, as if they were marked optional.
+     * Determines how nullable property types should be serialized and deserialized.
+     * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+     *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
+     * The values should be used as follows:
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    get propertyConvertingMode(): PropertyConvertingMode | undefined {
+        return this._propertyConvertingMode;
+    }
+
+    /**
+     * Determines how nullable property types should be serialized and deserialized.
+     * Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both).
+     *
+     * If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property.
+     *
+     * The values should be used as follows:
+     * - MAP_NULLABLE: the mapper is applied, type is checked
+     * - IGNORE_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * not added to the result
+     * - PASS_NULLABLE: the mapper is not applied if the property is missing, undefined or null; the property is
+     * added with its value to the result
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    set propertyConvertingMode(value: PropertyConvertingMode | undefined) {
+        this._propertyConvertingMode = value;
+    }
+
+    /**
+     * @deprecated
      */
     get ignoreRequiredCheck(): boolean {
-        return this._ignoreRequiredCheck;
+        return this.propertyConvertingMode === PropertyConvertingMode.IGNORE_NULLABLE;
     }
 
     /**
-     * Determines whether the check for "required" properties should be ignored, making all
-     * mapped values optional, whether or not the isOptional property mapping parameter is set.
-     * If true, any missing properties (undefined) when serializing or deserializing will be
-     * ignored, as if they were marked optional.
+     * @deprecated
+     */
+    set ignoreRequiredCheck(value: boolean) {
+        this.propertyConvertingMode = value ? PropertyConvertingMode.IGNORE_NULLABLE : undefined;
+    }
+
+    /**
+     * Determines if discriminators should be used.
+     * If this option is set to true, all registered classes will be serialized with an additional discriminator
+     * property (default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value.
+     * When deserializing an object containing the discriminator property, json2typescript will attempt to
+     * automatically instantiate the correct type (by comparing the value of the discriminator property with the
+     * registered classes).
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    set ignoreRequiredCheck(value: boolean) {
-        this._ignoreRequiredCheck = value;
+    private _useDiscriminator: boolean = false;
+
+    /**
+     * Determines if discriminators should be used.
+     * If this option is set to true, all registered classes will be serialized with an additional discriminator
+     * property (default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value.
+     * When deserializing an object containing the discriminator property, json2typescript will attempt to
+     * automatically instantiate the correct type (by comparing the value of the discriminator property with the
+     * registered classes).
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    get useDiscriminator(): boolean {
+        return this._useDiscriminator;
     }
+
+    /**
+     * Determines if discriminators should be used.
+     * If this option is set to true, all registered classes will be serialized with an additional discriminator
+     * property (default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value.
+     * When deserializing an object containing the discriminator property, json2typescript will attempt to
+     * automatically instantiate the correct type (by comparing the value of the discriminator property with the
+     * registered classes).
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    set useDiscriminator(value: boolean) {
+        this._useDiscriminator = value;
+    }
+
+    /**
+     * Defines the name of the discriminator property.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    private _discriminatorPropertyName: string = "$type";
+
+    /**
+     * Defines the name of the discriminator property.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    get discriminatorPropertyName(): string {
+        return this._discriminatorPropertyName;
+    }
+
+    /**
+     * Defines the name of the discriminator property.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    set discriminatorPropertyName(value: string) {
+        this._discriminatorPropertyName = value;
+    }
+
+    /**
+     * Determines all classes which should use the discriminator feature.
+     * Only classes provided here can be enriched with the discriminator property.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    private _classes: Map<string, (new() => any)> = new Map();
+
+    /**
+     * Determines all classes which should use the discriminator feature.
+     * Only classes provided here can be enriched with the discriminator property.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    private get classes(): Map<string, (new() => any)> {
+        return this._classes;
+    }
+
 
     /////////////////
     // CONSTRUCTOR //
@@ -212,8 +384,49 @@ export class JsonConvert {
 
 
     /**
+     * Registers a list of classes to be used in the discriminator feature.
+     * After registering these classes, they may be used for the discriminator feature.
+     *
+     * @param classReferences the class references
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    registerClasses(...classReferences: { new(): any }[]): void {
+        classReferences.forEach((classReference: { new(): any }) => {
+            const key = classReference.prototype[Settings.CLASS_IDENTIFIER] || classReference.name;
+            if (key) {
+                this.classes.set(key, classReference);
+            }
+        });
+    }
+
+    /**
+     * Unregisters a list of classes from the discriminator feature.
+     * After unregistering these classes, they cannot be used anymore for the discriminator feature.
+     *
+     * @param classReferences the class references
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    unregisterClasses(...classReferences: { new(): any }[]): void {
+        classReferences.forEach((classReference: { new(): any }) => {
+            const key = classReference.prototype[Settings.CLASS_IDENTIFIER] || classReference.name;
+            this.classes.delete(key);
+        });
+    }
+
+    /**
+     * Unregisters all classes from discriminator feature.
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    unregisterAllClasses(): void {
+        this.classes.clear();
+    }
+
+    /**
      * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference.  Note that if a class reference is provided, it will be used as
+     * the specified class reference. Note that if a class reference is provided, it will be used as
      * the source of property mapping for serialization, even if the object or one of its elements is
      * an instance of a different class with its own mappings.  Also, ONLY the properties from the
      * class reference will be serialized - any additional properties on the object(s) will be silently
@@ -228,7 +441,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serialize<T>(data: any | any[], classReference?: { new(): T }): any | any[] {
+    serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U }): any | any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -250,7 +463,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript object to a JSON object using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, it will be used as the source of property mapping for serialization,
      * even if the object is itself an instance of a different class with its own mappings.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -266,11 +479,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeObject<T>(data: any, classReference?: { new(): T }): any {
+    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
         }
+
+        data = this.mapUndefinedToNull && data === undefined ? null as any : data;
 
         // Check if the passed type is allowed
         if (data === undefined) {
@@ -286,7 +501,8 @@ export class JsonConvert {
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "Passed parameter instance in JsonConvert.serializeObject() is undefined. You have specified to disallow null values." +
+                    "Passed parameter instance in JsonConvert.serializeObject() is null. You have specified to " +
+                    "disallow null values." +
                     "\n"
                 );
             } else {
@@ -311,15 +527,15 @@ export class JsonConvert {
         }
 
         let jsonObject: any = {};
-        let instance: T;
+        let instance: T | U;
         if (!!classReference) {
             instance = new classReference();
         } else {
-            instance = <T>data;
+            instance = data;
         }
 
         // Loop through all initialized class properties on the mapping instance
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -344,7 +560,7 @@ export class JsonConvert {
 
     /**
      * Tries to serialize a TypeScript array to a JSON array using either the mappings on the
-     * provided class reference, if present, or on the provided object.  Note that if a class
+     * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, ALL objects in the array will be serialized using the mappings
      * from that class reference, even if they're actually instances of a different class.
      * Also, ONLY the properties from the class reference will be serialized - any additional
@@ -360,11 +576,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    serializeArray<T>(dataArray: any[], classReference?: { new(): T }): any[] {
+    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
         }
+
+        dataArray = this.mapUndefinedToNull && dataArray === undefined ? null as any : dataArray;
 
         // Check if the passed type is allowed
         if (dataArray === undefined) {
@@ -380,7 +598,8 @@ export class JsonConvert {
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "Passed parameter instanceArray in JsonConvert.serializeArray() is undefined. You have specified to disallow null values." +
+                    "Passed parameter instanceArray in JsonConvert.serializeArray() is null. You have specified to " +
+                    "disallow null values." +
                     "\n"
                 );
             } else {
@@ -404,10 +623,10 @@ export class JsonConvert {
             console.log(dataArray);
         }
 
-        let jsonArray: any[] = [];
+        let jsonArray: object[] = [];
 
         // Loop through all array elements
-        for (const dataObject of <any>dataArray) {
+        for (const dataObject of dataArray) {
             jsonArray.push(this.serializeObject(dataObject, classReference));
         }
 
@@ -433,10 +652,10 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize<T>(json: any, classReference: { new(): T }): T | T[] {
+    deserialize<T extends object>(json: object | object[], classReference: { new(): T }): T | T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return json;
+            return json as T | T[];
         }
 
         // Call the appropriate method depending on the type
@@ -466,11 +685,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T }): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return jsonObject;
+            return jsonObject as T;
         }
+
+        jsonObject = this.mapUndefinedToNull && jsonObject === undefined ? null : jsonObject;
 
         // Check if the passed type is allowed
         if (jsonObject === undefined) {
@@ -486,11 +707,12 @@ export class JsonConvert {
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "Passed parameter jsonObject in JsonConvert.deserializeObject() is undefined. You have specified to disallow null values." +
+                    "Passed parameter jsonObject in JsonConvert.deserializeObject() is null. You have specified to " +
+                    "disallow null values." +
                     "\n"
                 );
             } else {
-                return jsonObject;
+                return jsonObject as T;
             }
 
         } else if (typeof (jsonObject) !== "object" || jsonObject instanceof Array) {
@@ -513,7 +735,7 @@ export class JsonConvert {
         let instance: T = new classReference();
 
         // Loop through all initialized class properties
-        for (const propertyKey of Object.keys(instance as any)) {
+        for (const propertyKey of Object.keys(instance)) {
             try {
                 this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
             } catch (ex) {
@@ -548,12 +770,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T>(jsonArray: any[], classReference: { new(): T }): T[] {
-
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T }): T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
-            return jsonArray;
+            return jsonArray as T[];
         }
+
+        jsonArray = this.mapUndefinedToNull && jsonArray === undefined ? null as any[] : jsonArray;
 
         // Check if the passed type is allowed
         if (jsonArray === undefined) {
@@ -569,11 +792,12 @@ export class JsonConvert {
             if (this.valueCheckingMode === ValueCheckingMode.DISALLOW_NULL) {
                 throw new Error(
                     "Fatal error in JsonConvert. " +
-                    "Passed parameter jsonArray in JsonConvert.deserializeObject() is undefined. You have specified to disallow null values." +
+                    "Passed parameter jsonArray in JsonConvert.deserializeObject() is null. You have specified to " +
+                    "disallow null values." +
                     "\n"
                 );
             } else {
-                return jsonArray;
+                return jsonArray as T[];
             }
 
         } else if (typeof (jsonArray) !== "object" || jsonArray instanceof Array === false) {
@@ -587,9 +811,6 @@ export class JsonConvert {
         }
 
         // Now deserialize and return the array
-        if (this.operationMode === OperationMode.DISABLE) {
-            return jsonArray;
-        }
         if (this.operationMode === OperationMode.LOGGING) {
             console.log("----------");
             console.log("Receiving JSON array:");
@@ -639,36 +860,41 @@ export class JsonConvert {
 
 
         // Get expected and real values
-        let jsonPropertyName: string = mappingOptions.jsonPropertyName;
-        let expectedJsonType: any = mappingOptions.expectedJsonType;
-        let isOptional: boolean = mappingOptions.isOptional;
-        let customConverter: any = mappingOptions.customConverter;
+        const jsonPropertyName: string = mappingOptions.jsonPropertyName;
+        const expectedJsonType: any = mappingOptions.expectedJsonType;
+        const convertingMode: PropertyConvertingMode = this.propertyConvertingMode ?? mappingOptions.convertingMode;
+        const customConverter: any = mappingOptions.customConverter;
 
         let classInstancePropertyValue: any = dataObject[classPropertyName];
 
-
-        // Check if the class property value exists
-        if (typeof (classInstancePropertyValue) === "undefined") {
-
-            if (isOptional || this._ignoreRequiredCheck) return;
-
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Failed to map the JavaScript instance of class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" to JSON because the defined class property \"" + classPropertyName + "\" does not exist or is not defined:\n\n" +
-                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
-            );
+        // Check if we have a nullable type
+        classInstancePropertyValue = this.mapUndefinedToNull && classInstancePropertyValue === undefined ? null : classInstancePropertyValue;
+        if (classInstancePropertyValue === undefined || classInstancePropertyValue === null) {
+            if (convertingMode === PropertyConvertingMode.IGNORE_NULLABLE) {
+                return;
+            }
+            if (convertingMode === PropertyConvertingMode.PASS_NULLABLE) {
+                json[jsonPropertyName] = classInstancePropertyValue;
+                return;
+            }
         }
-
-
-        // Check if the property is optional
-        // If the json value is null, we don't assign it in that case
-        if (isOptional && classInstancePropertyValue === null) return;
-
 
         // Map the property
         try {
-            json[jsonPropertyName] = customConverter !== null ? customConverter.serialize(classInstancePropertyValue) : this.verifyProperty(expectedJsonType, classInstancePropertyValue, true);
+            json[jsonPropertyName] = customConverter !== null ?
+                customConverter.serialize(classInstancePropertyValue) :
+                this.convertProperty(expectedJsonType, classInstancePropertyValue, convertingMode, true);
+
+            const classConstructorName = dataObject?.constructor?.name;
+
+            if (this._useDiscriminator && json instanceof Object) {
+                this.classes.forEach((classDataObject: {new(): any}, key: string) => {
+                    if (classDataObject.name === classConstructorName) {
+                        json[this._discriminatorPropertyName] = key;
+                    }
+                });
+            }
+
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -700,40 +926,39 @@ export class JsonConvert {
         }
 
         // Get expected and real values
-        let jsonPropertyName: string = mappingOptions.jsonPropertyName;
+        const jsonPropertyName: string = mappingOptions.jsonPropertyName;
         let expectedJsonType: any = mappingOptions.expectedJsonType;
-        let isOptional: boolean = mappingOptions.isOptional;
-        let customConverter: any = mappingOptions.customConverter;
+        const convertingMode: PropertyConvertingMode = this.propertyConvertingMode ?? mappingOptions.convertingMode;
+        const customConverter: any = mappingOptions.customConverter;
 
         let jsonValue: any = undefined;
         try {
             jsonValue = this.getObjectValue(json, jsonPropertyName);
-        } catch {
+        } catch {}
+
+        // Check if we have a nullable type
+        jsonValue = this.mapUndefinedToNull && jsonValue === undefined ? null : jsonValue;
+        if (jsonValue === undefined || jsonValue === null) {
+            if (convertingMode === PropertyConvertingMode.IGNORE_NULLABLE) {
+                return;
+            }
+            if (convertingMode === PropertyConvertingMode.PASS_NULLABLE) {
+                instance[classPropertyName] = jsonValue;
+                return;
+            }
         }
-
-
-        // Check if the json value exists
-        if (typeof (jsonValue) === "undefined") {
-
-            if (isOptional || this._ignoreRequiredCheck) return;
-
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Failed to map the JSON object to the class \"" + instance[Settings.CLASS_IDENTIFIER] + "\" because the defined JSON property \"" + jsonPropertyName + "\" does not exist:\n\n" +
-                "\tClass property: \n\t\t" + classPropertyName + "\n\n" +
-                "\tJSON property: \n\t\t" + jsonPropertyName + "\n\n"
-            );
-        }
-
-
-        // Check if the property is optional
-        // If the json value is null, we don't assign it in that case
-        if (isOptional && jsonValue === null) return;
-
 
         // Map the property
         try {
-            instance[classPropertyName] = customConverter !== null ? customConverter.deserialize(jsonValue) : this.verifyProperty(expectedJsonType, jsonValue);
+            const classConstructorName = jsonValue instanceof Object ? jsonValue[this.discriminatorPropertyName] : null;
+
+            if (this._useDiscriminator && this.classes.has(classConstructorName)) {
+                expectedJsonType = this.classes.get(classConstructorName);
+            }
+
+            instance[classPropertyName] = customConverter !== null ?
+                customConverter.deserialize(jsonValue) :
+                this.convertProperty(expectedJsonType, jsonValue, convertingMode);
         } catch (e) {
             throw new Error(
                 "Fatal error in JsonConvert. " +
@@ -773,7 +998,7 @@ export class JsonConvert {
         let prototype = Object.getPrototypeOf(instance);
         /* According to documentation, we'll hit null when we've iterated all the way up to the base
          * Object, but check for undefined as well in case prototype has been manually set to
-         * undefined.  Note that javascript detects circular prototype references and will cause a
+         * undefined. Note that javascript detects circular prototype references and will cause a
          * TypeError, so no need to check for self, the prototype chain will eventually terminate. */
         while (prototype !== null && prototype !== undefined) {
             const classIdentifier = prototype[Settings.CLASS_IDENTIFIER];
@@ -794,19 +1019,205 @@ export class JsonConvert {
      * Compares the type of a given value with an internal expected json type.
      * Either returns the resulting value or throws an exception.
      *
-     * @param expectedJsonType the expected json type for the property
+     * @param expectedType the expected type for the property
      * @param value the property value to verify
+     * @param convertingMode the converting mode for this property
      * @param serialize optional param (default: false), if given, we are in serialization mode
      *
      * @returns returns the resulted mapped property
      *
      * @throws an error in case of failure
      */
-    private verifyProperty(expectedJsonType: any, value: any, serialize?: boolean): any {
+    private convertProperty(expectedType: any, value: any, convertingMode: PropertyConvertingMode, serialize?: boolean): any {
 
+        ////////////////////////////
+        // Prior checks and setup //
+        ////////////////////////////
+
+        // Return the value immediately if we don't care about the type
+        if (expectedType === undefined || expectedType === Any || expectedType === null || expectedType === Object) {
+            return value;
+        }
+
+        // Check if we have a nullable type
+        value = this.mapUndefinedToNull && value === undefined ? null : value;
+        if (value === undefined || value === null) {
+            if (convertingMode === PropertyConvertingMode.IGNORE_NULLABLE) {
+                return undefined;
+            }
+            if (convertingMode === PropertyConvertingMode.PASS_NULLABLE) {
+                return value;
+            }
+        }
+
+        // Match the dimensions
+        type Dimension = "1" | "2" | "1or2";
+
+        let expectedDimension: Dimension = "1";
+        if (expectedType instanceof Array) {
+            expectedDimension = "2";
+        }
+
+        let valueDimension: Dimension = "1or2";
+        if (value instanceof Array) {
+            valueDimension = "2";
+        } else if (!(value instanceof Object)) {
+            valueDimension = "1";
+        }
+
+        if (expectedDimension === "1" && valueDimension === "2") {
+            throw new Error("\tReason: Expected a non-array type, but given value is an array.");
+        }
+
+        if (expectedDimension === "2" && valueDimension === "1") {
+
+            // Allow to use null in the special case
+            if (value === null && this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) {
+                return null;
+            } else if (value === null) {
+                throw new Error("\tReason: Expected an array, but given value is null.");
+            }
+
+            throw new Error("\tReason: Expected an array, but given value is a primitive type.");
+
+        }
+
+        //////////////////
+        // Check values //
+        //////////////////
+
+        if (expectedDimension === "2" && (valueDimension === "2" || valueDimension === "1or2")) {
+
+            // Return an empty array if we have an empty array or object as value
+            if (value.length === 0 || Object.keys(value).length === 0) {
+                return [];
+            }
+
+            // Return the value if we don't care about the array type
+            if (expectedType.length === 0) {
+                return value;
+            }
+
+            // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
+            const jsonType: any[] = expectedType.slice(0);
+
+            const array: any[] = [];
+            if (valueDimension === "2") {
+
+                // Loop through the data. Both type and value are at least of length 1
+                let autofillType: boolean = jsonType.length < value.length;
+                for (let i = 0; i < value.length; i++) {
+
+                    if (autofillType && i >= jsonType.length) {
+                        jsonType[i] = jsonType[i - 1];
+                    }
+
+                    array[i] = this.convertProperty(
+                        jsonType[i],
+                        value[i],
+                        this.propertyConvertingMode || PropertyConvertingMode.MAP_NULLABLE,
+                        serialize
+                    );
+
+                }
+
+                return array;
+
+            } else {
+
+                // Loop through the data. Both type and value are at least of length 1
+                let autofillType: boolean = jsonType.length < Object.keys(value).length;
+                let i = 0;
+                for (let key in value) {
+
+                    if (autofillType && i >= jsonType.length) {
+                        jsonType[i] = jsonType[i - 1];
+                    }
+
+                    array[key as any] = this.convertProperty(
+                        jsonType[i],
+                        value[key],
+                        this.propertyConvertingMode || PropertyConvertingMode.MAP_NULLABLE,
+                        serialize
+                    );
+
+                    i++;
+                }
+
+                return array;
+
+            }
+
+        } else if (expectedDimension === "1" && (valueDimension === "1" || valueDimension === "1or2")) {
+
+            // Check if objects match
+            if (expectedType instanceof Object && value instanceof Object) {
+                if (expectedType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) {
+                    return serialize ?
+                        this.serializeObject(value, expectedType) :
+                        this.deserializeObject(value, expectedType);
+                } else {
+                    return value;
+                }
+            } else {
+
+                // Check for null values
+                if (value === null) {
+
+                    if (expectedType === String || expectedType === Number || expectedType === Boolean) {
+
+                        if (this.valueCheckingMode === ValueCheckingMode.ALLOW_NULL) {
+                            return null;
+                        } else {
+                            throw new Error("\tReason: Given value null does not match the expected primitive type.");
+                        }
+
+                    } else {
+
+                        if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) {
+                            return null;
+                        } else {
+                            throw new Error("\tReason: Given value null does not match the expected object type.");
+                        }
+
+                    }
+
+                }
+
+                // Check for primitive matches
+                if (
+                    (expectedType === String && typeof (value) === "string") ||
+                    (expectedType === Number && typeof (value) === "number") ||
+                    (expectedType === Boolean && typeof (value) === "boolean")
+                ) {
+                    return value;
+                } else {
+                    if (this.ignorePrimitiveChecks) return value;
+                    throw new Error("\tReason: Given value type does not match the expected primitive type.");
+                }
+
+            }
+
+        }
+
+        console.log("---------2");
+        console.log(expectedDimension);
+        console.log(expectedType);
+        console.log(valueDimension);
+        console.log(value);
+
+        // All other attempts are fatal
+        throw new Error("\tReason: Mapping failed because of an unknown error.");
+
+/*
         // Map immediately if we don't care about the type
         if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) {
             return value;
+        }
+
+        // Map the property to null if necessary
+        if (value === undefined && this.mapUndefinedToNull) {
+            value = null;
         }
 
         // Check if attempt and expected was 1-d
@@ -927,7 +1338,9 @@ export class JsonConvert {
                     }
 
                     return array;
+
                 }
+
             } else {
                 throw new Error("\tReason: Expected type is array, but given value is primitive.");
             }
@@ -940,7 +1353,7 @@ export class JsonConvert {
 
         // All other attempts are fatal
         throw new Error("\tReason: Mapping failed because of an unknown error.");
-
+*/
     }
 
     /**
