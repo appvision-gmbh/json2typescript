@@ -1,16 +1,17 @@
-[![npm](https://img.shields.io/npm/v/json2typescript.svg)](https://www.npmjs.com/package/json2typescript) 
+[![npm](https://img.shields.io/npm/v/json2typescript.svg)](https://www.npmjs.com/package/json2typescript)
 ![](https://img.shields.io/npm/dt/json2typescript.svg?style=flat)
 ![](https://img.shields.io/bundlephobia/minzip/json2typescript.svg?style=flat)
 ![](https://img.shields.io/npm/l/json2typescript.svg?style=flat)
 
 # json2typescript
 
-In Angular applications, everyone consumes JSON API's from an external source. 
-Type checking and object mapping is only possible in TypeScript, but not in the JavaScript runtime.
-As the API may change at any point, it is important for larger projects to verify the consumed data.
+In Angular applications, everyone consumes JSON API's from an external source. Type checking and object mapping is only
+possible in TypeScript, but not in the JavaScript runtime. As the API may change at any point, it is important for
+larger projects to verify the consumed data.
 
-**json2typescript** is a small package containing a helper class that maps JSON objects to an instance of a TypeScript class. 
-After compiling to JavaScript, the result will still be an instance of this class. One big advantage of this approach is, that you can  also use methods of this class.
+**json2typescript** is a small package containing a helper class that maps JSON objects to an instance of a TypeScript
+class. After compiling to JavaScript, the result will still be an instance of this class. One big advantage of this
+approach is, that you can also use methods of this class.
 
 With **json2typescript**, only a simple function call is necessary, as demonstrated in this TypeScript snippet:
 
@@ -26,8 +27,7 @@ let user: User = jsonConvert.deserializeObject(jsonObj, User);
 console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... }
 ```
 
-> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. 
-Make sure you catch errors in production!
+> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. Make sure you catch errors in production!
 
 ---
 
@@ -35,9 +35,7 @@ Make sure you catch errors in production!
 
 See the changelog in the separate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
-> Tip: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. 
-Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance.
-In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
+> Tip: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
 
@@ -45,13 +43,13 @@ In versions above v1.2.0 and below v1.4.0, it is possible to run into issues whe
 
 ## Requirements
 
-We developed **json2typescript** for Angular 2+ and Ionic 2+. In this document, we only cover this use case. 
-However, you may use our package for pure TypeScript or even JavaScript applications.
+We developed **json2typescript** for Angular 2+ and Ionic 2+. In this document, we only cover this use case. However,
+you may use our package for pure TypeScript or even JavaScript applications.
 
 ## Setup a Test Application
 
-We recommend to use the official **angular cli** tool in order to set up a new Angular project. 
-Then, all you need to do is type the following into your operating system's terminal:
+We recommend to use the official **angular cli** tool in order to set up a new Angular project. Then, all you need to do
+is type the following into your operating system's terminal:
 
 ```sh
 ng new testApplication
@@ -60,39 +58,41 @@ cd testApplication
 npm install json2typescript
 ```
 
-Our package makes use of TypeScript decorators. 
-If not done already, please activate them in your **tsconfig.json** under `compilerOptions` as follows:
+Our package makes use of TypeScript decorators. If not done already, please activate them in your **tsconfig.json**
+under `compilerOptions` as follows:
 
 ```json
 {
   "compilerOptions": {
-    [...]
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    [...]
+[
+  ...
+]
+"experimentalDecorators": true,
+"emitDecoratorMetadata": true,
+[...]
 }
 ```
 
-> Tip: We have tried to make the compiler options of `json2typescript` to be as strict as possible. 
-This enables you to use compiler options such as `"strictNullChecks": true` or `"noImplicitAny": true` in your own project.
+> Tip: We have tried to make the compiler options of `json2typescript` to be as strict as possible. This enables you to use compiler options such as `"strictNullChecks": true` or `"noImplicitAny": true` in your own project.
 
 Now you are ready to use the package.
 
 ## Mapping example
 
-In order to use the **json2typescript** package, all you need to do is write decorators and import the package. 
-The following things need to be done if you would like to map JSON to existing classes:
+In order to use the **json2typescript** package, all you need to do is write decorators and import the package. The
+following things need to be done if you would like to map JSON to existing classes:
 
 * Classes need to be preceeded by `@JsonObject(classIdentifier)`
-* Properties need to be preceeded by `@JsonProperty(jsonProperty, conversionOption, isOptional)`
+* Properties need to be preceeded by `@JsonProperty(jsonProperty, conversionOption, convertingMode)`
 * Properties need to have a default value (or undefined), otherwise the mapper will not work
 
 See below an example so you can learn from it how **json2typescript** works best.
 
-Assuming that you have created the **testApplication** in the step before and installed **json2typescript** as suggested, create a class in a new file **city.ts** with the following content:
+Assuming that you have created the **testApplication** in the step before and installed **json2typescript** as
+suggested, create a class in a new file **city.ts** with the following content:
 
 ```typescript
-import {JsonObject, JsonProperty} from "json2typescript";
+import { JsonObject, JsonProperty } from "json2typescript";
 
 @JsonObject("City")
 export class City {
@@ -105,47 +105,48 @@ export class City {
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("name", String)
     name: string = "";
-    
+
     // This maps the JSON key "founded" to the private class property "_founded".
     // Note the use of public getter and setter.
     // If the JSON value is not of type number (or missing), there will be an exception.
     @JsonProperty("founded", Number)
     private _founded: number = 0;
     get founded() { return this._founded; }
+
     set founded(value: number) { this._founded = value; }
-    
+
     // This maps the JSON key "beautiful" to the class property "beautiful".
     // If the JSON value is not of type boolean (or missing), there will be an exception.
     @JsonProperty("beautiful", Boolean)
     beautiful: boolean = false;
-    
+
     // This maps the JSON key "data" to the class property "data".
     // We are not sure about the type, so we omit the second parameter.
     // There will be an exception if the JSON value is missing.
     @JsonProperty("data") // is the same as @JsonProperty("data", Any)
     data: any = undefined;
-    
+
     // This maps the JSON key "keywords" to the class property "keywords".
     // This is an example of a string array. Note our syntax "[String]".
     // In the further examples at the end of this document, you can see how to nest complex arrays.
     @JsonProperty("keywords", [String])
     keywords: string[] = []; // or Array<string>
-    
+
     printInfo() {
         if (this.beautiful)
             console.log(this.name + " was founded in " + this.founded + " and is really beautiful!");
         else
             console.log(this.name + " was founded in " + this.founded + ".");
     }
-    
+
 }
 ```
 
 Now create a file **country.ts** with the following content:
 
 ```typescript
-import {City} from "./city";
-import {JsonObject, JsonProperty} from "json2typescript";
+import { City } from "./city";
+import { JsonObject, JsonProperty } from "json2typescript";
 
 @JsonObject("Country")
 export class Country {
@@ -154,22 +155,22 @@ export class Country {
     // If the JSON value is not of type string (or missing), there will be an exception.
     @JsonProperty("countryName", String)
     name: string = "";
-    
+
     // This maps the value of the JSON key "cities" to the class property "cities".
     // If the JSON value is not of type array object (or missing), there will be an exception.
     // There will be an exception too if the objects in the array do not match the class "City".
     @JsonProperty("cities", [City])
     cities: City[] = [];
-    
+
 }
 ```
 
 Then navigate to the file **app.component.ts** and add the following code:
 
 ```typescript
-import {Component, OnInit} from '@angular/core';
-import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
-import {Country} from "./country";
+import { Component, OnInit } from '@angular/core';
+import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript"
+import { Country } from "./country";
 
 @Component({
     selector: 'app-root',
@@ -182,32 +183,32 @@ export class AppComponent implements OnInit {
         const jsonObject: any = { 
             "countryName": "Switzerland", 
             "cities": [
-                { 
-                    "id": 1, 
-                    "name": "Basel", 
-                    "founded": -200, 
-                    "beautiful": true, 
+                {
+                    "id": 1,
+                    "name": "Basel",
+                    "founded": -200,
+                    "beautiful": true,
                     "data": 123,
-                    "keywords": ["Rhine", "River"] 
+                    "keywords": ["Rhine", "River"]
                 },
-                { 
-                    "id": 1, 
-                    "name": "Zurich", 
-                    "founded": 0, 
-                    "beautiful": false, 
+                {
+                    "id": 1,
+                    "name": "Zurich",
+                    "founded": 0,
+                    "beautiful": false,
                     "data": "no",
-                    "keywords": ["Limmat", "Lake"] 
+                    "keywords": ["Limmat", "Lake"]
                 }
             ]
         };
-        
+
         // Choose your settings
         // Check the detailed reference in the chapter "JsonConvert class properties and methods"
         let jsonConvert: JsonConvert = new JsonConvert();
         jsonConvert.operationMode = OperationMode.LOGGING; // print some debug data
         jsonConvert.ignorePrimitiveChecks = false; // don't allow assigning number to string etc.
         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL; // never allow null
-        
+
         // Map to the country class
         let country: Country;
         try {
@@ -216,14 +217,15 @@ export class AppComponent implements OnInit {
         } catch (e) {
             console.log((<Error>e));
         }
-}
+    }
 ```
+
 Play around with the JSON to provocate exceptions when deserializing the object.
 
 ## Important notes
 
-Avoid circular dependencies on the classes that use `json2typescript`. 
-Even if you don't have any errors in your IDE, `json2typescript` will not properly work in this case.
+Avoid circular dependencies on the classes that use `json2typescript`. Even if you don't have any errors in your
+IDE, `json2typescript` will not properly work in this case.
 
 ---
 
@@ -231,29 +233,32 @@ Even if you don't have any errors in your IDE, `json2typescript` will not proper
 
 ## Property declarations
 
-For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. They can be initialized using any (valid) value or `undefined`.
+For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. They can be
+initialized using any (valid) value or `undefined`.
 
 ```typescript
 @JsonObject("User")
 export class User {
     @JsonProperty("name", String, false)  // ✔ Decorator
-    name: string = "";  ✔ Initialization
-    
+    name: string = "";
+✔
+    Initialization
+
     @JsonProperty("alias", string, false)  // ❌ Must use String instead.
     alias: string = ""; //  ✔ Initialization
-    
-    @JsonProperty("expertise", String, false) ✔ Decorator
+
+@JsonProperty("expertise", String, false) ✔
+    Decorator
     expertise: string;  //  ❌ Must be initialised, otherwise is ignored.
 }
 ```
 
 > **Warning**: Non initialized properties won't trigger any exception, as **they are invisible to the mapper**.
 
-
 ## Class and property decorators
 
-Decorators should be used whenever you would like to map JSON with TypeScript data. 
-As of now, you must not use more than one decorator per class or property.
+Decorators should be used whenever you would like to map JSON with TypeScript data. As of now, you must not use more
+than one decorator per class or property.
 
 ### Class decorators
 
@@ -264,8 +269,7 @@ The class decorators are used infront of the class declaration and do support on
 export class User {}
 ```
 
-> Warning: The class decorator uses the parameter to identify the class.
-Please use a unique identifier for each class in your project, for example simply the name of the class.
+> Warning: The class decorator uses the parameter to identify the class. Please use a unique identifier for each class in your project, for example simply the name of the class.
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 
@@ -277,7 +281,8 @@ The first parameter of `@JsonObject` must be a unique class identifier, usually 
 
 ### Property decorators
 
-Property decorators are a vital part for type checking. It is important that the type in the decorator matches the TypeScript type.
+Property decorators are a vital part for type checking. It is important that the type in the decorator matches the
+TypeScript type.
 
 ```typescript
 @JsonObject("User")
@@ -293,21 +298,20 @@ export class User {
 
 #### First parameter: jsonProperty
 
-The first parameter of `@JsonProperty` is the JSON object property name. 
-It happens that the property names given by the server are very ugly.
-Here you can map any json property name to the `User` property `name`.
-In our case, `json["jsonPropertyName"]` gets mapped to `user.name`.
+The first parameter of `@JsonProperty` is the JSON object property name. It happens that the property names given by the
+server are very ugly. Here you can map any json property name to the `User` property `name`. In our
+case, `json["jsonPropertyName"]` gets mapped to `user.name`.
 
 #### Second parameter (optional): conversionOption
 
-The second parameter of `@JsonProperty` describes what happens when doing the mapping between JSON and TypeScript objects.
-This parameter is optional; the default value is `Any` (which means no type check is done when the mapping happens).
+The second parameter of `@JsonProperty` describes what happens when doing the mapping between JSON and TypeScript
+objects. This parameter is optional; the default value is `Any` (which means no type check is done when the mapping
+happens).
 
 ##### Use of expected type
 
-If you would like that `json2typescript` performs an automatic type 
-check according to given TypeScript types, you can pass a type you
-expect. Follow the following guide when doing that:
+If you would like that `json2typescript` performs an automatic type check according to given TypeScript types, you can
+pass a type you expect. Follow the following guide when doing that:
 
 - Make sure you pass the class name and not an instance of the class.
 - In case of primitive types, you have to use the upper case names.
@@ -316,7 +320,7 @@ expect. Follow the following guide when doing that:
 See the following cheat sheet for reference:
 
 | Expected type             | TypeScript type       |
-| ---                       | :---                  |
+| ---                       | ---                   |
 | String                    | string                |
 | Number                    | number                |
 | Boolean                   | boolean               | 
@@ -329,18 +333,16 @@ See the following cheat sheet for reference:
 | [User]                    | User[]                | 
 | [Any]                     | any[]                 | 
 
-At first, our array notation on the left looks odd. 
-But this notation allows you to define even nested arrays. 
-See the examples at the end of this document for more info about nesting arrays.
+At first, our array notation on the left looks odd. But this notation allows you to define even nested arrays. See the
+examples at the end of this document for more info about nesting arrays.
 
 ##### Adding a custom converter
 
 More advanced users may need to use custom converters. If you want
-`json2typescript` to use your custom converter, you need to follow these
-steps:
+`json2typescript` to use your custom converter, you need to follow these steps:
 
 - Write a converter class that implements `JsonCustomConvert<T>` where
-`<T>` is the type resulting in the TypeScript class.
+  `<T>` is the type resulting in the TypeScript class.
 - Make sure you add the `@JsonConverter` decorator to this class (see next chapter how).
 - Pass your converter class as second param in the `@JsonProperty` decorator
 
@@ -356,54 +358,94 @@ export class User {
 }
 ```
 
-#### Third parameter (optional): isOptional
+#### Third parameter (optional): convertingMode
 
-The third parameter of `@JsonProperty` determines whether the `jsonProperty` has to be present in the json.
-This parameter is optional; the default value is false.
+The third parameter of `@JsonProperty` determines how nullable property types should be serialized and deserialized.
+Nullable types are either missing (in JSON), undefined (in TypeScript) or null (both). This parameter is optional; the
+default value is `PropertyConvertingMode.MAP_NULLABLE`.
 
-By default, `JsonConvert` throws an exception if a decorated class property cannot be found in the given JSON when deserializing.
-If you set the third parameter to true, there is no exception when it is missing. 
-The type is still checked as soon the property is present again.
+See also the property `propertyConvertingMode` of the `JsonConvert` instance.
 
-The same applies for the case when you try to serialize a TypeScript object to a JSON object. If the property is not defined in the class and optional, it will not be added to the JSON object.
+The values should be used as follows:
 
-> Tip: Some API's return null instead of omitting optional values. 
-If you flag a property as optional, `json2typescript` will ignore (JSON) null values at deserialization and keep the default value of the property instead. 
-This fact is particularly helpful if your project uses TypeScript `strictNullChecks` or/and disallows `null` values through the `valueCheckingMode` property in `json2typescript`.
-Furthermore, note that the instance property `ignoreRequiredCheck` – if set to true – overrides all `isOptional` values for all properties.
+- `PropertyConvertingMode.MAP_NULLABLE`: the mapper is applied, type is checked
+- `PropertyConvertingMode.IGNORE_NULLABLE`: the mapper is not applied if the property is missing, undefined or null; the
+  property is not added to the result
+- `PropertyConvertingMode.PASS_NULLABLE`: the mapper is not applied if the property is missing, undefined or null; the
+  property is added with its value to the result
+
+> Tip: Make sure you import the `ENUM` `PropertyConvertingMode` when assigning a value to this property.
+
+##### Handling null, undefined and absent values
+
+Be careful when handling special values as `null`, `undefined` and `absent` properties.
+
+By default, `json2typescript` throws an exception if a decorated class property cannot be found in the given JSON when
+deserializing. If you set the third parameter to `IGNORE_NULLABLE` or `PASS_NULLABLE`, there will be no exception when
+it is missing. The type of a property will only be checked if the property is present in the JSON and not `undefined`
+or `null`.
+
+The global setting of `valueCheckingMode` determines whether you want to allow `null` values for objects or properties.
+We recommend to use the most strict option and also set your `TypeScript` compiler to the strict mode.
+
+The following table explains the difference between the three property converting modes:
+
+| **ALLOW_NULL** | `serialize(null)` | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
+| ---                         | ---               | ---                    |  ---                | --- |
+| `MAP_NULLABLE`              | `null` | error | `null` | error |
+| `IGNORE_NULLABLE`           | `undefined` (missing) | `undefined` (missing) | default value | default value |
+| `PASS_NULLABLE`             | `null` | `undefined` (missing) | `null` | `undefined` |
+| |
+| **DISALLOW_NULL** | `serialize(null)` | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
+| `MAP_NULLABLE`              | error | error | error | error |
+| `IGNORE_NULLABLE`           | `undefined` (missing) | `undefined` (missing) | default value | default value |
+| `PASS_NULLABLE`             | `null` | `undefined` (missing) | `null` | `undefined` |
+
+As shown in this table, a property with the default setting `MAP_NULLABLE` is never allowed to be `undefined` (or
+missing). The `valueCheckingMode` determines, whether `null` is allowed.
+
+> Tip: If you want `undefined` to be treated in the same way as `null` values, you may set the instance `mapUndefinedToNull` property to `true`.
 
 #### Important notes
 
 * Make sure you define the expected type as accurate as possible, even if you expect primitive types.
-* By default, casting primitives into other primitives is not allowed. Check the public properties below in this document to change this behaviour.
+* By default, casting primitives into other primitives is not allowed. Check the public properties below in this
+  document to change this behaviour.
 * By default, primitives are not allowed to be null. Check the public properties below in this document to change this.
-* If you don't know the type, you may use `Any` as expected type. You may also omit the second parameter of `@JsonProperty`.
+* If you don't know the type, you may use `Any` as expected type. You may also omit the second parameter
+  of `@JsonProperty`.
 
 #### More about the array syntax
 
-* You can allow arrays by using the bracket notation combined with the types as seen above. For example: `[String]` for a string array
-* Mixing arrays is allowed. For example: `[String, Number]` for an array where the first entry is a string, the second is a number.
-* If the real array is longer than indicated here, the last type will be forced to the rest of the array entries (above: `Number`). 
+* You can allow arrays by using the bracket notation combined with the types as seen above. For example: `[String]` for
+  a string array
+* Mixing arrays is allowed. For example: `[String, Number]` for an array where the first entry is a string, the second
+  is a number.
+* If the real array is longer than indicated here, the last type will be forced to the rest of the array entries (
+  above: `Number`).
 * This means, `[String, Number]` is equivalent to `[String, Number, Number]` and so on.
 * Nesting arrays and objects are allowed. For example: `[[String, Number], User]`.
 * This is equivalent to `[[String, Number, Number], User, User]` and so on.
-* As further example, `[[String]]` is equal to `[[String],[String]]` which is equal to  `[[String,String], [String,String]]` and so on.
+* As further example, `[[String]]` is equal to `[[String],[String]]` which is equal
+  to  `[[String,String], [String,String]]` and so on.
 * If an array has less elements as given in the expected type, no exception is thrown.
-* For example, if we define `[String]` or the equivalent `[String, String]` no exception is thrown - even if the JSON gives us an empty array.
+* For example, if we define `[String]` or the equivalent `[String, String]` no exception is thrown - even if the JSON
+  gives us an empty array.
 
 > Tip: See the examples at the end of this document for advanced examples for nesting arrays.
 
 ### Custom converter decorators
 
-In some cases, you may need to make custom conversion between JSON objects and TypeScript objects. You can define custom converters like this:
-
+In some cases, you may need to make custom conversion between JSON objects and TypeScript objects. You can define custom
+converters like this:
 
 ```typescript
 @JsonConverter
 class DateConverter implements JsonCustomConvert<Date> {
     serialize(date: Date): any {
-        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +  date.getDate();
+        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     }
+
     deserialize(date: any): Date {
         return new Date(date);
     }
@@ -412,8 +454,9 @@ class DateConverter implements JsonCustomConvert<Date> {
 
 > Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same type between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
 
-Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you simply have use the `@JsonProperty` decorator as follows:
-
+Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the
+custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you
+simply have use the `@JsonProperty` decorator as follows:
 
 ```typescript
 @JsonObject("User")
@@ -425,8 +468,6 @@ export class User {
 
 With this approach, you will achieve that your property `date` is going to be a real instance of `Date`.
 
-
-
 ## JsonConvert class properties and methods
 
 ### Public properties
@@ -435,22 +476,23 @@ With this approach, you will achieve that your property `date` is going to be a 
 
 `(number) JsonConvert.operationMode`
 
-Determines how the JsonConvert class instance should operate. 
+Determines how the JsonConvert class instance should operate.
 
 You may assign three different values:
+
 - `OperationMode.DISABLE`: json2typescript will be disabled, no type checking or mapping is done
 - `OperationMode.ENABLE`: json2typescript is enabled, but only errors are logged
 - `OperationMode.LOGGING`: json2typescript is enabled and detailed information is logged
 
 The default value is `OperationMode.ENABLE`. It will only print errors to the console and is suited for production.
 
-In some cases, you might consider disabling `json2typescript` in production by setting the `OperationMode.DISABLE` flag. 
-This only works in case you only use plain objects without functionality and no mapping. 
-However, disabling `json2typescript` might give you a performance advantage in heavy projects.
+In some cases, you might consider disabling `json2typescript` in production by setting the `OperationMode.DISABLE` flag.
+This only works in case you only use plain objects without functionality and no mapping. However,
+disabling `json2typescript` might give you a performance advantage in heavy projects.
 
 In case you have issues to find bugs, you can enable additional logging by setting the `OperationMode.LOGGING` flag.
-Please note that every serializing and deserializing is heavily logged to the console and will make your application slower.
-Never use this flag in production.
+Please note that every serializing and deserializing is heavily logged to the console and will make your application
+slower. Never use this flag in production.
 
 > Tip: Make sure you import the `ENUM` `OperationMode` when assigning a value to this property.
 
@@ -458,26 +500,35 @@ Never use this flag in production.
 
 `(number) JsonConvert.valueCheckingMode`
 
-Determines which types are allowed to be null.
-You may assign three different values:
+Determines which types are allowed to be null in the deserialization. You may assign three different values:
+
 * `ValueCheckingMode.ALLOW_NULL`: All given values can be null
 * `ValueCheckingMode.ALLOW_OBJECT_NULL`: Objects can be null, but primitive types cannot be null
 * `ValueCheckingMode.DISALLOW_NULL`: No null values are tolerated
 
-The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`. 
+The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 > Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
 
-> Tip: The TypeScript documentation suggests to avoid null values.
-Compile your TypeScript code with `strictNullChecks=true` and set the `valueCheckingMode` to disallow null values.
-If your API returns `null` in some cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on runtime.
+> Tip: The TypeScript documentation suggests to avoid null values. Compile your TypeScript code with `strictNullChecks=true` and set the `valueCheckingMode` to disallow null values. If your API returns `null` in some cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on runtime.
+
+#### Map undefined to null
+
+`(number) JsonConvert.mapUndefinedToNull`
+
+Determines whether a missing or undefined property value should be considered as null or not.
+
+If true, a missing JSON value will be added and set as null before deserialization. For serialization, undefined values
+will be set to null before serialization.
+
+> Note: ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during serialization or deserialization.
 
 #### Ignore primitive checks
 
 `(bool) JsonConvert.ignorePrimitiveChecks`
 
-Determines whether primitive types should be checked. 
-If true, it will be allowed to assign primitive to other primitive types.
+Determines whether primitive types should be checked. If true, it will be allowed to assign primitive to other primitive
+types.
 
 The default is `false`.
 
@@ -485,22 +536,39 @@ The default is `false`.
 
 `(number) JsonConvert.propertyMatchingRule`
 
-Determines the rule of how JSON properties shall be matched with class properties during deserialization.
-You may assign the following two values:
+Determines the rule of how JSON properties shall be matched with class properties during deserialization. You may assign
+the following two values:
+
 * `PropertyMatchingRule.CASE_STRICT`: JSON properties need to match exactly the names in the decorators
-* `PropertyMatchingRule.CASE_INSENSITIVE`: JSON properties need to match names in the decorators, but names they are not case sensitive
+* `PropertyMatchingRule.CASE_INSENSITIVE`: JSON properties need to match names in the decorators, but names they are not
+  case sensitive
 
 The default is `PropertyMatchingRule.CASE_STRICT`.
 
-#### Ignore required property checks
+#### Property converting mode
 
-`(bool) JsonConvert.ignoreRequiredCheck`
+`(number|undefined) JsonConvert.propertyConvertingMode`
 
-Determines whether the check for required properties should be ignored, making all mapped values optional, whether or not the isOptional property mapping parameter is set.
-If true, any missing properties (undefined or null) when serializing or deserializing will be ignored, as if they were marked optional.  
-Note that properties explicitly set to null will be unaffected by this flag – they will be ignored if optional and included if not.
+Determines how nullable property types should be serialized and deserialized. Nullable types are either missing (in
+JSON), undefined (in TypeScript) or null (both).
 
-The default is `false`.
+If the propertyConvertingMode has a non-undefined value, it overrides the individual settings of every property. See
+also the third parameter of the `@JsonProperty` decorator.
+
+The values should be used as follows:
+
+- `PropertyConvertingMode.MAP_NULLABLE`: the mapper is applied, type is checked
+- `PropertyConvertingMode.IGNORE_NULLABLE`: the mapper is not applied if the property is missing, undefined or null; the
+  property is
+    * not added to the result
+- `PropertyConvertingMode.PASS_NULLABLE`: the mapper is not applied if the property is missing, undefined or null; the
+  property is
+    * added with its value to the result
+
+The default is `PropertyMatchingRule.MAP_NULLABLE`.
+
+> This property is usually only temporarily set and should be used with caution.
+> It replaces the deprecated property `ignoreRequiredCheck`.
 
 #### Use discriminator
 
@@ -526,29 +594,33 @@ The default is `"$type"`.
 `json2typescript` allows you to map JSON objects (or arrays) to TypeScript objects (or arrays) and vice versa.
 
 #### Serializing (TypeScript to JSON)
- 
+
 `(any|any[]) serialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U })`
 
-Tries to serialize a TypeScript object or array of objects to JSON. 
+Tries to serialize a TypeScript object or array of objects to JSON.
 
 The first parameter must be a TypeScript object or array, the second parameter is the optional class reference.
 
-If you provide only one parameter, the class for serialization is inferred automatically.
-For example, if you call `jsonConvert.serialize(user)` where `user` is an instance of the class `User`, `json2typescript` will automatically use this class for serialization.
+If you provide only one parameter, the class for serialization is inferred automatically. For example, if you
+call `jsonConvert.serialize(user)` where `user` is an instance of the class `User`, `json2typescript` will automatically
+use this class for serialization.
 
-By providing two parameters, it will override the class for serialization.
-For example, this allows you to call `jsonConvert.serialize(userObject, User)` where `userObject` is just a plain TypeScript `any` object.
+By providing two parameters, it will override the class for serialization. For example, this allows you to
+call `jsonConvert.serialize(userObject, User)` where `userObject` is just a plain TypeScript `any` object.
 
 The returned value will be `any` object or an array of `any` objects.
 
 > Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the serialize method.
 
-You may optionally provide a class constructor to use the `@JsonProperty` mappings defined for that class to serialize the data object(s), instead of mappings defined on the data class.  Note that if the data is an array, the mappings from the constructor class are used for *all* elements in the array.  If no constructor is provided, the mappings from the data object class are used to serialize the data object(s).
+You may optionally provide a class constructor to use the `@JsonProperty` mappings defined for that class to serialize
+the data object(s), instead of mappings defined on the data class. Note that if the data is an array, the mappings from
+the constructor class are used for *all* elements in the array. If no constructor is provided, the mappings from the
+data object class are used to serialize the data object(s).
 
 > Tip: This feature is helpful if you need to serialize an object that was not created using a class constructor, or if you want to serialize a subclass with only the properties of the superclass.
 
 #### Deserializing (JSON to TypeScript)
- 
+
 `(T | T[]) deserialize<T extends object>(json: any, classReference: { new(): T })`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
@@ -557,7 +629,7 @@ The first parameter must be a Typescript object or array, the second parameter i
 
 The returned value will be an instance or an array of instances of the given class reference.
 
-> Tip: The param `json` must not be a string, but an `object` or an `array`.  Use `JSON.parse()` before applying the deserialize method in case you have a json string.
+> Tip: The param `json` must not be a string, but an `object` or an `array`. Use `JSON.parse()` before applying the deserialize method in case you have a json string.
 
 #### Registering and unregistering classes
 
@@ -577,15 +649,14 @@ Unregisters all classes from the discriminator feature.
 
 #### Other methods
 
-The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or array).
-In case you would like to force `json2typescript` to use a specific way, you can use the following methods instead:
+The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or
+array). In case you would like to force `json2typescript` to use a specific way, you can use the following methods
+instead:
 
 - `(any) serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U })`
 - `(any[]) serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U })`
 - `(T) deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T })`
 - `(T[]) deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T })`
-
-
 
 ---
 
@@ -595,8 +666,8 @@ In case you don't have enough complex examples yet, you may find some more in th
 
 ## Nesting arrays
 
-It is heavily discouraged to use nested arrays and use different types in a JSON api. 
-If you need them anyway, here is how you have to define the types:
+It is heavily discouraged to use nested arrays and use different types in a JSON api. If you need them anyway, here is
+how you have to define the types:
 
 ### 1) Nested arrays with same type
 
@@ -604,10 +675,16 @@ In the following example, `jsonKeyOfWeirdKeywords` is a key in the JSON object d
 
 ```JSON
 {
-    "jsonKeyOfWeirdKeywords": [
-        ["Hello", "World"],
-        ["Bye", "Earth"]
+  "jsonKeyOfWeirdKeywords": [
+    [
+      "Hello",
+      "World"
+    ],
+    [
+      "Bye",
+      "Earth"
     ]
+  ]
 }
 ```
 
@@ -629,10 +706,13 @@ In the following example, `JSONKeyOfWeirdKeywords` is a key in the JSON object d
 
 ```JSON
 {
-    "jsonKeyOfWeirdKeywords": [
-        ["FC", "Basel"],
-        1893
-    ]
+  "jsonKeyOfWeirdKeywords": [
+    [
+      "FC",
+      "Basel"
+    ],
+    1893
+  ]
 }
 ```
 
@@ -706,7 +786,9 @@ This means, your property can be safely declared in TypeScript as union type of 
 
 ## Class decorator generator
 
-Since version 1.4, `json2typescript` requires the `@JsonObject("ClassName")` decorator in front of the TypeScript class definition. GitHub user `tlmurphy` created a Python script that automatically generates the decorator with the original class name as parameter.
+Since version 1.4, `json2typescript` requires the `@JsonObject("ClassName")` decorator in front of the TypeScript class
+definition. GitHub user `tlmurphy` created a Python script that automatically generates the decorator with the original
+class name as parameter.
 
 More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
 
@@ -714,9 +796,10 @@ More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
 
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**AppVision GmbH**).
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**
+AppVision GmbH**).
 
 ## Special thanks
 
-You are welcome to report issues and discuss enhancements to make this package even more useful.
-Thanks for the input and all the pull requests from the community!
+You are welcome to report issues and discuss enhancements to make this package even more useful. Thanks for the input
+and all the pull requests from the community!

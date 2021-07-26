@@ -5,5 +5,5 @@ export interface IDog {
     friends?: any[];
     barking: boolean;
     other: number;
-    toys?: string[];
+    toys: string[];
 }

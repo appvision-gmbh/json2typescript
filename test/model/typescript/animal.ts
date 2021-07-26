@@ -1,5 +1,4 @@
 import { JsonObject, JsonProperty } from "../../../src/json2typescript/json-convert-decorators";
-import { Any } from "../../../src/json2typescript/any";
 
 import { DateConverter } from "./date-converter";
 import { Human } from "./human";
@@ -14,9 +13,9 @@ export class Animal {
     owner: Human | null = null;
 
     @JsonProperty("birthdate", DateConverter, true)
-    birthdate: Date | null = null;
+    birthdate: Date | null = null;
 
-    @JsonProperty("friends", Any, true)
-    friends: Any[] | null = null;
+    @JsonProperty("friends", [Animal], true)
+    friends: Animal[] | null = null;
 
 }
