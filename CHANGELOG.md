@@ -1,4 +1,4 @@
-# v1.5.0 (2021-07-23)
+# v1.5.0 (2021-07-26)
 
 ## Bug Fixes
 
@@ -7,10 +7,15 @@
 ## Features
 
 * Improve method types, closes [#137](https://github.com/appvision-gmbh/json2typescript/pull/137)
-* Add more optional property flags, closes [#138](https://github.com/appvision-gmbh/json2typescript/pull/138)
+* Change property decorator flags, closes [#138](https://github.com/appvision-gmbh/json2typescript/pull/138)
 * Add esm module format in order to fix CommonJS issue with Angular 10, closes [#147](https://github.com/appvision-gmbh/json2typescript/issues/147)
 * Improved docs about property initialization, closes [#149](https://github.com/appvision-gmbh/json2typescript/pull/149)
 * Implement discriminator feature, closes [#165](https://github.com/appvision-gmbh/json2typescript/pull/165)
+
+## Breaking Changes
+
+* There are no breaking changes to be expected. 
+  The usage of the third parameter of the `@JsonProperty` decorator has slightly changed but is downward compatible.
 
 # v1.4.1 (2020-04-14)
 
@@ -27,8 +32,8 @@
 ## Breaking Changes
 
 * The older versions did not enforce developers the use of the `@JsonObject(classId)` decorator. 
-If you do not use the class decorator or have no parameter given, please update according to the docs.
-This is now mandatory, closes [#129](https://github.com/AppVision-GmbH/json2typescript/issues/129) and [#130](https://github.com/AppVision-GmbH/json2typescript/issues/130)
+  If you do not use the class decorator or have no parameter given, please update according to the docs.
+  This is now mandatory, closes [#129](https://github.com/AppVision-GmbH/json2typescript/issues/129) and [#130](https://github.com/AppVision-GmbH/json2typescript/issues/130)
 
 # v1.3.0 (2020-04-13)
 
@@ -43,8 +48,8 @@ This is now mandatory, closes [#129](https://github.com/AppVision-GmbH/json2type
 ## Breaking Changes
 
 * In previous version, the serialization of plain objects failed, because instances of classes were required. 
-As of now, the serialization of plain object may succeed if the structure matches the class structure. 
-Thus, this is considered a soft breaking change.
+  As of now, the serialization of plain object may succeed if the structure matches the class structure. 
+  Thus, this is considered a soft breaking change.
 
 # v1.2.5 (2020-03-01)
 
@@ -89,7 +94,7 @@ Thus, this is considered a soft breaking change.
 ## Breaking Changes
 
 * If a property is declared optional (by `@JsonProperty(name, Type, true)`), then `null` is now ignored in both serialization and deserialization. 
-Before this version, `json2typescript` would have thrown an error if `ValueChecking.DISALLOW_NULL` was used.
+  Before this version, `json2typescript` would have thrown an error if `ValueChecking.DISALLOW_NULL` was used.
 
 # v1.1.1 (2019-02-12)
 

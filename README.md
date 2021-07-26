@@ -35,7 +35,12 @@ console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... 
 
 See the changelog in the separate file for bug fixes, new features and breaking changes: [Changelog](CHANGELOG.md)
 
-> Tip: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
+> Warning: If you are reading this document on GitHub, it might be ahead of the published NPM version.
+> Please refer to the [ReadMe on NPM](https://www.npmjs.com/package/json2typescript) if in doubt.
+
+> Warning: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. 
+> Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. 
+> In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
 
@@ -558,7 +563,7 @@ The values should be used as follows:
 
 The default is `PropertyMatchingRule.MAP_NULLABLE`.
 
-> This property is usually only temporarily set and should be used with caution.
+> Note: This property is usually only temporarily set and should be used with caution.
 > It replaces the deprecated property `ignoreRequiredCheck`.
 
 #### Use discriminator
@@ -570,6 +575,8 @@ If this option is set to true, all registered classes will be serialized with an
 When deserializing an object containing the discriminator property, json2typescript will attempt to automatically instantiate the correct type (by comparing the value of the discriminator property with the registered classes).
 
 The default is `false`.
+
+> Note: At the end of this document you may find an example on how to use the discriminator feature.
 
 #### Discriminator property name
 
@@ -649,15 +656,17 @@ instead:
 - `(T) deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T })`
 - `(T[]) deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T })`
 
+
+
 ---
 
-# Further examples
+# Advanced strategies
 
-In case you don't have enough complex examples yet, you may find some more in this section.
+In this section you will find additional examples.
 
 ## Nesting arrays
 
-It is heavily discouraged to use nested arrays and use different types in a JSON api. If you need them anyway, here is
+It is heavily discouraged to use nested arrays and use different types in a JSON API. If you need them anyway, here is
 how you have to define the types:
 
 ### 1) Nested arrays with same type
@@ -755,10 +764,10 @@ const user1: User = jsonConvert.deserialize(jsonObject, User);
 
 // But now you may automatically map it thanks to the $type property
 const user2: User = jsonConvert.deserialize<User>(jsonObject);
-
 ```
 
-> Note: This feature is particularly useful when doing dynamic mapping. Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
+> Note: This feature is particularly useful when doing dynamic mapping. 
+> Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
 
 A real-world example for the discriminator feature is the mapping of child classes.
 
@@ -787,8 +796,7 @@ More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
 
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, software architect at his own company (**
-AppVision GmbH**).
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, founder of and software architect at **AppVision GmbH**.
 
 ## Special thanks
 
