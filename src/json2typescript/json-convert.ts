@@ -652,7 +652,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize<T extends object>(json: object | object[], classReference: { new(): T }): T | T[] {
+    deserialize<T extends object>(json: object | object[], classReference: { new(): T } | null = null): T | T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return json as T | T[];
@@ -685,11 +685,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T } | null): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject as T;
         }
+
+        const realClassReference = this.getRealClassReference(jsonObject, classReference);
 
         jsonObject = this.mapUndefinedToNull && jsonObject === undefined ? null as any : jsonObject;
 
@@ -732,7 +734,7 @@ export class JsonConvert {
             console.log(jsonObject);
         }
 
-        let instance: T = new classReference();
+        let instance: T = new realClassReference();
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
@@ -770,11 +772,17 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T }): T[] {
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T } | null): T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonArray as T[];
         }
+
+        /*let baseClassReference = classReference;
+
+        if (classReference === null){
+            baseClassReference = this.getBaseClassReferenceForFirstElementInArray(jsonArray);
+        }*/
 
         jsonArray = this.mapUndefinedToNull && jsonArray === undefined ? null as any : jsonArray;
 
@@ -839,6 +847,60 @@ export class JsonConvert {
     // PRIVATE METHODS //
     /////////////////////
 
+    /**
+     * Returns the correct class reference for the provided JSON object.
+     * If the provided class reference is null, the class reference is retrieved from the class map using the discriminator property.
+     *
+     * @param jsonObject the JSON object
+     * @param classReference the class reference
+     * @throws throws an Error in case of failure
+     */
+    private getRealClassReference<T extends object>(jsonObject: any, classReference: { new(): T } | null): { new(): T } {
+        if (classReference === null && !this._useDiscriminator) {
+            throw new Error(
+              "Fatal error in JsonConvert. " +
+              "Passed parameter classReference in JsonConvert.deserialize() is null. " +
+              "This is only allowed if discriminator feature is enabled." +
+              "\n"
+            );
+        }
+
+        if (classReference === null) {
+            if (jsonObject.hasOwnProperty(this._discriminatorPropertyName)) {
+                const discriminatorValue: string = jsonObject[this._discriminatorPropertyName].toString();
+
+                return this.getClassReferenceByName(discriminatorValue);
+            } else {
+                throw new Error(
+                  "Fatal error in JsonConvert. " +
+                  "Discriminator property '" + this._discriminatorPropertyName + "' is missing in JSON object." +
+                  "\n"
+                );
+            }
+        } else {
+            return classReference;
+        }
+    }
+
+    /**
+     * Returns the class reference for the provided name.
+     *
+     * @param className the class name
+     * @throws throws an Error in case of failure
+     */
+    private getClassReferenceByName<T extends object>(className: string): { new(): T } {
+        const classReferenceNameFromMap = this._classes.get(className);
+
+        if (classReferenceNameFromMap !== undefined && classReferenceNameFromMap !== null) {
+            return classReferenceNameFromMap;
+        } else {
+            throw new Error(
+              "Fatal error in JsonConvert. " +
+              "Discriminator value '" + className + "' is not mapped to a class reference." +
+              "\n"
+            );
+        }
+    }
 
     /**
      * Tries to find the JSON mapping for a given class property from the given instance used for mapping,
