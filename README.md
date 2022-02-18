@@ -619,11 +619,12 @@ data object class are used to serialize the data object(s).
 
 #### Deserializing (JSON to TypeScript)
 
-`(T | T[]) deserialize<T extends object>(json: any, classReference: { new(): T })`
+`(T | T[]) deserialize<T extends object>(json: any, classReference: { new(): T } | null = null)`
 
 Tries to deserialize given JSON to a TypeScript object or array of objects.
 
 The first parameter must be a Typescript object or array, the second parameter is the class reference.
+If the discriminator feature is used, the class reference is optional.
 
 The returned value will be an instance or an array of instances of the given class reference.
 

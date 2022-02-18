@@ -778,12 +778,6 @@ export class JsonConvert {
             return jsonArray as T[];
         }
 
-        /*let baseClassReference = classReference;
-
-        if (classReference === null){
-            baseClassReference = this.getBaseClassReferenceForFirstElementInArray(jsonArray);
-        }*/
-
         jsonArray = this.mapUndefinedToNull && jsonArray === undefined ? null as any : jsonArray;
 
         // Check if the passed type is allowed
@@ -865,7 +859,7 @@ export class JsonConvert {
             );
         }
 
-        if (classReference === null) {
+        if (this._useDiscriminator) {
             if (jsonObject.hasOwnProperty(this._discriminatorPropertyName)) {
                 const discriminatorValue: string = jsonObject[this._discriminatorPropertyName].toString();
 
@@ -878,7 +872,7 @@ export class JsonConvert {
                 );
             }
         } else {
-            return classReference;
+            return classReference!;
         }
     }
 
