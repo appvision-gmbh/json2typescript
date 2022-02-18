@@ -685,7 +685,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T } | null): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T } | null = null): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject as T;
@@ -772,7 +772,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T } | null): T[] {
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T } | null = null): T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonArray as T[];
