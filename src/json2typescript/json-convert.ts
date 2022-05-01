@@ -850,30 +850,39 @@ export class JsonConvert {
      * @throws throws an Error in case of failure
      */
     private getRealClassReference<T extends object>(jsonObject: any, classReference: { new(): T } | null): { new(): T } {
-        if (classReference === null && !this._useDiscriminator) {
-            throw new Error(
-              "Fatal error in JsonConvert. " +
-              "Passed parameter classReference in JsonConvert.deserialize() is null. " +
-              "This is only allowed if discriminator feature is enabled." +
-              "\n"
-            );
-        }
 
-        if (this._useDiscriminator) {
-            if (jsonObject.hasOwnProperty(this._discriminatorPropertyName)) {
-                const discriminatorValue: string = jsonObject[this._discriminatorPropertyName].toString();
+        if (this.useDiscriminator) {
 
+            if (jsonObject.hasOwnProperty(this.discriminatorPropertyName)) {
+
+                const discriminatorValue: string = jsonObject[this.discriminatorPropertyName] ?? "";
                 return this.getClassReferenceByName(discriminatorValue);
+
             } else {
+
                 throw new Error(
                   "Fatal error in JsonConvert. " +
-                  "Discriminator property '" + this._discriminatorPropertyName + "' is missing in JSON object." +
+                  "Discriminator property '" + this.discriminatorPropertyName + "' is missing in JSON object." +
                   "\n"
                 );
+
             }
+
         } else {
-            return classReference!;
+
+            if (classReference === null) {
+                throw new Error(
+                    "Fatal error in JsonConvert. " +
+                    "Passed parameter classReference in JsonConvert.deserialize() is null. " +
+                    "This is only allowed if discriminator feature is enabled." +
+                    "\n"
+                );
+            }
+
+            return classReference;
+
         }
+
     }
 
     /**
@@ -883,17 +892,20 @@ export class JsonConvert {
      * @throws throws an Error in case of failure
      */
     private getClassReferenceByName<T extends object>(className: string): { new(): T } {
-        const classReferenceNameFromMap = this._classes.get(className);
+
+        const classReferenceNameFromMap = this.classes.get(className);
 
         if (classReferenceNameFromMap !== undefined && classReferenceNameFromMap !== null) {
             return classReferenceNameFromMap;
         } else {
             throw new Error(
               "Fatal error in JsonConvert. " +
-              "Discriminator value '" + className + "' is not mapped to a class reference." +
+              "Discriminator value \"" + className + "\" is not mapped to a class reference. " +
+              "Make sure you register the class using the method JsonConvert.registerClasses(" + className + ")" +
               "\n"
             );
         }
+
     }
 
     /**
