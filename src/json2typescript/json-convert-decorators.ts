@@ -14,18 +14,16 @@ export function JsonConverter(target: any): void {
 /**
  * Decorator of a class that comes from a JSON object.
  *
- * @param target the class identifier or the class
+ * @param classIdentifier the class identifier
  *
  * @returns
  *
  * @throws Error
  */
-export function JsonObject(target: string | any): (target: any) => void {
-    // target is the constructor or the custom class name
+export function JsonObject(classIdentifier: string): (target: any) => void {
 
-    let classIdentifier = "";
+    return (target: any): void => {
 
-    const decorator = (target: any): void => {
 
         target.prototype[Settings.CLASS_IDENTIFIER] = classIdentifier.length > 0 ? classIdentifier : target.name;
 
@@ -47,30 +45,6 @@ export function JsonObject(target: string | any): (target: any) => void {
         }
 
     };
-
-    const type: string = typeof target;
-
-    switch (type) {
-
-        // Decorator was @JsonObject(classId)
-        case "string":
-            classIdentifier = target;
-            return decorator;
-
-        // Decorator was @JsonObject
-        // Decorator was @JsonObject()
-        // Decorator was @JsonObject(123)
-        case "function":
-        case "undefined":
-        default:
-
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "It is mandatory to pass a string as parameter in the @JsonObject decorator.\n\n" +
-                "Use @JsonObject(classId) where classId is a string.\n\n"
-            );
-
-    }
 
 }
 
