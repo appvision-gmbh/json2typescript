@@ -337,16 +337,16 @@ export class JsonConvert {
     }
 
     /**
-     * Determines all classes which should use the lazy loading or discriminator feature.
-     * Only classes provided here can be enriched with lazy loading or the discriminator property.
+     * Determines all classes which should use the lazy-loading or discriminator feature.
+     * Only classes provided here can be used with lazy-loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     private _classes: Map<string, (new() => any)> = new Map();
 
     /**
-     * Determines all classes which should use the lazy loading or discriminator feature.
-     * Only classes provided here can be enriched with lazy loading or the discriminator property.
+     * Determines all classes which should use the lazy-loading or discriminator feature.
+     * Only classes provided here can be used with lazy-loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -1212,7 +1212,7 @@ export class JsonConvert {
             // Check if objects match
             if ((expectedType instanceof Object || typeof expectedType === "string") && value instanceof Object) {
 
-                // If the expected type is a string (means: lazy loading), get the real type from the registered classes
+                // If the expected type is a string (means: lazy-loading), get the real type from the registered classes
                 if (typeof expectedType === "string") {
                     const realExpectedType = this.classes.get(expectedType);
                     if (!realExpectedType) {

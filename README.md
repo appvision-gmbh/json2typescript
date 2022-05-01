@@ -38,8 +38,8 @@ See the changelog in the separate file for bug fixes, new features and breaking 
 > Warning: If you are reading this document on GitHub, it might be ahead of the published NPM version.
 > Please refer to the [ReadMe on NPM](https://www.npmjs.com/package/json2typescript) if in doubt.
 
-> Warning: We earlier suggested to use the `@JsonObject(classId)` decorator, but did not enforce it. 
-> Since v1.4.0, this is mandatory in order to make (de)serialization work properly with class inheritance. 
+> Warning: We earlier suggested to use the `@JsonObject(classIdentifier)` decorator, but did not enforce it. 
+> Since v1.4.0, it is mandatory to use a unique classIdentifier for every class in order to make (de)serialization work properly with class inheritance. 
 > In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
@@ -87,11 +87,11 @@ Now you are ready to use the package.
 In order to use the **json2typescript** package, all you need to do is write decorators and import the package. The
 following things need to be done if you would like to map JSON to existing classes:
 
-* Classes need to be preceeded by `@JsonObject(classIdentifier)`
-* Properties need to be preceeded by `@JsonProperty(jsonProperty, conversionOption, convertingMode)`
+* Classes need to be preceded by `@JsonObject(classIdentifier)` where the classIdentifier is unique in the whole project
+* Properties need to be preceded by `@JsonProperty(jsonProperty, conversionOption, convertingMode)`
 * Properties need to have a default value (or undefined), otherwise the mapper will not work
 
-See below an example so you can learn from it how **json2typescript** works best.
+See below an example, so you can learn from it how **json2typescript** works best.
 
 Assuming that you have created the **testApplication** in the step before and installed **json2typescript** as
 suggested, create a class in a new file **city.ts** with the following content:
@@ -99,7 +99,7 @@ suggested, create a class in a new file **city.ts** with the following content:
 ```typescript
 import { JsonObject, JsonProperty } from "json2typescript";
 
-@JsonObject("City")
+@JsonObject("City") // Make sure "City" is a unique identifier for this class
 export class City {
 
     // This property has no @JsonProperty. 
@@ -153,7 +153,7 @@ Now create a file **country.ts** with the following content:
 import { City } from "./city";
 import { JsonObject, JsonProperty } from "json2typescript";
 
-@JsonObject("Country")
+@JsonObject("Country") // Make sure "Country" is a unique identifier for this class
 export class Country {
 
     // This maps the value of the JSON key "countryName" to the class property "name".
@@ -331,6 +331,10 @@ See the following cheat sheet for reference:
 
 At first, our array notation on the left looks odd. But this notation allows you to define even nested arrays. See the
 examples at the end of this document for more info about nesting arrays.
+
+> Tip: It is possible to lazy-load custom classes to prevent circular dependencies. 
+> Then, the expected type for custom classes can be written as a string. 
+> Please read further below how to implement this feature.
 
 ##### Adding a custom converter
 
@@ -634,17 +638,17 @@ The returned value will be an instance or an array of instances of the given cla
 
 `void registerClasses(...classReferences: { new(): any }[])`
 
-Registers a list of classes to be used in the discriminator feature.
+Registers a list of classes to be used with lazy-loading and in the discriminator feature.
 
 `void ungisterClasses(...classReferences: { new(): any }[])`
 
-Unregisters a list of classes from the discriminator feature.
+Unregisters a list of classes from lazy-loading and the discriminator feature.
 
 `void unregisterAllClasses()`
 
-Unregisters all classes from the discriminator feature.
+Unregisters all classes from lazy-loading and the discriminator feature.
 
-> Note: You only need to register and unregister classes if you use the discriminator feature. Otherwise, these methods are without any effect.
+> Note: You only need to register and unregister classes if you use lazy-loading or the discriminator feature. Otherwise, these methods are without any effect.
 
 #### Other methods
 
@@ -728,6 +732,48 @@ export class User {
 ```
 
 > Tip: In our syntax, `[[String, String], Number]` is equivalent to `[[String], Number]`.
+
+## Instantiation with the lazy-loading feature to avoid circular dependencies
+
+In some scenarios, developers run into circular dependencies when declaring objects. 
+A simple example would be two classes importing each other:
+
+```typescript
+import { User } from "./user";
+
+@JsonObject("Team")
+export class Team {
+    @JsonProperty("users", [User])
+    user: User[] = [];
+}
+```
+
+```typescript
+import { Team } from "./team";
+
+@JsonObject("User")
+export class User {
+    @JsonProperty("teams", [Team])
+    team: Team[] = [];
+}
+```
+
+This is generally not possible because of the circular dependency.
+But since TypeScript 3.8, you may use [type imports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html) in order to bypass circular dependencies.
+
+`json2typescript` implements a lazy-loading feature so that the above example is possible.
+The following steps need to be done:
+- Import only the type, for example by writing `import type { User } from "./user";`. Note that we added the `type` keyword.
+- Do not use the class reference in the `@JsonProperty` decorator, but instead use the classIdentifier (as string) given in the `@JsonObject` decorator.
+For example, write `@JsonProperty("users", ["User"])`. Note that we added the `"` around the User.
+- Register all lazy-loading classes before ever using them with `json2typescript`. 
+You may simply call `jsonConvert.registerClasses(User, Team)` for the example above.
+
+Now you can use the classes `User` and `Team` as expected.
+
+> Note: Using type imports may cause other problems in your classes because the imports may only be used for type contexts.
+> For example, you will not be able to write `new Team()` in the `User` class at all.
+> However, you still will be able to use `Team` as a type in the `User` class and access all its properties and methods.
 
 ## Automatic instantiation using the discriminator feature
 

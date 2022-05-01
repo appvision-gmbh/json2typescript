@@ -1,4 +1,4 @@
-# v1.5.0 (2021-07-26)
+# v1.5.0 (2022-05-02)
 
 ## Bug Fixes
 
@@ -11,11 +11,13 @@
 * Add esm module format in order to fix CommonJS issue with Angular 10, closes [#147](https://github.com/appvision-gmbh/json2typescript/issues/147)
 * Improved docs about property initialization, closes [#149](https://github.com/appvision-gmbh/json2typescript/pull/149)
 * Implement discriminator feature, closes [#165](https://github.com/appvision-gmbh/json2typescript/pull/165)
+* Improve discriminator feature and add lazy-loading to prevent circular dependencies, closes [#181](https://github.com/appvision-gmbh/json2typescript/pull/181)
 
 ## Breaking Changes
 
 * There are no breaking changes to be expected. 
   The usage of the third parameter of the `@JsonProperty` decorator has slightly changed but is downward compatible.
+  Collisions with class identifiers in the `@JsonObject` decorators now throw an error.
 
 # v1.4.1 (2020-04-14)
 
@@ -31,7 +33,7 @@
 
 ## Breaking Changes
 
-* The older versions did not enforce developers the use of the `@JsonObject(classId)` decorator. 
+* The older versions did not enforce developers the use of the `@JsonObject(classIdentifier)` decorator. 
   If you do not use the class decorator or have no parameter given, please update according to the docs.
   This is now mandatory, closes [#129](https://github.com/AppVision-GmbH/json2typescript/issues/129) and [#130](https://github.com/AppVision-GmbH/json2typescript/issues/130)
 
