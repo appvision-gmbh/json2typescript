@@ -13,6 +13,7 @@ import { Dog } from "./model/typescript/dog";
 import { DuplicateCat } from "./model/typescript/duplicate-cat";
 import { Human } from "./model/typescript/human";
 import { OptionalCat } from "./model/typescript/optional-cat";
+import { AnimalWithLazyHuman } from "./model/typescript/animal-with-lazy-human";
 
 describe("JsonConvert integration tests", () => {
 
@@ -338,6 +339,16 @@ describe("JsonConvert integration tests", () => {
             jsonConvert.deserialize(dog1JsonObject, Dog);
             expect((<any>jsonConvert).getClassPropertyMappingOptions(dog2, "toys").expectedJsonType)
                 .toEqual([String], "expectedJsonType after deserializing");
+        });
+
+        it("should use lazy-loading feature if classes registered", () => {
+            jsonConvert.registerClasses(Human);
+            expect(jsonConvert.deserializeObject(cat1AnimalOnlyJson, AnimalWithLazyHuman).getOwnerName()).toEqual("Andreas");
+            jsonConvert.unregisterAllClasses();
+        });
+
+        it("should throw an error if lazy-loading class not registered", () => {
+            expect(() => jsonConvert.deserializeObject(cat1AnimalOnlyJson, AnimalWithLazyHuman).getOwnerName()).toThrow();
         });
 
         it("should get class from discriminator property if enabled", () => {

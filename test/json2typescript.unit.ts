@@ -513,7 +513,7 @@ describe("JsonConvert unit tests", () => {
             expect((<any>jsonConvert).getExpectedType([String, [Boolean, Number]])).toBe("[string,[boolean,number]]");
             expect((<any>jsonConvert).getExpectedType([[null, Any], Object])).toBe("[[any,any],any]");
             expect((<any>jsonConvert).getExpectedType(undefined)).toBe("undefined");
-            expect((<any>jsonConvert).getExpectedType("?")).toBe("?????");
+            expect((<any>jsonConvert).getExpectedType("A")).toBe("A");
         });
         it("getJsonType()", () => {
             expect((<any>jsonConvert).getJsonType({name: "Andreas"})).toBe("object");

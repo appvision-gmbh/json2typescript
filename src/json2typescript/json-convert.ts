@@ -337,16 +337,16 @@ export class JsonConvert {
     }
 
     /**
-     * Determines all classes which should use the discriminator feature.
-     * Only classes provided here can be enriched with the discriminator property.
+     * Determines all classes which should use the lazy loading or discriminator feature.
+     * Only classes provided here can be enriched with lazy loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     private _classes: Map<string, (new() => any)> = new Map();
 
     /**
-     * Determines all classes which should use the discriminator feature.
-     * Only classes provided here can be enriched with the discriminator property.
+     * Determines all classes which should use the lazy loading or discriminator feature.
+     * Only classes provided here can be enriched with lazy loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -1210,7 +1210,17 @@ export class JsonConvert {
         } else if (expectedDimension === "1" && (valueDimension === "1" || valueDimension === "1or2")) {
 
             // Check if objects match
-            if (expectedType instanceof Object && value instanceof Object) {
+            if ((expectedType instanceof Object || typeof expectedType === "string") && value instanceof Object) {
+
+                // If the expected type is a string (means: lazy loading), get the real type from the registered classes
+                if (typeof expectedType === "string") {
+                    const realExpectedType = this.classes.get(expectedType);
+                    if (!realExpectedType) {
+                        throw new Error("\tReason: Given expected type \"" + expectedType + "\" not registered with JsonConvert.registerClasses().");
+                    }
+                    expectedType = realExpectedType;
+                }
+
                 if (expectedType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) {
                     return serialize ?
                         this.serializeObject(value, expectedType) :
@@ -1218,6 +1228,7 @@ export class JsonConvert {
                 } else {
                     return value;
                 }
+
             } else {
 
                 // Check for null values
@@ -1338,6 +1349,8 @@ export class JsonConvert {
                 return (new expectedJsonType()).constructor.name.toLowerCase();
             } else if (typeof expectedJsonType === "function") {
                 return (new expectedJsonType()).constructor.name;
+            } else if (typeof expectedJsonType === "string") {
+                return expectedJsonType;
             } else if (expectedJsonType === undefined) {
                 return "undefined"
             } else {
