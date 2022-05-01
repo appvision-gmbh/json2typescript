@@ -372,10 +372,7 @@ describe("JsonConvert integration tests", () => {
 
         it("should not get class from discriminator property if enabled but no classes provided", () => {
             jsonConvert.useDiscriminator = true;
-            const result = <AnimalHolder>jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject, AnimalHolder);
-            expect(result.animal).toBeInstanceOf(Animal);
-            const isDog = result.animal instanceof Dog;
-            expect(isDog).toBeFalse();
+            expect(() => jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject, AnimalHolder)).toThrow();
             jsonConvert.useDiscriminator = false;
         });
 
