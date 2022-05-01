@@ -2,6 +2,12 @@ import { MappingOptions, Settings } from "./json-convert-options";
 import { Any } from "./any";
 import { PropertyConvertingMode } from "./json-convert-enums";
 
+
+/**
+ * Map of all registered json objects
+ */
+const jsonObjectsMap: Map<string, { new(): any }> = new Map<string, { new(): any }>();
+
 /**
  * Decorator of a class that is a custom converter.
  *
@@ -24,6 +30,18 @@ export function JsonObject(classIdentifier: string): (target: any) => void {
 
     return (target: any): void => {
 
+         // Store the classIdentifier with the actual class reference
+         if (jsonObjectsMap.has(classIdentifier)) {
+             throw new Error(
+                 "Fatal error in JsonConvert. " +
+                 "You must use unique class identifiers in the @JsonObject() decorator.\n\n" +
+                 "\tClass identifier: \n" +
+                 "\t\t" + classIdentifier + "\n\n" +
+                 "This class identifier has been already used for class \"" + jsonObjectsMap.get(classIdentifier)?.name + "\".\n\n"
+             );
+         } else {
+             jsonObjectsMap.set(classIdentifier, target);
+         }
 
         target.prototype[Settings.CLASS_IDENTIFIER] = classIdentifier.length > 0 ? classIdentifier : target.name;
 
