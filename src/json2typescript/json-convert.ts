@@ -337,16 +337,16 @@ export class JsonConvert {
     }
 
     /**
-     * Determines all classes which should use the discriminator feature.
-     * Only classes provided here can be enriched with the discriminator property.
+     * Determines all classes which should use the lazy-loading or discriminator feature.
+     * Only classes provided here can be used with lazy-loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     private _classes: Map<string, (new() => any)> = new Map();
 
     /**
-     * Determines all classes which should use the discriminator feature.
-     * Only classes provided here can be enriched with the discriminator property.
+     * Determines all classes which should use the lazy-loading or discriminator feature.
+     * Only classes provided here can be used with lazy-loading or the discriminator property.
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
@@ -652,7 +652,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserialize<T extends object>(json: object | object[], classReference: { new(): T }): T | T[] {
+    deserialize<T extends object>(json: object | object[], classReference: { new(): T } | null = null): T | T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return json as T | T[];
@@ -685,11 +685,13 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T }): T {
+    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T } | null = null): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject as T;
         }
+
+        const realClassReference = this.getRealClassReference(jsonObject, classReference);
 
         jsonObject = this.mapUndefinedToNull && jsonObject === undefined ? null as any : jsonObject;
 
@@ -732,7 +734,7 @@ export class JsonConvert {
             console.log(jsonObject);
         }
 
-        let instance: T = new classReference();
+        let instance: T = new realClassReference();
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
@@ -770,7 +772,7 @@ export class JsonConvert {
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
-    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T }): T[] {
+    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T } | null = null): T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonArray as T[];
@@ -839,6 +841,63 @@ export class JsonConvert {
     // PRIVATE METHODS //
     /////////////////////
 
+    /**
+     * Returns the correct class reference for the provided JSON object.
+     * If the provided class reference is null, the class reference is retrieved from the class map using the discriminator property.
+     *
+     * @param jsonObject the JSON object
+     * @param classReference the class reference
+     * @throws throws an Error in case of failure
+     */
+    private getRealClassReference<T extends object>(jsonObject: any, classReference: { new(): T } | null): { new(): T } {
+
+        // First determine if the discriminator is used or not
+        if (this.useDiscriminator) {
+
+            // Check if we find the $type property. If not, throw an error.
+            if (jsonObject.hasOwnProperty(this.discriminatorPropertyName)) {
+
+                const discriminatorValue: string = jsonObject[this.discriminatorPropertyName] ?? "";
+                const classReferenceNameFromMap = this.classes.get(discriminatorValue);
+
+                if (classReferenceNameFromMap !== undefined && classReferenceNameFromMap !== null) {
+                    return classReferenceNameFromMap;
+                } else {
+                    throw new Error(
+                        "Fatal error in JsonConvert. " +
+                        "Discriminator value \"" + discriminatorValue + "\" could not be found in the registered classes. " +
+                        "Make sure you register the class using the method JsonConvert.registerClasses(" + discriminatorValue + ")" +
+                        "\n"
+                    );
+                }
+
+            } else {
+
+                throw new Error(
+                  "Fatal error in JsonConvert. " +
+                  "Discriminator property \"" + this.discriminatorPropertyName + "\" is missing in JSON object." +
+                  "\n"
+                );
+
+            }
+
+        } else {
+
+            // Make sure the class reference is given for if the discriminator is disabled
+            if (classReference === null) {
+                throw new Error(
+                    "Fatal error in JsonConvert. " +
+                    "Passed parameter classReference in JsonConvert.deserialize() is null. " +
+                    "This is only allowed if discriminator feature is enabled." +
+                    "\n"
+                );
+            }
+
+            return classReference;
+
+        }
+
+    }
 
     /**
      * Tries to find the JSON mapping for a given class property from the given instance used for mapping,
@@ -1151,7 +1210,17 @@ export class JsonConvert {
         } else if (expectedDimension === "1" && (valueDimension === "1" || valueDimension === "1or2")) {
 
             // Check if objects match
-            if (expectedType instanceof Object && value instanceof Object) {
+            if ((expectedType instanceof Object || typeof expectedType === "string") && value instanceof Object) {
+
+                // If the expected type is a string (means: lazy-loading), get the real type from the registered classes
+                if (typeof expectedType === "string") {
+                    const realExpectedType = this.classes.get(expectedType);
+                    if (!realExpectedType) {
+                        throw new Error("\tReason: Given expected type \"" + expectedType + "\" not registered with JsonConvert.registerClasses().");
+                    }
+                    expectedType = realExpectedType;
+                }
+
                 if (expectedType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) {
                     return serialize ?
                         this.serializeObject(value, expectedType) :
@@ -1159,6 +1228,7 @@ export class JsonConvert {
                 } else {
                     return value;
                 }
+
             } else {
 
                 // Check for null values
@@ -1209,151 +1279,6 @@ export class JsonConvert {
         // All other attempts are fatal
         throw new Error("\tReason: Mapping failed because of an unknown error.");
 
-/*
-        // Map immediately if we don't care about the type
-        if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) {
-            return value;
-        }
-
-        // Map the property to null if necessary
-        if (value === undefined && this.mapUndefinedToNull) {
-            value = null;
-        }
-
-        // Check if attempt and expected was 1-d
-        if (expectedJsonType instanceof Array === false && value instanceof Array === false) {
-
-            // Check the type
-            if (typeof (expectedJsonType) !== "undefined" && expectedJsonType.prototype.hasOwnProperty(Settings.CLASS_IDENTIFIER)) { // only decorated custom objects have this injected property
-
-                // Check if we have null value
-                if (value === null) {
-                    if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
-                        return null;
-                    else throw new Error("\tReason: Given value is null.");
-                }
-
-                if (serialize) return this.serializeObject(value, expectedJsonType);
-                else return this.deserializeObject(value, expectedJsonType);
-
-            } else if (expectedJsonType === Any || expectedJsonType === null || expectedJsonType === Object) { // general object
-
-                // Check if we have null value
-                if (value === null) {
-                    if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL)
-                        return null;
-                    else throw new Error("\tReason: Given value is null.");
-                }
-
-                return value;
-
-            } else if (expectedJsonType === String || expectedJsonType === Number || expectedJsonType === Boolean) { // otherwise check for a primitive type
-
-                // Check if we have null value
-                if (value === null) {
-                    if (this.valueCheckingMode === ValueCheckingMode.ALLOW_NULL) return null;
-                    else throw new Error("\tReason: Given value is null.");
-                }
-
-                // Check if the types match
-                if ( // primitive types match
-                    (expectedJsonType === String && typeof (value) === "string") ||
-                    (expectedJsonType === Number && typeof (value) === "number") ||
-                    (expectedJsonType === Boolean && typeof (value) === "boolean")
-                ) {
-                    return value;
-                } else { // primitive types mismatch
-                    if (this.ignorePrimitiveChecks) return value;
-                    throw new Error("\tReason: Given object does not match the expected primitive type.");
-                }
-
-            } else { // other weird types
-
-                throw new Error(
-                    "\tReason: Expected type is unknown. There might be multiple reasons for this:\n" +
-                    "\t- You are missing the decorator @JsonObject (for object mapping)\n" +
-                    "\t- You are missing the decorator @JsonConverter (for custom mapping) before your class definition\n" +
-                    "\t- Your given class is undefined in the decorator because of circular dependencies"
-                );
-
-            }
-
-        }
-
-        // Check if expected was n-d
-        if (expectedJsonType instanceof Array) {
-            if (value === null) {
-                if (this.valueCheckingMode !== ValueCheckingMode.DISALLOW_NULL) return null;
-                else throw new Error("\tReason: Given value is null.");
-            }
-
-            // Check that value is not primitive
-            if (value instanceof Object) {
-                let array: any[] = [];
-
-                // No data given, so return empty value
-                if (value.length === 0) {
-                    return array;
-                }
-
-                // We obviously don't care about the type, so return the value as is
-                if (expectedJsonType.length === 0) {
-                    return value;
-                }
-                // Copy the expectedJsonType array so we don't change the class-level mapping based on the value of this property
-                const jsonType: any[] = expectedJsonType.slice(0);
-
-                // Check if attempt was n-d
-                if (value instanceof Array) {
-
-                    // Loop through the data. Both type and value are at least of length 1
-                    let autofillType: boolean = jsonType.length < value.length;
-                    for (let i = 0; i < value.length; i++) {
-
-                        if (autofillType && i >= jsonType.length) {
-                            jsonType[i] = jsonType[i - 1];
-                        }
-
-                        array[i] = this.verifyProperty(jsonType[i], value[i], serialize);
-
-                    }
-
-                    return array;
-
-                // Otherwise attempt was 1-d
-                } else {
-
-                    // Loop through the data. Both type and value are at least of length 1
-                    let autofillType: boolean = jsonType.length < Object.keys(value).length;
-                    let i = 0;
-                    for (let key in value) {
-
-                        if (autofillType && i >= jsonType.length) {
-                            jsonType[i] = jsonType[i - 1];
-                        }
-
-                        array[key as any] = this.verifyProperty(jsonType[i], value[key]);
-
-                        i++;
-                    }
-
-                    return array;
-
-                }
-
-            } else {
-                throw new Error("\tReason: Expected type is array, but given value is primitive.");
-            }
-        }
-
-        // Check if attempt was n-d and expected as 1-d
-        if (value instanceof Array) {
-            throw new Error("\tReason: Given value is array, but expected a non-array type.");
-        }
-
-        // All other attempts are fatal
-        throw new Error("\tReason: Mapping failed because of an unknown error.");
-*/
     }
 
     /**
@@ -1424,6 +1349,8 @@ export class JsonConvert {
                 return (new expectedJsonType()).constructor.name.toLowerCase();
             } else if (typeof expectedJsonType === "function") {
                 return (new expectedJsonType()).constructor.name;
+            } else if (typeof expectedJsonType === "string") {
+                return expectedJsonType;
             } else if (expectedJsonType === undefined) {
                 return "undefined"
             } else {
