@@ -1210,7 +1210,7 @@ export class JsonConvert {
         } else if (expectedDimension === "1" && (valueDimension === "1" || valueDimension === "1or2")) {
 
             // Check if objects match
-            if ((expectedType instanceof Object || typeof expectedType === "string") && value instanceof Object) {
+            if (((expectedType instanceof Object && [String, Number, Boolean].includes(expectedType) === false) || typeof expectedType === "string") && value instanceof Object) {
 
                 // If the expected type is a string (means: lazy-loading), get the real type from the registered classes
                 if (typeof expectedType === "string") {
@@ -1262,19 +1262,15 @@ export class JsonConvert {
                 ) {
                     return value;
                 } else {
-                    if (this.ignorePrimitiveChecks) return value;
+                    if (this.ignorePrimitiveChecks && ["string", "number", "boolean"].includes(typeof (value))) {
+                        return value;
+                    }
                     throw new Error("\tReason: Given value type does not match the expected primitive type.");
                 }
 
             }
 
         }
-
-        console.log("---------2");
-        console.log(expectedDimension);
-        console.log(expectedType);
-        console.log(valueDimension);
-        console.log(value);
 
         // All other attempts are fatal
         throw new Error("\tReason: Mapping failed because of an unknown error.");
