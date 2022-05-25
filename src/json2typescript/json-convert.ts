@@ -1270,12 +1270,6 @@ export class JsonConvert {
 
         }
 
-        console.log("---------2");
-        console.log(expectedDimension);
-        console.log(expectedType);
-        console.log(valueDimension);
-        console.log(value);
-
         // All other attempts are fatal
         throw new Error("\tReason: Mapping failed because of an unknown error.");
 
