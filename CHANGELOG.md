@@ -1,3 +1,9 @@
+# v1.5.1 (2022-05-25)
+
+## Bug Fixes
+
+* Throw error (again) when expected primitive type is object or array, closes [#187](https://github.com/appvision-gmbh/json2typescript/issues/187)
+
 # v1.5.0 (2022-05-02)
 
 ## Bug Fixes
