@@ -230,10 +230,10 @@ describe("JsonConvert integration tests", () => {
         });
 
         it("should partially serialize a TypeScript object to a JSON object", () => {
-            expect(() => jsonConvert.serializeObject(catPartialTypescript, Cat)).toThrow();
-            expect(jsonConvert.serializeObject(catPartialTypescript, Cat, true)).toEqual(catPartialJsonObject);
-            expect(() => jsonConvert.serializeObject(dogPartialTypescript, Dog)).toThrow();
-            expect(jsonConvert.serializeObject(dogPartialTypescript, Dog, true)).toEqual(dogPartialJsonObject);
+            expect(() => jsonConvert.serialize(catPartialTypescript, Cat)).toThrow();
+            expect(jsonConvert.partialSerialize(catPartialTypescript, Cat)).toEqual(catPartialJsonObject);
+            expect(() => jsonConvert.serialize(dogPartialTypescript, Dog)).toThrow();
+            expect(jsonConvert.partialSerialize(dogPartialTypescript, Dog)).toEqual(dogPartialJsonObject);
         });
 
         it("should serialize a TypeScript array to a JSON array", () => {
@@ -339,10 +339,10 @@ describe("JsonConvert integration tests", () => {
         });
 
         it("should partially deserialize a JSON object to a TypeScript object", () => {
-            expect(() => jsonConvert.deserializeObject(catPartialJsonObject, Cat)).toThrow();
-            expect(jsonConvert.deserializeObject(catPartialJsonObject, Cat, true)).toEqual(catPartialInstance);
-            expect(() => jsonConvert.deserializeObject(dogPartialJsonObject, Dog)).toThrow();
-            expect(jsonConvert.deserializeObject(dogPartialJsonObject, Dog, true)).toEqual(dogPartialInstance);
+            expect(() => jsonConvert.deserialize(catPartialJsonObject, Cat)).toThrow();
+            expect(jsonConvert.partialDeserialize(catPartialJsonObject, Cat)).toEqual(catPartialInstance);
+            expect(() => jsonConvert.deserialize(dogPartialJsonObject, Dog)).toThrow();
+            expect(jsonConvert.partialDeserialize(dogPartialJsonObject, Dog)).toEqual(dogPartialInstance);
         });
 
         it("should deserialize a JSON array to a TypeScript array", () => {
