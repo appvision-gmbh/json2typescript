@@ -290,13 +290,13 @@ describe("JsonConvert integration tests", () => {
                 .toEqual([String], "expectedJsonType after serializing");
         });
 
-        it('should not add discriminator property to json if disabled', () => {
+        it("should not add discriminator property to json if disabled", () => {
             animalHolder.animal = dog1;
             expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual(undefined);
             animalHolder.animal = null;
         });
 
-        it('should add discriminator property to json if enabled and class provided', () => {
+        it("should add discriminator property to json if enabled and class provided", () => {
             jsonConvert.useDiscriminator = true;
             jsonConvert.unregisterAllClasses();
             jsonConvert.registerClasses(Dog);
@@ -307,7 +307,7 @@ describe("JsonConvert integration tests", () => {
             jsonConvert.useDiscriminator = false;
         });
 
-        it('should not add discriminator property to json if enabled but class not provided', () => {
+        it("should not add discriminator property to json if enabled but class not provided", () => {
             jsonConvert.useDiscriminator = true;
             animalHolder.animal = dog1;
             expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual(undefined);
