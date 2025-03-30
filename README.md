@@ -634,6 +634,32 @@ The returned value will be an instance or an array of instances of the given cla
 
 > Tip: The param `json` must not be a string, but an `object` or an `array`. Use `JSON.parse()` before applying the deserialize method in case you have a json string.
 
+#### Serializing partially (TypeScript to JSON)
+
+`(any|any[]) partialSerialize<T extends object, U extends object = {}>(data: T | T[], classReference?: { new(): U })`
+
+In some cases, you may want to serialize only a part of an object (array).
+This can be achieved by using the method `partialSerialize`.
+
+It works in the exact same way as `serialize`, but it will not throw an error if a property of an object is missing (or undefined) in the source (`data`).
+Note that the returned data will not contain a missing property.
+
+> Note: If you know in advance which properties will be missing, you should not use this method. 
+  Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
+
+#### Deserializing partially (JSON to TypeScript)
+
+`(T | T[]) partialDeserialize<T extends object>(json: any, classReference: { new(): T } | null = null)`
+
+In some cases, you may want to deserialize only a part of an object (array). 
+This can be achieved by using the method `partialDeserialize`.
+
+It works in the exact same way as `deserialize`, but it will not throw an error if a property is missing (or undefined) in the source (`json`).
+Note that the returned data will contain a missing property with its default value defined in the TypeScript class.
+
+> Note: If you know in advance which properties will be missing, you should not use this method.
+  Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
+
 #### Registering and unregistering classes
 
 `void registerClasses(...classReferences: { new(): any }[])`
@@ -649,19 +675,6 @@ Unregisters a list of classes from lazy-loading and the discriminator feature.
 Unregisters all classes from lazy-loading and the discriminator feature.
 
 > Note: You only need to register and unregister classes if you use lazy-loading or the discriminator feature. Otherwise, these methods are without any effect.
-
-#### Other methods
-
-The methods `serialize()` and `deserialize()` will automatically detect the dimension of your param (either object or
-array). In case you would like to force `json2typescript` to use a specific way, you can use the following methods
-instead:
-
-- `(any) serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U })`
-- `(any[]) serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U })`
-- `(T) deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T })`
-- `(T[]) deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T })`
-
-
 
 ---
 

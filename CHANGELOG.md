@@ -1,3 +1,15 @@
+# v1.6.0 (2025-03-30)
+
+## Features
+
+* Adds new methods for partial serialization and deserialization, closes [#187](https://github.com/appvision-gmbh/json2typescript/issues/176)
+
+## Deprecations
+
+* We recommend to use `serialize` instead of the `serializeObject` `serializeArray` methods. 
+  Similarly, we recommend to use `deserialize` instead of the `deserializeObject` and `deserializeArray` methods.
+  The latter will be removed in the next major version.
+
 # v1.5.1 (2022-05-25)
 
 ## Bug Fixes
