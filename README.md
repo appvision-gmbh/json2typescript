@@ -18,7 +18,9 @@ With **json2typescript**, only a simple function call is necessary, as demonstra
 ```typescript
 // Assume that you have a class named User defined at some point
 // Assume that you get a JSON string from a webservice
-let jsonStr: string = ...;
+let jsonStr: string =
+...
+;
 let jsonObj: any = JSON.parse(jsonStr);
 
 // Now you can map the json object to the TypeScript object automatically
@@ -27,7 +29,8 @@ let user: User = jsonConvert.deserializeObject(jsonObj, User);
 console.log(user); // prints User{ ... } in JavaScript runtime, not Object{ ... }
 ```
 
-> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. Make sure you catch errors in production!
+> Tip: All `serialize()` and `deserialize()` methods may throw an `Error` in case of failure. Make sure you catch errors
+> in production!
 
 ---
 
@@ -38,8 +41,9 @@ See the changelog in the separate file for bug fixes, new features and breaking 
 > Warning: If you are reading this document on GitHub, it might be ahead of the published NPM version.
 > Please refer to the [ReadMe on NPM](https://www.npmjs.com/package/json2typescript) if in doubt.
 
-> Warning: We earlier suggested to use the `@JsonObject(classIdentifier)` decorator, but did not enforce it. 
-> Since v1.4.0, it is mandatory to use a unique classIdentifier for every class in order to make (de)serialization work properly with class inheritance. 
+> Warning: We earlier suggested to use the `@JsonObject(classIdentifier)` decorator, but did not enforce it.
+> Since v1.4.0, it is mandatory to use a unique classIdentifier for every class in order to make (de)serialization work
+> properly with class inheritance.
 > In versions above v1.2.0 and below v1.4.0, it is possible to run into issues when not using the decorator.
 
 ---
@@ -78,7 +82,8 @@ under `compilerOptions` as follows:
 }
 ```
 
-> Tip: We have tried to make the compiler options of `json2typescript` to be as strict as possible. This enables you to use compiler options such as `"strictNullChecks": true` or `"noImplicitAny": true` in your own project.
+> Tip: We have tried to make the compiler options of `json2typescript` to be as strict as possible. This enables you to
+> use compiler options such as `"strictNullChecks": true` or `"noImplicitAny": true` in your own project.
 
 Now you are ready to use the package.
 
@@ -185,8 +190,8 @@ import { Country } from "./country";
 export class AppComponent implements OnInit {
     ngOnInit() {
         // Define a JSON object (could come from a HTTP service, parsed with JSON.parse() if necessary)
-        const jsonObject: any = { 
-            "countryName": "Switzerland", 
+        const jsonObject: any = {
+            "countryName": "Switzerland",
             "cities": [
                 {
                     "id": 1,
@@ -246,11 +251,13 @@ than one decorator per class or property.
 The class decorators are used infront of the class declaration and do support one parameter:
 
 ```typescript
+
 @JsonObject("User")
 export class User {}
 ```
 
-> Warning: The class decorator uses the parameter to identify the class. Please use a unique identifier for each class in your project, for example simply the name of the class.
+> Warning: The class decorator uses the parameter to identify the class. Please use a unique identifier for each class
+> in your project, for example simply the name of the class.
 
 > Tip: Make sure you import `JsonObject` from `json2typescript`.
 
@@ -265,30 +272,34 @@ The first parameter of `@JsonObject` must be a unique class identifier, usually 
 Property decorators are a vital part for type checking. It is important that the type in the decorator matches the
 TypeScript type.
 
-For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored. 
+For class properties to be visible to the mapper they **must be initialized**, otherwise they are ignored.
 They can be initialized using any (valid) value or `undefined`.
 See the example below for better understanding:
 
 ```typescript
+
 @JsonObject("User")
 export class User {
-    
+
     // A correct example
     @JsonProperty("name", String, false)
     name: string = "";
-    
+
     // An incorrect example
     @JsonProperty("alias", string, false) // Wrong type: Must use String instead.
     alias: string = "";
-  
+
     // An incorrect example
     @JsonProperty("expertise", String, false)
     expertise: string; // No initialization: Property will be ignored without visible exception
-    
+
 }
 ```
 
-> **Important note**: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our mapper does **not** work and will simply ignore the property. Assigning no value is not the same as assigning `undefined` in context of `json2typescript`. Non-initialized properties will not trigger any exception, as **they are invisible to the mapper**.
+> **Important note**: You must assign any (valid) value or `undefined` to your property at initialization, otherwise our
+> mapper does **not** work and will simply ignore the property. Assigning no value is not the same as assigning
+`undefined` in context of `json2typescript`. Non-initialized properties will not trigger any exception, as **they are
+invisible to the mapper**.
 
 > Tip: Make sure you import `JsonObject` and `JsonProperty` from `json2typescript`.
 
@@ -315,25 +326,25 @@ pass a type you expect. Follow the following guide when doing that:
 
 See the following cheat sheet for reference:
 
-| Expected type             | TypeScript type       |
-| ---                       | ---                   |
-| String                    | string                |
-| Number                    | number                |
-| Boolean                   | boolean               | 
-| User                      | User                  |
-| Any                       | any                   |
-|                           |                       | 
-| [String]                  | string[]              | 
-| [Number]                  | number[]              |
-| [Boolean]                 | boolean[]             | 
-| [User]                    | User[]                | 
-| [Any]                     | any[]                 | 
+| Expected type | TypeScript type |
+|---------------|-----------------|
+| String        | string          |
+| Number        | number          |
+| Boolean       | boolean         | 
+| User          | User            |
+| Any           | any             |
+|               |                 | 
+| [String]      | string[]        | 
+| [Number]      | number[]        |
+| [Boolean]     | boolean[]       | 
+| [User]        | User[]          | 
+| [Any]         | any[]           | 
 
 At first, our array notation on the left looks odd. But this notation allows you to define even nested arrays. See the
 examples at the end of this document for more info about nesting arrays.
 
-> Tip: It is possible to lazy-load custom classes to prevent circular dependencies. 
-> Then, the expected type for custom classes can be written as a string. 
+> Tip: It is possible to lazy-load custom classes to prevent circular dependencies.
+> Then, the expected type for custom classes can be written as a string.
 > Please read further below how to implement this feature.
 
 ##### Adding a custom converter
@@ -351,6 +362,7 @@ Assume you would like to transform `1893-11-15` (string from JSON) to a TypeScri
 and pass it as second param in `@JsonProperty` as below:
 
 ```typescript
+
 @JsonObject("User")
 export class User {
     @JsonProperty("birthdate", DateConverter)
@@ -390,21 +402,22 @@ We recommend to use the most strict option and also set your `TypeScript` compil
 
 The following table explains the difference between the three property converting modes:
 
-| **ALLOW_NULL** | `serialize(null)` | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
-| ---                         | ---               | ---                    |  ---                | --- |
-| `MAP_NULLABLE`              | `null` | error | `null` | error |
-| `IGNORE_NULLABLE`           | `undefined` (missing) | `undefined` (missing) | default value | default value |
-| `PASS_NULLABLE`             | `null` | `undefined` (missing) | `null` | `undefined` |
-| |
-| **DISALLOW_NULL** | `serialize(null)` | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
-| `MAP_NULLABLE`              | error | error | error | error |
-| `IGNORE_NULLABLE`           | `undefined` (missing) | `undefined` (missing) | default value | default value |
-| `PASS_NULLABLE`             | `null` | `undefined` (missing) | `null` | `undefined` |
+| **ALLOW_NULL**    | `serialize(null)`     | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
+|-------------------|-----------------------|------------------------|---------------------|--------------------------|
+| `MAP_NULLABLE`    | `null`                | error                  | `null`              | error                    |
+| `IGNORE_NULLABLE` | `undefined` (missing) | `undefined` (missing)  | default value       | default value            |
+| `PASS_NULLABLE`   | `null`                | `undefined` (missing)  | `null`              | `undefined`              |
+|                   |
+| **DISALLOW_NULL** | `serialize(null)`     | `serialize(undefined)` | `deserialize(null)` | `deserialize(undefined)` |
+| `MAP_NULLABLE`    | error                 | error                  | error               | error                    |
+| `IGNORE_NULLABLE` | `undefined` (missing) | `undefined` (missing)  | default value       | default value            |
+| `PASS_NULLABLE`   | `null`                | `undefined` (missing)  | `null`              | `undefined`              |
 
 As shown in this table, a property with the default setting `MAP_NULLABLE` is never allowed to be `undefined` (or
 missing). The `valueCheckingMode` determines, whether `null` is allowed.
 
-> Tip: If you want `undefined` to be treated in the same way as `null` values, you may set the instance `mapUndefinedToNull` property to `true`.
+> Tip: If you want `undefined` to be treated in the same way as `null` values, you may set the instance
+`mapUndefinedToNull` property to `true`.
 
 #### Important notes
 
@@ -440,6 +453,7 @@ In some cases, you may need to make custom conversion between JSON objects and T
 converters like this:
 
 ```typescript
+
 @JsonConverter
 class DateConverter implements JsonCustomConvert<Date> {
     serialize(date: Date): any {
@@ -452,13 +466,15 @@ class DateConverter implements JsonCustomConvert<Date> {
 }
 ```
 
-> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same type between the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
+> Tip: Make sure that you import `JsonConverter` from `json2typescript`. Also don't forget to use the same type between
+> the brackets `<>`, as the `serialize()` param and `deserialize()` return value.
 
 Assume that in your JSON you have a date in a standardized format, such as `2017-07-19 10:00:00`. You could use the
 custom converter class above to make sure it is stored as a real TypeScript `Date` in your class. For your property, you
 simply have use the `@JsonProperty` decorator as follows:
 
 ```typescript
+
 @JsonObject("User")
 export class User {
     @JsonProperty("date", DateConverter)
@@ -510,7 +526,10 @@ The default is `ValueCheckingMode.ALLOW_OBJECT_NULL`.
 
 > Tip: Make sure you import the `ENUM` `ValueCheckingMode` when assigning a value to this property.
 
-> Tip: The TypeScript documentation suggests to avoid null values. Compile your TypeScript code with `strictNullChecks=true` and set the `valueCheckingMode` to disallow null values. If your API returns `null` in some cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on runtime.
+> Tip: The TypeScript documentation suggests to avoid null values. Compile your TypeScript code with
+`strictNullChecks=true` and set the `valueCheckingMode` to disallow null values. If your API returns `null` in some
+> cases, simply mark these properties as optional in the corresponding `JsonProperty` decorator to avoid errors on
+> runtime.
 
 #### Map undefined to null
 
@@ -521,7 +540,8 @@ Determines whether a missing or undefined property value should be considered as
 If true, a missing JSON value will be added and set as null before deserialization. For serialization, undefined values
 will be set to null before serialization.
 
-> Note: ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during serialization or deserialization.
+> Note: ValueCheckingMode and PropertyConvertingMode determine whether an error will be thrown during serialization or
+> deserialization.
 
 #### Ignore primitive checks
 
@@ -575,8 +595,10 @@ The default is `PropertyMatchingRule.MAP_NULLABLE`.
 `(bool) JsonConvert.useDiscriminator`
 
 Determines if discriminators should be used.
-If this option is set to true, all registered classes will be serialized with an additional discriminator property (default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value. 
-When deserializing an object containing the discriminator property, json2typescript will attempt to automatically instantiate the correct type (by comparing the value of the discriminator property with the registered classes).
+If this option is set to true, all registered classes will be serialized with an additional discriminator property (
+default: "$type"), which has the key of the class (given in the @JsonObject decorator) as value.
+When deserializing an object containing the discriminator property, json2typescript will attempt to automatically
+instantiate the correct type (by comparing the value of the discriminator property with the registered classes).
 
 The default is `false`.
 
@@ -589,7 +611,6 @@ The default is `false`.
 Defines the name of the discriminator property.
 
 The default is `"$type"`.
-
 
 ### Public methods
 
@@ -612,14 +633,16 @@ call `jsonConvert.serialize(userObject, User)` where `userObject` is just a plai
 
 The returned value will be `any` object or an array of `any` objects.
 
-> Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the serialize method.
+> Tip: The return value is not a string. In case you need a string as result, use `JSON.stringify()` after calling the
+> serialize method.
 
 You may optionally provide a class constructor to use the `@JsonProperty` mappings defined for that class to serialize
 the data object(s), instead of mappings defined on the data class. Note that if the data is an array, the mappings from
 the constructor class are used for *all* elements in the array. If no constructor is provided, the mappings from the
 data object class are used to serialize the data object(s).
 
-> Tip: This feature is helpful if you need to serialize an object that was not created using a class constructor, or if you want to serialize a subclass with only the properties of the superclass.
+> Tip: This feature is helpful if you need to serialize an object that was not created using a class constructor, or if
+> you want to serialize a subclass with only the properties of the superclass.
 
 #### Deserializing (JSON to TypeScript)
 
@@ -632,7 +655,8 @@ If the discriminator feature is used, the class reference is optional.
 
 The returned value will be an instance or an array of instances of the given class reference.
 
-> Tip: The param `json` must not be a string, but an `object` or an `array`. Use `JSON.parse()` before applying the deserialize method in case you have a json string.
+> Tip: The param `json` must not be a string, but an `object` or an `array`. Use `JSON.parse()` before applying the
+> deserialize method in case you have a json string.
 
 #### Serializing partially (TypeScript to JSON)
 
@@ -641,24 +665,26 @@ The returned value will be an instance or an array of instances of the given cla
 In some cases, you may want to serialize only a part of an object (array).
 This can be achieved by using the method `partialSerialize`.
 
-It works in the exact same way as `serialize`, but it will not throw an error if a property of an object is missing (or undefined) in the source (`data`).
+It works in the exact same way as `serialize`, but it will not throw an error if a property of an object is missing (or
+undefined) in the source (`data`).
 Note that the returned data will not contain a missing property.
 
-> Note: If you know in advance which properties will be missing, you should not use this method. 
-  Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
+> Note: If you know in advance which properties will be missing, you should not use this method.
+> Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
 
 #### Deserializing partially (JSON to TypeScript)
 
 `(T | T[]) partialDeserialize<T extends object>(json: any, classReference: { new(): T } | null = null)`
 
-In some cases, you may want to deserialize only a part of an object (array). 
+In some cases, you may want to deserialize only a part of an object (array).
 This can be achieved by using the method `partialDeserialize`.
 
-It works in the exact same way as `deserialize`, but it will not throw an error if a property is missing (or undefined) in the source (`json`).
+It works in the exact same way as `deserialize`, but it will not throw an error if a property is missing (or undefined)
+in the source (`json`).
 Note that the returned data will contain a missing property with its default value defined in the TypeScript class.
 
 > Note: If you know in advance which properties will be missing, you should not use this method.
-  Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
+> Instead, configure the `@JsonProperty` decorator (third parameter) for these properties.
 
 #### Registering and unregistering classes
 
@@ -674,7 +700,8 @@ Unregisters a list of classes from lazy-loading and the discriminator feature.
 
 Unregisters all classes from lazy-loading and the discriminator feature.
 
-> Note: You only need to register and unregister classes if you use lazy-loading or the discriminator feature. Otherwise, these methods are without any effect.
+> Note: You only need to register and unregister classes if you use lazy-loading or the discriminator feature.
+> Otherwise, these methods are without any effect.
 
 ---
 
@@ -709,6 +736,7 @@ In the following example, `jsonKeyOfWeirdKeywords` is a key in the JSON object d
 As we have an array of array of strings, you can define the expected type like this:
 
 ```typescript
+
 @JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], [String, String]])
@@ -716,7 +744,8 @@ export class User {
 }
 ```
 
-> Tip: In our syntax, `[[String, String], [String, String]]` is equivalent to `[[String], [String]]` and `[[String]]`. That is because the last type in an array will be automatically repeated as much as needed.
+> Tip: In our syntax, `[[String, String], [String, String]]` is equivalent to `[[String], [String]]` and `[[String]]`.
+> That is because the last type in an array will be automatically repeated as much as needed.
 
 ### 2) Nested array with mixed depth and type
 
@@ -737,6 +766,7 @@ In the following example, `JSONKeyOfWeirdKeywords` is a key in the JSON object d
 You can define the expected type in your class like this:
 
 ```typescript
+
 @JsonObject("User")
 export class User {
     @JsonProperty("jsonKeyOfWeirdKeywords", [[String, String], Number])
@@ -748,7 +778,7 @@ export class User {
 
 ## Instantiation with the lazy-loading feature to avoid circular dependencies
 
-In some scenarios, developers run into circular dependencies when declaring objects. 
+In some scenarios, developers run into circular dependencies when declaring objects.
 A simple example would be two classes importing each other:
 
 ```typescript
@@ -772,29 +802,37 @@ export class User {
 ```
 
 This is generally not possible because of the circular dependency.
-But since TypeScript 3.8, you may use [type imports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html) in order to bypass circular dependencies.
+But since TypeScript 3.8, you may
+use [type imports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html) in order to bypass
+circular dependencies.
 
 `json2typescript` implements a lazy-loading feature so that the above example is possible.
 The following steps need to be done:
-- Import only the type, for example by writing `import type { User } from "./user";`. Note that we added the `type` keyword.
-- Do not use the class reference in the `@JsonProperty` decorator, but instead use the classIdentifier (as string) given in the `@JsonObject` decorator.
-For example, write `@JsonProperty("users", ["User"])`. Note that we added the `"` around the User.
-- Register all lazy-loading classes before ever using them with `json2typescript`. 
-You may simply call `jsonConvert.registerClasses(User, Team)` for the example above.
+
+- Import only the type, for example by writing `import type { User } from "./user";`. Note that we added the `type`
+  keyword.
+- Do not use the class reference in the `@JsonProperty` decorator, but instead use the classIdentifier (as string) given
+  in the `@JsonObject` decorator.
+  For example, write `@JsonProperty("users", ["User"])`. Note that we added the `"` around the User.
+- Register all lazy-loading classes before ever using them with `json2typescript`.
+  You may simply call `jsonConvert.registerClasses(User, Team)` for the example above.
 
 Now you can use the classes `User` and `Team` as expected.
 
-> Note: Using type imports may cause other problems in your classes because the imports may only be used for type contexts.
+> Note: Using type imports may cause other problems in your classes because the imports may only be used for type
+> contexts.
 > For example, you will not be able to write `new Team()` in the `User` class at all.
 > However, you still will be able to use `Team` as a type in the `User` class and access all its properties and methods.
 
 ## Automatic instantiation using the discriminator feature
 
-If your server adds a discriminator property to every JSON object, `json2typescript` is able to automatically instantiate objects.
+If your server adds a discriminator property to every JSON object, `json2typescript` is able to automatically
+instantiate objects.
 
 First, set up the discriminator feature for a class, for example
 
 ```typescript
+
 @JsonObject("app.example.User")
 export class User {
     @JsonProperty("name", String)
@@ -826,17 +864,20 @@ const user1: User = jsonConvert.deserialize(jsonObject, User);
 const user2: User = jsonConvert.deserialize<User>(jsonObject);
 ```
 
-> Note: This feature is particularly useful when doing dynamic mapping. 
+> Note: This feature is particularly useful when doing dynamic mapping.
 > Otherwise, you just may provide the type yourself (as done above with `user1`) and disable the discriminator feature.
 
 A real-world example for the discriminator feature is the mapping of child classes.
 
-Assume that you might have two classes `AdminUser` and `NormalUser` that inherit from `User`. 
-The web client sometimes cannot know the type in advance. 
-If you use the discriminator feature, the server can define the type in the JSON and `json2typescript` will properly instantiate the desired class.
-This means, your property can be safely declared in TypeScript as union type of `AdminUser | NormalUser` instead of `User`.
+Assume that you might have two classes `AdminUser` and `NormalUser` that inherit from `User`.
+The web client sometimes cannot know the type in advance.
+If you use the discriminator feature, the server can define the type in the JSON and `json2typescript` will properly
+instantiate the desired class.
+This means, your property can be safely declared in TypeScript as union type of `AdminUser | NormalUser` instead of
+`User`.
 
-> Warning: If you enable the discriminator feature and try to deserialize a JSON object to a registered class instance, the second parameter of the `deserialize` methods is always ignored.
+> Warning: If you enable the discriminator feature and try to deserialize a JSON object to a registered class instance,
+> the second parameter of the `deserialize` methods is always ignored.
 
 
 
@@ -856,7 +897,8 @@ More: https://gist.github.com/tlmurphy/71b58c71e594899120da365159d7d40d
 
 # Contributors
 
-This NPM package was originally created in 2016 by **Andreas Aeschlimann**, founder of and software architect at **AppVision GmbH**.
+This NPM package was originally created in 2016 by **Andreas Aeschlimann**, founder of and software architect at *
+*AppVision GmbH**.
 
 ## Special thanks
 
