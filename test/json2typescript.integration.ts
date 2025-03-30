@@ -48,6 +48,13 @@ describe("JsonConvert integration tests", () => {
         talky: true,
         other: "",
     };
+    let catPartialJsonObject: Partial<ICat> = {
+        catName: "Meowy",
+    };
+    let dogPartialJsonObject: Partial<IDog> = {
+        name: "Barky",
+        barking: true,
+    }
     let duplicateCat1SerializeJsonObject: IDuplicateCat = {
         name: "Duplicate",
         talky: "2015-02-03",
@@ -179,6 +186,18 @@ describe("JsonConvert integration tests", () => {
         talky: true,
         other: "",
     };
+    let catPartialTypescript: any = {
+        name: "Meowy",
+    }
+    let catPartialInstance = new Cat();
+    catPartialInstance.name = "Meowy";
+    let dogPartialTypescript: any = {
+        name: "Barky",
+        isBarking: true,
+    }
+    let dogPartialInstance = new Dog();
+    dogPartialInstance.name = "Barky";
+    dogPartialInstance.isBarking = true;
     let dogTypescript: any = {
         name: "Barky",
         isBarking: true,
@@ -208,6 +227,13 @@ describe("JsonConvert integration tests", () => {
             expect(jsonConvert.serializeObject(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
 
             expect(() => jsonConvert.serializeArray(<any>cat1)).toThrow();
+        });
+
+        it("should partially serialize a TypeScript object to a JSON object", () => {
+            expect(() => jsonConvert.serializeObject(catPartialTypescript, Cat)).toThrow();
+            expect(jsonConvert.serializeObject(catPartialTypescript, Cat, true)).toEqual(catPartialJsonObject);
+            expect(() => jsonConvert.serializeObject(dogPartialTypescript, Dog)).toThrow();
+            expect(jsonConvert.serializeObject(dogPartialTypescript, Dog, true)).toEqual(dogPartialJsonObject);
         });
 
         it("should serialize a TypeScript array to a JSON array", () => {
@@ -310,6 +336,13 @@ describe("JsonConvert integration tests", () => {
 
             expect(() => jsonConvert.deserializeArray<Cat>(<any>cat1JsonObject, Cat)).toThrow();
 
+        });
+
+        it("should partially deserialize a JSON object to a TypeScript object", () => {
+            expect(() => jsonConvert.deserializeObject(catPartialJsonObject, Cat)).toThrow();
+            expect(jsonConvert.deserializeObject(catPartialJsonObject, Cat, true)).toEqual(catPartialInstance);
+            expect(() => jsonConvert.deserializeObject(dogPartialJsonObject, Dog)).toThrow();
+            expect(jsonConvert.deserializeObject(dogPartialJsonObject, Dog, true)).toEqual(dogPartialInstance);
         });
 
         it("should deserialize a JSON array to a TypeScript array", () => {
