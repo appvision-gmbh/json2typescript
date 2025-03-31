@@ -226,7 +226,7 @@ describe("JsonConvert integration tests", () => {
             // District property should not be included in serialized JSON
             expect(jsonConvert.serializeObject(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
 
-            expect(() => jsonConvert.serializeArray(<any>cat1)).toThrow();
+            expect(() => jsonConvert.serializeObject(<any>cats)).toThrow();
         });
 
         it("should partially serialize a TypeScript object to a JSON object", () => {
@@ -334,7 +334,7 @@ describe("JsonConvert integration tests", () => {
             // Duplicate property in JSON should be not be deserialized
             expect(jsonConvert.deserializeObject(duplicateCat2DeserializeJsonObject, DuplicateCat)).toEqual(duplicateCat2);
 
-            expect(() => jsonConvert.deserializeArray(<any>cat1JsonObject, Cat)).toThrow();
+            expect(() => jsonConvert.deserializeObject(<any>catsJsonArray, Cat)).toThrow();
 
         });
 
@@ -349,7 +349,7 @@ describe("JsonConvert integration tests", () => {
             expect(jsonConvert.deserialize(catsJsonArray, Cat)).toEqual(cats);
             expect(jsonConvert.deserializeArray(catsJsonArray, Cat)).toEqual(cats);
 
-            expect(() => jsonConvert.deserializeObject<any>(catsJsonArray, Cat)).toThrow();
+            expect(() => jsonConvert.deserializeArray(<any>cat1JsonObject, Cat)).toThrow();
         });
 
 
