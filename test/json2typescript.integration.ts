@@ -59,7 +59,7 @@ describe("JsonConvert integration tests", () => {
         name: "Duplicate",
         talky: "2015-02-03",
     };
-    let animalHolderWithDogJsonObject = {
+    let animalHolderWithDogJsonObject: object = {
         $type: "AnimalHolder",
         name: "Laura",
         animal: {
@@ -72,7 +72,7 @@ describe("JsonConvert integration tests", () => {
             toys: ["pizza", "bone", "ball"]
         }
     };
-    let differentAnimalsJsonArray = [
+    let differentAnimalsJsonArray: object[] = [
         {
             $type: "Doggy",
             name: "Barky",
@@ -93,7 +93,7 @@ describe("JsonConvert integration tests", () => {
         }
     ];
     // Add district property, which exists on DuplicateCat but is not mapped - should not be deserialized
-    let duplicateCat2DeserializeJsonObject = {
+    let duplicateCat2DeserializeJsonObject: object = {
         name: "Duplicate2",
         district: "2016-02-01",
         talky: "2016-03-04",
@@ -167,7 +167,7 @@ describe("JsonConvert integration tests", () => {
     animalHolder.name = "Lisa";
 
     // JSON objects using Typescript mappings
-    let cat1Typescript: any = {
+    let cat1Typescript: object = {
         name: "Meowy",
         district: 100,
         owner: {
@@ -179,26 +179,26 @@ describe("JsonConvert integration tests", () => {
         talky: false,
         other: "",
     };
-    let cat2Typescript: any = {
+    let cat2Typescript: object = {
         name: "Links",
         district: 50,
         birthdate: new Date("2016-05-19"),
         talky: true,
         other: "",
     };
-    let catPartialTypescript: any = {
+    let catPartialTypescript: object = {
         name: "Meowy",
     }
     let catPartialInstance = new Cat();
     catPartialInstance.name = "Meowy";
-    let dogPartialTypescript: any = {
+    let dogPartialTypescript: object = {
         name: "Barky",
         isBarking: true,
     }
     let dogPartialInstance = new Dog();
     dogPartialInstance.name = "Barky";
     dogPartialInstance.isBarking = true;
-    let dogTypescript: any = {
+    let dogTypescript: object = {
         name: "Barky",
         isBarking: true,
         birthdate: new Date("2017-02-12"),
@@ -215,14 +215,14 @@ describe("JsonConvert integration tests", () => {
         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
         it("should serialize a TypeScript object to a JSON object", () => {
-            expect(jsonConvert.serialize<Cat>(cat1)).toEqual(cat1JsonObject);
-            expect(jsonConvert.serialize<Cat>(cat2)).toEqual(cat2JsonObject);
-            expect(jsonConvert.serialize<Dog>(dog1)).toEqual(dog1JsonObject);
+            expect(jsonConvert.serialize(cat1)).toEqual(cat1JsonObject);
+            expect(jsonConvert.serialize(cat2)).toEqual(cat2JsonObject);
+            expect(jsonConvert.serialize(dog1)).toEqual(dog1JsonObject);
             // District property should not be included in serialized JSON
             expect(jsonConvert.serialize(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
-            expect(jsonConvert.serializeObject<Cat>(cat1)).toEqual(cat1JsonObject);
-            expect(jsonConvert.serializeObject<Cat>(cat2)).toEqual(cat2JsonObject);
-            expect(jsonConvert.serializeObject<Dog>(dog1)).toEqual(dog1JsonObject);
+            expect(jsonConvert.serializeObject(cat1)).toEqual(cat1JsonObject);
+            expect(jsonConvert.serializeObject(cat2)).toEqual(cat2JsonObject);
+            expect(jsonConvert.serializeObject(dog1)).toEqual(dog1JsonObject);
             // District property should not be included in serialized JSON
             expect(jsonConvert.serializeObject(duplicateCat1)).toEqual(duplicateCat1SerializeJsonObject);
 
@@ -237,12 +237,12 @@ describe("JsonConvert integration tests", () => {
         });
 
         it("should serialize a TypeScript array to a JSON array", () => {
-            expect(jsonConvert.serialize<Animal>(animals)).toEqual(animalJsonArray);
-            expect(jsonConvert.serialize<Cat>(cats)).toEqual(catsJsonArray);
-            expect(jsonConvert.serializeArray<Animal>(animals)).toEqual(animalJsonArray);
-            expect(jsonConvert.serializeArray<Cat>(cats)).toEqual(catsJsonArray);
+            expect(jsonConvert.serialize(animals)).toEqual(animalJsonArray);
+            expect(jsonConvert.serialize(cats)).toEqual(catsJsonArray);
+            expect(jsonConvert.serializeArray(animals)).toEqual(animalJsonArray);
+            expect(jsonConvert.serializeArray(cats)).toEqual(catsJsonArray);
 
-            expect(() => jsonConvert.serializeArray<Cat>(<any>cat1)).toThrow();
+            expect(() => jsonConvert.serializeArray(<any>cat1)).toThrow();
         });
 
         it("should serialize a plain object using Typescript class mappings", () => {
@@ -262,7 +262,7 @@ describe("JsonConvert integration tests", () => {
             expect(jsonConvert.serializeArray(catsTypescript, Cat)).toEqual(catsJsonArray);
             expect(jsonConvert.serializeArray(animalsTypescript, Animal)).toEqual(animalsOnlyJsonArray);
 
-            expect(() => jsonConvert.serializeArray(cat1Typescript, Cat)).toThrow();
+            expect(() => jsonConvert.serializeArray(<any>cat1Typescript, Cat)).toThrow();
             // Should throw an error if attempting to serialize an array containing a Dog using Cat mappings
             // because required properties are missing
             expect(() => jsonConvert.serializeArray(animalsTypescript, Cat)).toThrow();
@@ -292,7 +292,7 @@ describe("JsonConvert integration tests", () => {
 
         it("should not add discriminator property to json if disabled", () => {
             animalHolder.animal = dog1;
-            expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual(undefined);
+            expect(jsonConvert.serialize(animalHolder).animal.$type).toEqual(undefined);
             animalHolder.animal = null;
         });
 
@@ -301,7 +301,7 @@ describe("JsonConvert integration tests", () => {
             jsonConvert.unregisterAllClasses();
             jsonConvert.registerClasses(Dog);
             animalHolder.animal = dog1;
-            expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual("Doggy");
+            expect(jsonConvert.serialize(animalHolder).animal.$type).toEqual("Doggy");
             animalHolder.animal = null;
             jsonConvert.unregisterAllClasses();
             jsonConvert.useDiscriminator = false;
@@ -310,7 +310,7 @@ describe("JsonConvert integration tests", () => {
         it("should not add discriminator property to json if enabled but class not provided", () => {
             jsonConvert.useDiscriminator = true;
             animalHolder.animal = dog1;
-            expect(jsonConvert.serialize<AnimalHolder>(animalHolder).animal.$type).toEqual(undefined);
+            expect(jsonConvert.serialize(animalHolder).animal.$type).toEqual(undefined);
             animalHolder.animal = null;
             jsonConvert.useDiscriminator = false;
         });
@@ -323,18 +323,18 @@ describe("JsonConvert integration tests", () => {
         jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL;
 
         it("should deserialize a JSON object to a TypeScript object", () => {
-            expect(jsonConvert.deserialize<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
-            expect(jsonConvert.deserialize<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
-            expect(jsonConvert.deserialize<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
+            expect(jsonConvert.deserialize(cat1JsonObject, Cat)).toEqual(cat1);
+            expect(jsonConvert.deserialize(cat2JsonObject, Cat)).toEqual(cat2);
+            expect(jsonConvert.deserialize(dog1JsonObject, Dog)).toEqual(dog1);
             // Duplicate property in JSON should be not be deserialized
             expect(jsonConvert.deserialize(duplicateCat2DeserializeJsonObject, DuplicateCat)).toEqual(duplicateCat2);
-            expect(jsonConvert.deserializeObject<Cat>(cat1JsonObject, Cat)).toEqual(cat1);
-            expect(jsonConvert.deserializeObject<Cat>(cat2JsonObject, Cat)).toEqual(cat2);
-            expect(jsonConvert.deserializeObject<Dog>(dog1JsonObject, Dog)).toEqual(dog1);
+            expect(jsonConvert.deserializeObject(cat1JsonObject, Cat)).toEqual(cat1);
+            expect(jsonConvert.deserializeObject(cat2JsonObject, Cat)).toEqual(cat2);
+            expect(jsonConvert.deserializeObject(dog1JsonObject, Dog)).toEqual(dog1);
             // Duplicate property in JSON should be not be deserialized
             expect(jsonConvert.deserializeObject(duplicateCat2DeserializeJsonObject, DuplicateCat)).toEqual(duplicateCat2);
 
-            expect(() => jsonConvert.deserializeArray<Cat>(<any>cat1JsonObject, Cat)).toThrow();
+            expect(() => jsonConvert.deserializeArray(<any>cat1JsonObject, Cat)).toThrow();
 
         });
 
@@ -346,10 +346,10 @@ describe("JsonConvert integration tests", () => {
         });
 
         it("should deserialize a JSON array to a TypeScript array", () => {
-            expect(jsonConvert.deserialize<Cat>(catsJsonArray, Cat)).toEqual(cats);
-            expect(jsonConvert.deserializeArray<Cat>(catsJsonArray, Cat)).toEqual(cats);
+            expect(jsonConvert.deserialize(catsJsonArray, Cat)).toEqual(cats);
+            expect(jsonConvert.deserializeArray(catsJsonArray, Cat)).toEqual(cats);
 
-            expect(() => jsonConvert.deserializeObject<Cat>(catsJsonArray, Cat)).toThrow();
+            expect(() => jsonConvert.deserializeObject<any>(catsJsonArray, Cat)).toThrow();
         });
 
 
@@ -388,7 +388,7 @@ describe("JsonConvert integration tests", () => {
             jsonConvert.useDiscriminator = true;
             jsonConvert.unregisterAllClasses();
             jsonConvert.registerClasses(AnimalHolder, Dog);
-            const result = <AnimalHolder>jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject);
+            const result = jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject);
             expect(result).toBeInstanceOf(AnimalHolder);
             expect(result.animal).toBeInstanceOf(Dog);
             jsonConvert.unregisterAllClasses();
@@ -399,7 +399,7 @@ describe("JsonConvert integration tests", () => {
             jsonConvert.useDiscriminator = true;
             jsonConvert.unregisterAllClasses();
             jsonConvert.registerClasses(Dog, Cat);
-            const result = <Animal[]>jsonConvert.deserialize<Animal[]>(differentAnimalsJsonArray);
+            const result = jsonConvert.deserialize<Animal>(differentAnimalsJsonArray);
             expect(result[0]).toBeInstanceOf(Dog);
             expect(result[1]).toBeInstanceOf(Cat);
             jsonConvert.unregisterAllClasses();
@@ -408,7 +408,7 @@ describe("JsonConvert integration tests", () => {
 
         it("should not get class from discriminator property if disabled", () => {
             jsonConvert.useDiscriminator = false;
-            const result = <AnimalHolder>jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject, AnimalHolder);
+            const result = jsonConvert.deserialize(animalHolderWithDogJsonObject, AnimalHolder);
             expect(result.animal).toBeInstanceOf(Animal);
             const isDog = result.animal instanceof Dog;
             expect(isDog).toBeFalse();
@@ -416,7 +416,7 @@ describe("JsonConvert integration tests", () => {
 
         it("should not get class from discriminator property if enabled but no classes provided", () => {
             jsonConvert.useDiscriminator = true;
-            expect(() => jsonConvert.deserialize<AnimalHolder>(animalHolderWithDogJsonObject, AnimalHolder)).toThrow();
+            expect(() => jsonConvert.deserialize(animalHolderWithDogJsonObject, AnimalHolder)).toThrow();
             jsonConvert.useDiscriminator = false;
         });
 
