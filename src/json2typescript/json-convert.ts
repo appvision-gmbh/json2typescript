@@ -425,17 +425,64 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference. Note that if a class reference is provided, it will be used as
-     * the source of property mapping for serialization, even if the object or one of its elements is
-     * an instance of a different class with its own mappings.  Also, ONLY the properties from the
-     * class reference will be serialized - any additional properties on the object(s) will be silently
-     * ignored.
+     * Tries to serialize a TypeScript array of objects to JSON using the mappings defined on
+     * the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serialize<T extends object, U extends object = {}>(data: T[], classReference?: { new(): U }): any[];
+
+    /**
+     * Tries to serialize a TypeScript object to JSON using the mappings defined on the specified
+     * class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
      *
      * @param data object or array of objects
      * @param classReference the class reference which provides the property mappings to use
      *
      * @returns the JSON object
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serialize<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any;
+
+    /**
+     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings
+     * defined on the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array or object
      *
      * @throws an Error in case of failure
      *
@@ -462,6 +509,249 @@ export class JsonConvert {
     }
 
     /**
+     * Tries to serialize a TypeScript array of objects to JSON using the mappings defined on
+     * the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * This method is similar to `serialize`, but it will not throw an error if a property is missing
+     * (or undefined). The resulting JSON object will not include the missing property.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array
+     *
+     * @throws an Error in case of failure
+     *
+     * @see serialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialSerialize<T extends object, U extends object = {}>(data: T[],
+                                                              classReference?: { new(): U }): any[];
+
+    /**
+     * Tries to serialize a TypeScript object to JSON using the mappings defined on the specified
+     * class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * This method is similar to `serialize`, but it will not throw an error if a property is missing
+     * (or undefined). The resulting JSON object will not include the missing property.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON object
+     *
+     * @throws an Error in case of failure
+     *
+     * @see serialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialSerialize<T extends object, U extends object = {}>(data: T,
+                                                              classReference?: { new(): U }): any;
+
+    /**
+     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings
+     * defined on the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * This method is similar to `serialize`, but it will not throw an error if a property is missing
+     * (or undefined). The resulting JSON object will not include the missing property.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array or object
+     *
+     * @throws an Error in case of failure
+     *
+     * @see serialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialSerialize<T extends object, U extends object = {}>(data: T | T[],
+                                                              classReference?: { new(): U }): any | any[] {
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return data;
+        }
+
+        // Call the appropriate method depending on the type
+        if (data instanceof Array) {
+            return this.serializeArray(data, classReference, true);
+        } else if (typeof data === "object") { // careful: an array is an object in TypeScript!
+            return this.serializeObject(data, classReference, true);
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter data in JsonConvert.partialSerialize() is not in valid format (object or array)." +
+                "\n"
+            );
+        }
+    }
+
+    /**
+     * Tries to deserialize a given JSON array to an array of TypeScript instances.
+     *
+     * @param json the JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T extends object>(json: object[],
+                                  classReference?: { new(): T } | null): T[];
+
+    /**
+     * Tries to deserialize a given JSON object to a TypeScript instance.
+     *
+     * @param json the JSON object
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T extends object>(json: object,
+                                  classReference?: { new(): T } | null): T;
+
+    /**
+     * Tries to deserialize a given JSON object or JSON array of objects to a TypeScript instance.
+     *
+     * @param json the JSON object or JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T extends object>(json: object | object[],
+                                  classReference: { new(): T } | null = null): T | T[] {
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return json as T | T[];
+        }
+
+        // Call the appropriate method depending on the type
+        if (json instanceof Array) {
+            return this.deserializeArray(json, classReference);
+        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
+            return this.deserializeObject(json, classReference);
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
+                "\n"
+            );
+        }
+
+    }
+
+    /**
+     * Tries to deserialize a given JSON array to an array of TypeScript instances.
+     *
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
+     *
+     * @param json the JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see deserialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialDeserialize<T extends object>(json: object[],
+                                         classReference?: { new(): T } | null): T[];
+
+
+    /**
+     * Tries to deserialize a given JSON object to a TypeScript instance.
+     *
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
+     *
+     * @param json the JSON object
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see deserialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialDeserialize<T extends object>(json: object,
+                                         classReference?: { new(): T } | null): T;
+
+    /**
+     * Tries to deserialize a given JSON object or JSON array of objects to a TypeScript instance.
+     *
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
+     *
+     * @param json the JSON object or JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see deserialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialDeserialize<T extends object>(json: object | object[],
+                                         classReference: { new(): T } | null = null): T | T[] {
+
+        if (this.operationMode === OperationMode.DISABLE) {
+            return json as T | T[];
+        }
+
+        // Call the appropriate method depending on the type
+        if (json instanceof Array) {
+            return this.deserializeArray(json, classReference, true);
+        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
+            return this.deserializeObject(json, classReference, true);
+        } else {
+            throw new Error(
+                "Fatal error in JsonConvert. " +
+                "Passed parameter json in JsonConvert.partialDeserialize() is not in valid JSON format (object or array)." +
+                "\n"
+            );
+        }
+
+    }
+
+
+    /////////////////////
+    // PRIVATE METHODS //
+    /////////////////////
+
+
+    /**
      * Tries to serialize a TypeScript object to a JSON object using either the mappings on the
      * provided class reference, if present, or on the provided object. Note that if a class
      * reference is provided, it will be used as the source of property mapping for serialization,
@@ -472,14 +762,19 @@ export class JsonConvert {
      * @param data object containing the values to be mapped to a JSON object, must be an
      *             instance of a class with JSON mappings if no class reference is provided
      * @param classReference optional class reference which provides the property mappings to use
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
      *
      * @returns the JSON object
      *
      * @throws an Error in case of failure
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
+     *
+     * @deprecated will be made private, use the generic `serialize`
      */
-    serializeObject<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any {
+    serializeObject<T extends object, U extends object = {}>(data: T,
+                                                             classReference?: { new(): U },
+                                                             partial: boolean = false): any {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return data;
@@ -536,8 +831,9 @@ export class JsonConvert {
 
         // Loop through all initialized class properties on the mapping instance
         for (const propertyKey of Object.keys(instance)) {
+
             try {
-                this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject);
+                this.serializeObject_loopProperty(data, instance, propertyKey, jsonObject, partial);
             } catch (ex) {
                 if (this.operationMode === OperationMode.LOGGING) {
                     console.log("Failed to serialize property:");
@@ -546,6 +842,7 @@ export class JsonConvert {
                 }
                 throw ex;
             }
+
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -569,14 +866,19 @@ export class JsonConvert {
      * @param dataArray array of objects containing the values to be mapped to a JSON object, which
      *                  must be instances of classes with JSON mappings if no class reference is provided
      * @param classReference optional class reference which provides the property mappings to use
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
      *
      * @returns the JSON array
      *
      * @throws an Error in case of failure
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
+     *
+     * @deprecated will be made private, use the generic `serialize`
      */
-    serializeArray<T extends object, U extends object = {}>(dataArray: T[], classReference?: { new(): U }): any[] {
+    serializeArray<T extends object, U extends object = {}>(dataArray: T[],
+                                                            classReference?: { new(): U },
+                                                            partial: boolean = false): any[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return dataArray;
@@ -627,7 +929,7 @@ export class JsonConvert {
 
         // Loop through all array elements
         for (const dataObject of dataArray) {
-            jsonArray.push(this.serializeObject(dataObject, classReference));
+            jsonArray.push(this.serializeObject(dataObject, classReference, partial));
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -641,51 +943,23 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to deserialize given JSON to a TypeScript object or array of objects.
-     *
-     * @param json the JSON as object or array
-     * @param classReference the class reference
-     *
-     * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
-     *
-     * @throws an Error in case of failure
-     *
-     * @see https://www.npmjs.com/package/json2typescript full documentation
-     */
-    deserialize<T extends object>(json: object | object[], classReference: { new(): T } | null = null): T | T[] {
-
-        if (this.operationMode === OperationMode.DISABLE) {
-            return json as T | T[];
-        }
-
-        // Call the appropriate method depending on the type
-        if (json instanceof Array) {
-            return this.deserializeArray(json, classReference);
-        } else if (typeof json === "object") { // careful: an array is an object in TypeScript!
-            return this.deserializeObject(json, classReference);
-        } else {
-            throw new Error(
-                "Fatal error in JsonConvert. " +
-                "Passed parameter json in JsonConvert.deserialize() is not in valid JSON format (object or array)." +
-                "\n"
-            );
-        }
-
-    }
-
-    /**
      * Tries to deserialize a JSON object to a TypeScript object.
      *
      * @param jsonObject the JSON object
      * @param classReference the class reference
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
      *
      * @returns the deserialized TypeScript instance
      *
      * @throws an Error in case of failure
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
+     *
+     * @deprecated will be made private, use the generic `deserialize`
      */
-    deserializeObject<T extends object>(jsonObject: any, classReference: { new(): T } | null = null): T {
+    deserializeObject<T extends object>(jsonObject: object,
+                                        classReference: { new(): T } | null = null,
+                                        partial: boolean = false): T {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonObject as T;
@@ -738,8 +1012,9 @@ export class JsonConvert {
 
         // Loop through all initialized class properties
         for (const propertyKey of Object.keys(instance)) {
+
             try {
-                this.deserializeObject_loopProperty(instance, propertyKey, jsonObject);
+                this.deserializeObject_loopProperty(instance, propertyKey, jsonObject, partial);
             } catch (ex) {
                 if (this.operationMode === OperationMode.LOGGING) {
                     console.log("Failed to deserialize property:");
@@ -748,6 +1023,7 @@ export class JsonConvert {
                 }
                 throw ex;
             }
+
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -765,14 +1041,19 @@ export class JsonConvert {
      *
      * @param jsonArray the JSON array
      * @param classReference the object class
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
      *
      * @returns the deserialized array of TypeScript instances
      *
      * @throws an Error in case of failure
      *
      * @see https://www.npmjs.com/package/json2typescript full documentation
+     *
+     * @deprecated will be made private, use the generic `deserialize`
      */
-    deserializeArray<T extends object>(jsonArray: any[], classReference: { new(): T } | null = null): T[] {
+    deserializeArray<T extends object>(jsonArray: object[],
+                                       classReference: { new(): T } | null = null,
+                                       partial: boolean = false): T[] {
 
         if (this.operationMode === OperationMode.DISABLE) {
             return jsonArray as T[];
@@ -823,7 +1104,7 @@ export class JsonConvert {
 
         // Loop through all array elements
         for (const jsonObject of jsonArray) {
-            array.push(this.deserializeObject<T>(jsonObject, classReference));
+            array.push(this.deserializeObject<T>(jsonObject, classReference, partial));
         }
 
         if (this.operationMode === OperationMode.LOGGING) {
@@ -836,11 +1117,6 @@ export class JsonConvert {
 
     }
 
-
-    /////////////////////
-    // PRIVATE METHODS //
-    /////////////////////
-
     /**
      * Returns the correct class reference for the provided JSON object.
      * If the provided class reference is null, the class reference is retrieved from the class map using the discriminator property.
@@ -849,7 +1125,8 @@ export class JsonConvert {
      * @param classReference the class reference
      * @throws throws an Error in case of failure
      */
-    private getRealClassReference<T extends object>(jsonObject: any, classReference: { new(): T } | null): { new(): T } {
+    private getRealClassReference<T extends object>(jsonObject: any,
+                                                    classReference: { new(): T } | null): { new(): T } {
 
         // First determine if the discriminator is used or not
         if (this.useDiscriminator) {
@@ -874,9 +1151,9 @@ export class JsonConvert {
             } else {
 
                 throw new Error(
-                  "Fatal error in JsonConvert. " +
-                  "Discriminator property \"" + this.discriminatorPropertyName + "\" is missing in JSON object." +
-                  "\n"
+                    "Fatal error in JsonConvert. " +
+                    "Discriminator property \"" + this.discriminatorPropertyName + "\" is missing in JSON object." +
+                    "\n"
                 );
 
             }
@@ -907,16 +1184,21 @@ export class JsonConvert {
      * @param instance the instance of the class used for mapping
      * @param classPropertyName the property name
      * @param json the JSON object
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
+     *
      * @throws throws an Error in case of failure
      */
-    private serializeObject_loopProperty(dataObject: any, instance: any, classPropertyName: string, json: any): void {
+    private serializeObject_loopProperty(dataObject: any,
+                                         instance: any,
+                                         classPropertyName: string,
+                                         json: any,
+                                         partial: boolean = false): void {
 
         // Check if a JSON-object mapping is possible for a property
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
             return;
         }
-
 
         // Get expected and real values
         const jsonPropertyName: string = mappingOptions.jsonPropertyName;
@@ -936,6 +1218,9 @@ export class JsonConvert {
                 json[jsonPropertyName] = classInstancePropertyValue;
                 return;
             }
+            if (classInstancePropertyValue === undefined && partial) {
+                return;
+            }
         }
 
         // Map the property
@@ -947,7 +1232,7 @@ export class JsonConvert {
             const classConstructorName = dataObject?.constructor?.name;
 
             if (this._useDiscriminator && json instanceof Object) {
-                this.classes.forEach((classDataObject: {new(): any}, key: string) => {
+                this.classes.forEach((classDataObject: { new(): any }, key: string) => {
                     if (classDataObject.name === classConstructorName) {
                         json[this._discriminatorPropertyName] = key;
                     }
@@ -974,10 +1259,14 @@ export class JsonConvert {
      * @param instance the instance of the class
      * @param classPropertyName the property name
      * @param json the JSON object
+     * @param partial optional param (default: false) to indicate if missing properties should be ignored
      *
      * @throws throws an Error in case of failure
      */
-    private deserializeObject_loopProperty(instance: any, classPropertyName: string, json: any): void {
+    private deserializeObject_loopProperty(instance: any,
+                                           classPropertyName: string,
+                                           json: any,
+                                           partial: boolean = false): void {
 
         const mappingOptions: MappingOptions | null = this.getClassPropertyMappingOptions(instance, classPropertyName);
         if (mappingOptions === null) {
@@ -1003,6 +1292,9 @@ export class JsonConvert {
             }
             if (convertingMode === PropertyConvertingMode.PASS_NULLABLE) {
                 instance[classPropertyName] = jsonValue;
+                return;
+            }
+            if (jsonValue === undefined && partial) {
                 return;
             }
         }
@@ -1087,7 +1379,10 @@ export class JsonConvert {
      *
      * @throws an error in case of failure
      */
-    private convertProperty(expectedType: any, value: any, convertingMode: PropertyConvertingMode, serialize?: boolean): any {
+    private convertProperty(expectedType: any,
+                            value: any,
+                            convertingMode: PropertyConvertingMode,
+                            serialize?: boolean): any {
 
         ////////////////////////////
         // Prior checks and setup //
