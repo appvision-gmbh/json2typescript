@@ -784,7 +784,7 @@ export class JsonConvert {
      *
      * @deprecated will be made private, use the generic `deserialize`
      */
-    deserializeObject<T extends object>(jsonObject: any,
+    deserializeObject<T extends object>(jsonObject: object,
                                         classReference: { new(): T } | null = null,
                                         partial: boolean = false): T {
 
@@ -878,7 +878,7 @@ export class JsonConvert {
      *
      * @deprecated will be made private, use the generic `deserialize`
      */
-    deserializeArray<T extends object>(jsonArray: any[],
+    deserializeArray<T extends object>(jsonArray: object[],
                                        classReference: { new(): T } | null = null,
                                        partial: boolean = false): T[] {
 
