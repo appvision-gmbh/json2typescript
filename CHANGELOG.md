@@ -1,9 +1,10 @@
-# v1.6.0 (2025-03-30)
+# v1.6.1 (2025-03-31)
 
 ## Features
 
 * Adds new methods for partial serialization and deserialization,
   closes [#187](https://github.com/appvision-gmbh/json2typescript/issues/176)
+* Improved type inference for public methods
 
 ## Deprecations
 
