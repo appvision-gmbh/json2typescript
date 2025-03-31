@@ -425,17 +425,64 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference. Note that if a class reference is provided, it will be used as
-     * the source of property mapping for serialization, even if the object or one of its elements is
-     * an instance of a different class with its own mappings. Also, ONLY the properties from the
-     * class reference will be serialized - any additional properties on the object(s) will be silently
-     * ignored.
+     * Tries to serialize a TypeScript array of objects to JSON using the mappings defined on
+     * the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serialize<T extends object, U extends object = {}>(data: T[], classReference?: { new(): U }): any[];
+
+    /**
+     * Tries to serialize a TypeScript object to JSON using the mappings defined on the specified
+     * class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
      *
      * @param data object or array of objects
      * @param classReference the class reference which provides the property mappings to use
      *
      * @returns the JSON object
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    serialize<T extends object, U extends object = {}>(data: T, classReference?: { new(): U }): any;
+
+    /**
+     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings
+     * defined on the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array or object
      *
      * @throws an Error in case of failure
      *
@@ -462,12 +509,42 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings defined on
-     * the specified class reference. Note that if a class reference is provided, it will be used as
-     * the source of property mapping for serialization, even if the object or one of its elements is
-     * an instance of a different class with its own mappings. Also, ONLY the properties from the
-     * class reference will be serialized - any additional properties on the object(s) will be silently
-     * ignored.
+     * Tries to serialize a TypeScript array of objects to JSON using the mappings defined on
+     * the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * This method is similar to `serialize`, but it will not throw an error if a property is missing
+     * (or undefined). The resulting JSON object will not include the missing property.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array
+     *
+     * @throws an Error in case of failure
+     *
+     * @see serialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialSerialize<T extends object, U extends object = {}>(data: T[],
+                                                              classReference?: { new(): U }): any[];
+
+    /**
+     * Tries to serialize a TypeScript object to JSON using the mappings defined on the specified
+     * class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
      *
      * This method is similar to `serialize`, but it will not throw an error if a property is missing
      * (or undefined). The resulting JSON object will not include the missing property.
@@ -479,6 +556,34 @@ export class JsonConvert {
      *
      * @throws an Error in case of failure
      *
+     * @see serialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialSerialize<T extends object, U extends object = {}>(data: T,
+                                                              classReference?: { new(): U }): any;
+
+    /**
+     * Tries to serialize a TypeScript object or array of objects to JSON using the mappings
+     * defined on the specified class reference.
+     *
+     * If a class reference is provided, it will be used as the source of property mapping for
+     * serialization, even if the object or one of its elements is an instance of a different
+     * class with its own mappings.
+     *
+     * Also, only the properties from the class reference will be serialized – any additional
+     * properties on the object(s) will be silently ignored.
+     *
+     * This method is similar to `serialize`, but it will not throw an error if a property is missing
+     * (or undefined). The resulting JSON object will not include the missing property.
+     *
+     * @param data object or array of objects
+     * @param classReference the class reference which provides the property mappings to use
+     *
+     * @returns the JSON array or object
+     *
+     * @throws an Error in case of failure
+     *
+     * @see serialize
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     partialSerialize<T extends object, U extends object = {}>(data: T | T[],
@@ -503,9 +608,39 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to deserialize given JSON to a TypeScript object or array of objects.
+     * Tries to deserialize a given JSON array to an array of TypeScript instances.
      *
-     * @param json the JSON as object or array
+     * @param json the JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T extends object>(json: object[],
+                                  classReference?: { new(): T } | null): T[];
+
+    /**
+     * Tries to deserialize a given JSON object to a TypeScript instance.
+     *
+     * @param json the JSON object
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    deserialize<T extends object>(json: object,
+                                  classReference?: { new(): T } | null): T;
+
+    /**
+     * Tries to deserialize a given JSON object or JSON array of objects to a TypeScript instance.
+     *
+     * @param json the JSON object or JSON array of objects
      * @param classReference the class reference
      *
      * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
@@ -537,17 +672,55 @@ export class JsonConvert {
     }
 
     /**
-     * Tries to deserialize given JSON to a TypeScript object or array of objects.
+     * Tries to deserialize a given JSON array to an array of TypeScript instances.
      *
-     * This method is similar to `deserialize`, but it will not throw an error if a JSON property is missing properties.
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
      *
-     * @param json the JSON as object or array
+     * @param json the JSON array of objects
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (array of TypeScript instances)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see deserialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialDeserialize<T extends object>(json: object[],
+                                         classReference?: { new(): T } | null): T[];
+
+
+    /**
+     * Tries to deserialize a given JSON object to a TypeScript instance.
+     *
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
+     *
+     * @param json the JSON object
+     * @param classReference the class reference
+     *
+     * @returns the deserialized data (TypeScript instance)
+     *
+     * @throws an Error in case of failure
+     *
+     * @see deserialize
+     * @see https://www.npmjs.com/package/json2typescript full documentation
+     */
+    partialDeserialize<T extends object>(json: object,
+                                         classReference?: { new(): T } | null): T;
+
+    /**
+     * Tries to deserialize a given JSON object or JSON array of objects to a TypeScript instance.
+     *
+     * This method is similar to `deserialize`, but it will not throw an error if a JSON object is missing properties.
+     *
+     * @param json the JSON object or JSON array of objects
      * @param classReference the class reference
      *
      * @returns the deserialized data (TypeScript instance or array of TypeScript instances)
      *
      * @throws an Error in case of failure
      *
+     * @see deserialize
      * @see https://www.npmjs.com/package/json2typescript full documentation
      */
     partialDeserialize<T extends object>(json: object | object[],
